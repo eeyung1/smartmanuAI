@@ -1,0 +1,13 @@
+CREATE TABLE auth_user (id text PRIMARY KEY, name text NOT NULL, email text NOT NULL UNIQUE, email_verified boolean NOT NULL DEFAULT false, image text, created_at timestamp NOT NULL, updated_at timestamp NOT NULL);
+CREATE TABLE auth_session (id text PRIMARY KEY, expires_at timestamp NOT NULL, token text NOT NULL UNIQUE, created_at timestamp NOT NULL, updated_at timestamp NOT NULL, ip_address text, user_agent text, user_id text NOT NULL REFERENCES auth_user(id) ON DELETE CASCADE);
+CREATE INDEX auth_session_user ON auth_session(user_id);
+CREATE TABLE auth_account (id text PRIMARY KEY, account_id text NOT NULL, provider_id text NOT NULL, user_id text NOT NULL REFERENCES auth_user(id) ON DELETE CASCADE, access_token text, refresh_token text, id_token text, access_token_expires_at timestamp, refresh_token_expires_at timestamp, scope text, password text, created_at timestamp NOT NULL, updated_at timestamp NOT NULL);
+CREATE TABLE auth_verification (id text PRIMARY KEY, identifier text NOT NULL, value text NOT NULL, expires_at timestamp NOT NULL, created_at timestamp NOT NULL, updated_at timestamp NOT NULL);
+CREATE INDEX auth_verification_identifier ON auth_verification(identifier);
+CREATE TABLE profiles (user_id text PRIMARY KEY REFERENCES auth_user(id) ON DELETE CASCADE, preferences jsonb NOT NULL DEFAULT '{}');
+CREATE TABLE saved_items (user_id text NOT NULL REFERENCES auth_user(id) ON DELETE CASCADE, opportunity_id text NOT NULL, status text NOT NULL CHECK (status IN ('interested','applying','applied')), PRIMARY KEY(user_id, opportunity_id));
+CREATE TABLE notification_preferences (user_id text PRIMARY KEY REFERENCES auth_user(id) ON DELETE CASCADE, enabled boolean NOT NULL DEFAULT false, channel text NOT NULL DEFAULT 'email' CHECK(channel IN ('email','telegram')));
+CREATE TABLE outbox (id text PRIMARY KEY, event_key text NOT NULL UNIQUE, user_id text NOT NULL REFERENCES auth_user(id) ON DELETE CASCADE, state text NOT NULL DEFAULT 'queued' CHECK(state IN ('queued','sending','accepted','uncertain','suppressed')), payload jsonb NOT NULL);
+CREATE TABLE sink_messages (event_key text PRIMARY KEY, channel text NOT NULL, payload jsonb NOT NULL);
+CREATE TABLE budget (id integer PRIMARY KEY CHECK(id=1), limit_micros bigint NOT NULL CHECK(limit_micros>=0), reserved_micros bigint NOT NULL DEFAULT 0 CHECK(reserved_micros>=0));
+INSERT INTO budget(id,limit_micros) VALUES(1,3000000);

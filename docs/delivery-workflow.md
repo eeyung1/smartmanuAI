@@ -27,6 +27,7 @@ The project owner has requested this branch, PR and merge workflow for the curre
 | [Provider feasibility](provider-feasibility.md) | Provider candidates, budget scenarios and unresolved runtime gates |
 | [Source assessment](source-feasibility.md) | Official source observations and collection boundaries |
 | [Budget worksheet](pilot-budget.json) | Recalculable assumptions and cost totals |
+| [Local scaffold validation](local-spike.md) | Executable checks, setup and runtime limitations |
 | This document | Delivery stages, validation and decisions |
 
 The repository currently contains planning documents. Proposed routes and components are not implemented features. Keep the original version 0.1 PRD intact; material scope changes should receive an explicit PRD revision and linked design changes.
@@ -76,3 +77,7 @@ Record the date, evidence and affected documents when a proposal is accepted or 
 ## 6 Feasibility checkpoint on 29 October 2026
 
 Provider and source research is documented, with budget arithmetic checked. Stage 1 remains conditional: launch locales, account policy, exact hosting prices, source permission checks and runtime proof are unresolved. The next work is a local scaffold spike with synthetic users and notification sinks to resolve technical feasibility; it does not constitute a passed public-launch gate. No paid subscriptions or infrastructure were created.
+
+## 7 Local scaffold checkpoint on 29 October 2026
+
+Stage 2 has a working local subset: email-link identity, private preferences and saved fixtures, SQL migrations, a notification sink and repeatable web and agent checks. See the local scaffold validation report. PGlite was tested; a real PostgreSQL server and managed provider were not. Settled-session reconnection works in the checkpoint test, while immediate hard-kill recovery had timeouts and remains a deployment blocker. Browser visual validation is also pending. No public-release gate has been waived.
