@@ -182,3 +182,11 @@ Official framework references checked on 29 October 2026:
 - [eve schedules](https://eve.dev/docs/schedules) — reference for implementation scheduling integration.
 
 Read documentation bundled with the pinned package before using framework APIs. This document does not claim that application adapters, infrastructure or automated searches exist yet.
+
+## 13 Feasibility checkpoint on 29 October 2026
+
+See [Provider feasibility](provider-feasibility.md), [Budget worksheet](pilot-budget.json) and [Official source sample](source-feasibility.md). The runtime spike should test an explicitly configured just-bash environment with model shell and filesystem tools disabled, rather than assuming the production default can run without Docker. This is a constrained candidate, not an isolation guarantee or a validated deployment.
+
+The proposed free email allocation needs daily and monthly reservation controls. A 100-account pilot can target no more than 50 daily email digest subscribers initially, with other users choosing Telegram or available email capacity explicitly. This capacity recommendation is not yet an accepted product limit.
+
+Funding evidence must include known application and registration fees, coverage duration and renewal conditions. A degree and scholarship source can be joined only when program and intake applicability is supported. Add these fields to the implementation model without relabelling all funded scholarships as entirely cost-free.
