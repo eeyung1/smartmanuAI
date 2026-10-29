@@ -24,6 +24,9 @@ The project owner has requested this branch, PR and merge workflow for the curre
 | [Product requirements](smartmanuAI_PRD_v0_1.md) | User goals, scope, functional requirements and release gates |
 | [Screen flows](screen-flows.md) | Navigation, user actions, error states and screen acceptance |
 | [Technical architecture](technical-architecture.md) | Components, data, contracts, research and notification semantics |
+| [Provider feasibility](provider-feasibility.md) | Provider candidates, budget scenarios and unresolved runtime gates |
+| [Source assessment](source-feasibility.md) | Official source observations and collection boundaries |
+| [Budget worksheet](pilot-budget.json) | Recalculable assumptions and cost totals |
 | This document | Delivery stages, validation and decisions |
 
 The repository currently contains planning documents. Proposed routes and components are not implemented features. Keep the original version 0.1 PRD intact; material scope changes should receive an explicit PRD revision and linked design changes.
@@ -61,11 +64,15 @@ Release: verify browser onboarding, catalogue, save, channel connection, digest,
 | D02 | Email or Telegram, one active channel in MVP | Defined in PRD; implement channel switch semantics |
 | D03 | Scholarships in China; global online programs and China in-person events | Scholarship scope confirmed; program and event geography proposed |
 | D04 | Separate interface, alert and teaching languages | Defined design; select supported launch locales |
-| D05 | US$30 monthly pilot ceiling | Proposed target; obtain priced provider plan and owner decision |
+| D05 | US$30 monthly pilot ceiling | Conditional US$26.07 baseline documented; quotes, extras and owner decision still needed |
 | D06 | TypeScript, Node 24+, Next.js, PostgreSQL and eve | Proposed architecture; validate scaffold and persistence |
-| D07 | Hosting, identity, search, model and email providers | Open; assess cost, limits and regional suitability |
+| D07 | Hosting, identity, search, model and email providers | Candidates researched in provider feasibility; account, region and runtime tests pending |
 | D08 | Account age, privacy terms, retention and backup expiry | Open launch prerequisites |
 | D09 | Free pilot access and future monetization | Open business decision |
 | D10 | Human review of all pilot publications | Required pilot quality control in PRD |
 
 Record the date, evidence and affected documents when a proposal is accepted or changed. A document merge means the design is versioned; it does not resolve every open decision.
+
+## 6 Feasibility checkpoint on 29 October 2026
+
+Provider and source research is documented, with budget arithmetic checked. Stage 1 remains conditional: launch locales, account policy, exact hosting prices, source permission checks and runtime proof are unresolved. The next work is a local scaffold spike with synthetic users and notification sinks to resolve technical feasibility; it does not constitute a passed public-launch gate. No paid subscriptions or infrastructure were created.

@@ -1,0 +1,65 @@
+{
+  "version": "0.1",
+  "checked_on": "2026-10-29",
+  "currency": "USD",
+  "status": "conditional_estimate_not_approved",
+  "proposed_ceiling": 30,
+  "assumptions": {
+    "days": 30,
+    "registered_users": 100,
+    "max_daily_email_digest_subscribers": 50,
+    "discovery_requests": 600,
+    "extraction_calls": 300,
+    "extraction_input_tokens_per_call": 12000,
+    "extraction_output_tokens_per_call": 2000,
+    "translation_calls": 87,
+    "translation_input_tokens_per_call": 1500,
+    "translation_output_tokens_per_call": 500,
+    "model_input_per_million": 0.4,
+    "model_output_per_million": 1.6,
+    "search_per_1000": 5
+  },
+  "fixed_allowances": {
+    "workspace": 0,
+    "web_service_provisional": 7,
+    "research_service_provisional": 7,
+    "postgres_compute": 6,
+    "postgres_storage_reserve": 0.3,
+    "workflow_disk_provisional": 0.25
+  },
+  "email_reservations_per_day": {
+    "digests": 50,
+    "account": 20,
+    "reminders_and_updates": 20,
+    "safety_headroom": 10
+  },
+  "calculated": {
+    "fixed_subtotal": 20.55,
+    "search_gross": 3,
+    "extraction": 2.4,
+    "translation": 0.1218,
+    "baseline": 26.0718,
+    "headroom": 3.9282,
+    "all_extractions_repaired_once": 28.4718,
+    "repairs_and_all_searches_retried_once": 31.4718,
+    "resend_pro_baseline": 46.0718
+  },
+  "unresolved": [
+    "Current web and research service checkout prices",
+    "Selectable disk minimum and final storage quote",
+    "Provider account eligibility and source access from chosen region",
+    "Runtime compatibility and memory benchmark",
+    "Domain costs if needed, taxes and FX fees",
+    "Backup storage and staging costs",
+    "Any paid sandbox or platform subscription"
+  ],
+  "evidence_urls": [
+    "https://render.com/pricing",
+    "https://render.com/docs/compute-plans",
+    "https://render.com/docs/disks",
+    "https://api-dashboard.search.brave.com/documentation/pricing",
+    "https://vercel.com/ai-gateway/models/gpt-4.1-mini",
+    "https://resend.com/pricing",
+    "https://core.telegram.org/bots/faq"
+  ]
+}
