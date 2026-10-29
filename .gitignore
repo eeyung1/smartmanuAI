@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.eve/
+.local/
+.env*
+!.env.example
+*.tsbuildinfo
+coverage/
+
+.output/
