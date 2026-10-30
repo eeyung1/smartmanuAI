@@ -17,6 +17,8 @@ async function start() {
   server = spawn(
     process.execPath,
     [
+      "--import",
+      resolve(root, "scripts/local-network-guard.mjs"),
       resolve(root, "node_modules/eve/bin/eve.js"),
       "start",
       "--host",

@@ -14,12 +14,14 @@
     "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts",
     "format:check": "prettier --check app src agent scripts tests db package.json tsconfig.json next.config.ts",
     "db:migrate": "node --env-file=.env.local --import tsx scripts/migrate.ts",
-    "spike": "node --env-file=.env.local --import tsx scripts/spike.ts",
-    "agent:build": "node --env-file=.env.local node_modules/eve/bin/eve.js build",
-    "agent:start": "node --env-file=.env.local node_modules/eve/bin/eve.js start --host 127.0.0.1 --port 3100",
+    "spike": "node --env-file=.env.local --import ./scripts/local-network-guard.mjs --import tsx scripts/spike.ts",
+    "agent:build": "node --env-file=.env.local --import ./scripts/local-network-guard.mjs node_modules/eve/bin/eve.js build",
+    "agent:start": "node --env-file=.env.local --import ./scripts/local-network-guard.mjs node_modules/eve/bin/eve.js start --host 127.0.0.1 --port 3100",
     "test:http": "node --env-file=.env.local --import tsx scripts/http-spike.ts",
     "check": "npm run format:check && npm run typecheck && npm test && npm run build && npm run test:http && npm run agent:build && npm run spike",
-    "setup:local": "node scripts/setup-local.mjs"
+    "setup:local": "node scripts/setup-local.mjs",
+    "seed:local": "node --env-file=.env.local --import tsx scripts/seed-local.ts",
+    "admin:grant": "node --env-file=.env.local --import tsx scripts/grant-admin.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.13",

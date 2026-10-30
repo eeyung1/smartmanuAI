@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicOpportunity, CatalogueError } from "../catalogue/service";
 import type { SQL } from "../db";
 export const preferencesSchema = z
   .object({
@@ -36,17 +37,28 @@ export async function saveItem(
   userId: string,
   opportunityId: string,
 ) {
-  if (opportunityId !== "synthetic-course")
-    throw new Error("Unknown local fixture");
-  await sql.query(
-    "INSERT INTO saved_items(user_id,opportunity_id,status) VALUES($1,$2,'interested') ON CONFLICT DO NOTHING",
-    [userId, opportunityId],
-  );
+  await sql.transaction(async (tx) => {
+    await tx.query("SELECT id FROM opportunities WHERE id=$1 FOR SHARE", [
+      opportunityId,
+    ]);
+    const record = await publicOpportunity(tx, opportunityId);
+    if (!record?.available)
+      throw new CatalogueError(404, "Opportunity is unavailable.");
+    await tx.query(
+      "INSERT INTO saved_items(user_id,opportunity_id,status) VALUES($1,$2,'interested') ON CONFLICT DO NOTHING",
+      [userId, opportunityId],
+    );
+  });
 }
 export async function listSaved(sql: SQL, userId: string) {
   return (
-    await sql.query(
-      "SELECT opportunity_id,status FROM saved_items WHERE user_id=$1",
+    await sql.query<{
+      opportunity_id: string;
+      status: string;
+      title: string | null;
+      state: string | null;
+    }>(
+      "SELECT si.opportunity_id,si.status,o.details->>'title' AS title,o.state FROM saved_items si LEFT JOIN opportunities o ON o.id=si.opportunity_id WHERE si.user_id=$1 ORDER BY si.opportunity_id",
       [userId],
     )
   ).rows;

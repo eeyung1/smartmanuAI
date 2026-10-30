@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { apiError } from "@/src/http/access";
 import { getAuth } from "@/src/auth";
 import { getDatabase } from "@/src/db";
 import { listSaved, saveItem } from "@/src/domain/profile";
@@ -21,19 +22,23 @@ export async function POST(request: Request) {
   ).api.getSession({ headers: request.headers });
   if (!session)
     return Response.json({ error: "unauthorized" }, { status: 401 });
-  let body: { opportunityId: "synthetic-course" };
+  let body: { opportunityId: string };
   try {
     body = z
-      .object({ opportunityId: z.literal("synthetic-course") })
+      .object({ opportunityId: z.string().min(1).max(100) })
       .strict()
       .parse(await request.json());
   } catch {
     return Response.json({ error: "invalid_opportunity" }, { status: 400 });
   }
-  await saveItem(
-    (await getDatabase()).sql,
-    session.user.id,
-    body.opportunityId,
-  );
-  return Response.json({ saved: true });
+  try {
+    await saveItem(
+      (await getDatabase()).sql,
+      session.user.id,
+      body.opportunityId,
+    );
+    return Response.json({ saved: true });
+  } catch (e) {
+    return apiError(e);
+  }
 }
