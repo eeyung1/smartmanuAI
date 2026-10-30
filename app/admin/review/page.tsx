@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { getAuth } from "@/src/auth";
@@ -24,6 +25,7 @@ export default async function Review() {
         Check the source and evidence before publishing. Edits return a record
         to draft until reviewed again.
       </p>
+      <Link href="/admin/research">Source collection and candidates</Link>
       <ReviewWorkspace initial={JSON.parse(JSON.stringify(data))} />
     </>
   );

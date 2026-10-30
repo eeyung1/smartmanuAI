@@ -85,3 +85,8 @@ Stage 2 has a working local subset: email-link identity, private preferences and
 ## 8 Catalogue implementation checkpoint on 30 October 2026
 
 Stage 3 has a local implementation of source registration, evidence-backed drafts, administrator review with revision conflicts, public filters/details and saved-record history. The catalogue report records conservative funding, freshness and date-only policies and the remaining scope. The shared catalogue integration test has a PostgreSQL 16 CI case as well as PGlite coverage. Browser validation and precise timestamp handling remain pending. This checkpoint does not waive earlier feasibility decisions or authorize public release.
+
+
+## 9 Source pipeline checkpoint on 30 October 2026
+
+Stage 4 now includes a local source queue with persisted leases, bounded retrieval, snapshot deduplication, evidence validation and private-draft extraction. The admin dashboard controls source permissions and shows candidate text and job failures. The optional Gateway adapter is gated by explicit configuration and a worst-case budget reservation; no model or paid service has been selected or called. See the source pipeline report for tested behavior and remaining gaps. A live-source/model pilot, general web search, semantic reconciliation, actual-cost reconciliation, recurring worker hosting and arbitrary in-flight eve recovery remain open. Stage 4 and public release are not marked complete.

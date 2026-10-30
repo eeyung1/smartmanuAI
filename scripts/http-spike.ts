@@ -67,6 +67,23 @@ try {
   const a = await login("http-alice@example.test");
   const b = await login("http-bob@example.test");
   const admin = await login("reviewer@example.test");
+  assert.equal((await fetch(base + "/api/admin/research")).status, 401);
+  assert.equal(
+    (await fetch(base + "/api/admin/research", { headers: { Cookie: a } }))
+      .status,
+    403,
+  );
+  assert.equal(
+    (await fetch(base + "/admin/research", { headers: { Cookie: admin } }))
+      .status,
+    200,
+  );
+  const research = await fetch(base + "/api/admin/research", {
+    headers: { Cookie: admin },
+  });
+  assert.equal(research.status, 200);
+  assert.ok((await research.json()).sources.length > 0);
+
   assert.equal(
     (await fetch(base + "/api/admin/opportunities", { headers: { Cookie: a } }))
       .status,
@@ -94,6 +111,62 @@ try {
   });
   assert.equal(sourceResponse.status, 201);
   const source = await sourceResponse.json();
+  assert.equal(
+    (
+      await post("/api/admin/research", {
+        action: "policy",
+        sourceId: source.id,
+        enabled: true,
+        permissionNote: "Synthetic collection must be refused.",
+      })
+    ).status,
+    400,
+  );
+  const official = await post("/api/admin/sources", {
+    name: "HTTP collection policy",
+    url: "https://school.example.edu/manufacturing",
+    synthetic: false,
+  });
+  assert.equal(official.status, 201);
+  const officialSource = await official.json();
+  assert.equal(
+    (
+      await post(
+        "/api/admin/research",
+        {
+          action: "policy",
+          sourceId: officialSource.id,
+          enabled: true,
+          permissionNote: "Fixture review only; no worker is started.",
+        },
+        a,
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (
+      await post("/api/admin/research", {
+        action: "policy",
+        sourceId: officialSource.id,
+        enabled: true,
+        permissionNote: "Fixture review only; no worker is started.",
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await post("/api/admin/research", {
+        action: "policy",
+        sourceId: officialSource.id,
+        enabled: false,
+        permissionNote: "Collection remains paused in HTTP tests.",
+      })
+    ).status,
+    200,
+  );
+
   const { fixtureDetails, fixtureEvidence } =
     await import("../src/catalogue/fixtures");
   const created = await post("/api/admin/opportunities", {

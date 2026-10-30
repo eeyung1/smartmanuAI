@@ -13,6 +13,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 7. [Budget worksheet](docs/pilot-budget.json)
 8. [Local scaffold and validation](docs/local-spike.md)
 9. [Reviewed catalogue implementation](docs/catalogue-implementation.md)
+10. [Source collection and extraction pipeline](docs/source-pipeline.md)
 
 ## Local development
 
@@ -41,7 +42,9 @@ Implemented locally:
 - [x] Admin source registration, evidence review and revision history
 - [x] Conservative funding, date and stale-listing checks
 - [x] SQL migrations, notification sink and bounded eve fixture runtime
-- [ ] Live Internet discovery and AI extraction
+- [x] Durable source-collection jobs, bounded retrieval and snapshot deduplication
+- [x] Evidence-checked extraction into private drafts and admin collection controls
+- [ ] Live-source/model pilot and open-web discovery
 - [ ] Personalized matching and completed translated interfaces
 - [ ] Email and Telegram delivery
 - [ ] Public pilot and deployment
@@ -49,6 +52,8 @@ Implemented locally:
 To review records with the default embedded database, sign in first, stop the development server, then run `npm run admin:grant -- your-name@example.test` and restart the server before visiting `/admin/review`. Run migration and seed commands while the server is stopped as well; the embedded database must have only one owning process. This local command grants a role; there is no public role-grant endpoint. Optional fixtures are not real opportunities.
 
 The catalogue integration suite runs on PGlite locally. CI also runs it against PostgreSQL 16, using isolated schemas. Set `TEST_DATABASE_URL` to an expendable local PostgreSQL database to run that case locally; it is explicitly skipped when absent.
+
+Source collection and optional model extraction are documented in the pipeline guide. Both live collection and paid execution require explicit configuration. Tests use fixtures; no paid calls or recurring infrastructure have been enabled.
 
 Settled-session recovery has been exercised; arbitrary in-flight crash recovery remains unresolved. Browser visual validation, managed database validation, exact hosting quotes and launch decisions are still pending.
 
