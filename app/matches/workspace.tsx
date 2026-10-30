@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import type { Preferences } from "@/src/domain/profile";
 export default function Workspace({
@@ -6,10 +7,14 @@ export default function Workspace({
   saved,
 }: {
   profile: Preferences | null;
-  saved: unknown[];
+  saved: {
+    opportunity_id: string;
+    title: string | null;
+    state: string | null;
+  }[];
 }) {
   const [notice, setNotice] = useState("");
-  const [items, setItems] = useState(saved);
+  const items = saved;
   const [stored, setStored] = useState(profile);
   const [busy, setBusy] = useState(false);
   const [interfaceLanguage, setInterfaceLanguage] = useState(
@@ -97,27 +102,26 @@ export default function Workspace({
       <p>
         Stored preferences: <code>{JSON.stringify(stored)}</code>
       </p>
-      <button
-        disabled={busy}
-        onClick={() =>
-          action(async () => {
-            const r = await fetch("/api/me/saved", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ opportunityId: "synthetic-course" }),
-            });
-            if (r.ok) {
-              const list = await fetch("/api/me/saved");
-              if (!list.ok) throw new Error();
-              setItems(await list.json());
-              setNotice("Fixture saved.");
-            } else setNotice("Unable to save fixture.");
-          })
-        }
-      >
-        Save synthetic opportunity
-      </button>
-      <p>{items.length} saved opportunity</p>
+      <h2>Saved opportunities</h2>
+      {items.length ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item.opportunity_id}>
+              <Link
+                href={
+                  "/opportunities/" + encodeURIComponent(item.opportunity_id)
+                }
+              >
+                {item.title ?? "Unavailable opportunity"}
+              </Link>{" "}
+              · {item.state ?? "unavailable"}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No saved opportunities yet.</p>
+      )}
+      <Link href="/opportunities">Explore opportunities</Link>
       <button
         disabled={busy}
         onClick={() =>

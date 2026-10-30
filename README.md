@@ -12,6 +12,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 6. [Official source feasibility sample](docs/source-feasibility.md)
 7. [Budget worksheet](docs/pilot-budget.json)
 8. [Local scaffold and validation](docs/local-spike.md)
+9. [Reviewed catalogue implementation](docs/catalogue-implementation.md)
 
 ## Local development
 
@@ -21,6 +22,7 @@ Requires Node.js 24. No cloud accounts or provider keys are needed for the local
 npm ci
 npm run setup:local
 npm run db:migrate
+npm run seed:local # optional, explicitly labelled synthetic catalogue
 npm run dev
 ```
 
@@ -32,8 +34,22 @@ npm run check
 
 ## Current status
 
-An executable local scaffold now provides email-link sign-in, private preferences and saved fixtures, SQL migrations, simulated notifications and a bounded eve fixture runtime. Live search, real AI extraction, provider delivery and public deployment are not connected.
+Implemented locally:
 
-Settled-session recovery has been exercised; arbitrary in-flight crash recovery remains unresolved. Browser visual validation, a real PostgreSQL server run, exact hosting quotes and launch decisions are still pending.
+- [x] Email-link sign-in and private user preferences
+- [x] Reviewed catalogue, filters, detail pages and saved opportunities
+- [x] Admin source registration, evidence review and revision history
+- [x] Conservative funding, date and stale-listing checks
+- [x] SQL migrations, notification sink and bounded eve fixture runtime
+- [ ] Live Internet discovery and AI extraction
+- [ ] Personalized matching and completed translated interfaces
+- [ ] Email and Telegram delivery
+- [ ] Public pilot and deployment
+
+To review records with the default embedded database, sign in first, stop the development server, then run `npm run admin:grant -- your-name@example.test` and restart the server before visiting `/admin/review`. Run migration and seed commands while the server is stopped as well; the embedded database must have only one owning process. This local command grants a role; there is no public role-grant endpoint. Optional fixtures are not real opportunities.
+
+The catalogue integration suite runs on PGlite locally. CI also runs it against PostgreSQL 16, using isolated schemas. Set `TEST_DATABASE_URL` to an expendable local PostgreSQL database to run that case locally; it is explicitly skipped when absent.
+
+Settled-session recovery has been exercised; arbitrary in-flight crash recovery remains unresolved. Browser visual validation, managed database validation, exact hosting quotes and launch decisions are still pending.
 
 All changes follow a focused branch, validation, pull request and merge workflow. See the delivery workflow for implementation stages and release gates.

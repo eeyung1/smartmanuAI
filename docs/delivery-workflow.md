@@ -81,3 +81,7 @@ Provider and source research is documented, with budget arithmetic checked. Stag
 ## 7 Local scaffold checkpoint on 29 October 2026
 
 Stage 2 has a working local subset: email-link identity, private preferences and saved fixtures, SQL migrations, a notification sink and repeatable web and agent checks. See the local scaffold validation report. PGlite was tested; a real PostgreSQL server and managed provider were not. Settled-session reconnection works in the checkpoint test, while immediate hard-kill recovery had timeouts and remains a deployment blocker. Browser visual validation is also pending. No public-release gate has been waived.
+
+## 8 Catalogue implementation checkpoint on 30 October 2026
+
+Stage 3 has a local implementation of source registration, evidence-backed drafts, administrator review with revision conflicts, public filters/details and saved-record history. The catalogue report records conservative funding, freshness and date-only policies and the remaining scope. The shared catalogue integration test has a PostgreSQL 16 CI case as well as PGlite coverage. Browser validation and precise timestamp handling remain pending. This checkpoint does not waive earlier feasibility decisions or authorize public release.

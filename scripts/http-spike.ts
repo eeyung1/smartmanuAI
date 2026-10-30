@@ -5,8 +5,13 @@ import { mkdtemp, open, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { localConfig } from "../src/config";
+import { openDatabase } from "../src/db";
+import { seedLocalCatalogue } from "../src/catalogue/fixtures";
 localConfig();
 const dir = await mkdtemp(join(tmpdir(), "smartmanu-http-"));
+const seed = await openDatabase(dir);
+await seedLocalCatalogue(seed.sql);
+await seed.close();
 const log = await open(join(dir, "server.log"), "w");
 const server = spawn(
   process.execPath,
@@ -61,6 +66,123 @@ try {
   assert.equal((await fetch(base + "/api/me/profile")).status, 401);
   const a = await login("http-alice@example.test");
   const b = await login("http-bob@example.test");
+  const admin = await login("reviewer@example.test");
+  assert.equal(
+    (await fetch(base + "/api/admin/opportunities", { headers: { Cookie: a } }))
+      .status,
+    403,
+  );
+  assert.equal(
+    (await fetch(base + "/admin/review", { headers: { Cookie: admin } }))
+      .status,
+    200,
+  );
+  const post = (path: string, body: unknown, cookie = admin) =>
+    fetch(base + path, {
+      method: "POST",
+      headers: {
+        Cookie: cookie,
+        Origin: base,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  const sourceResponse = await post("/api/admin/sources", {
+    name: "HTTP fixture source",
+    url: "https://example.test/http-course",
+    synthetic: true,
+  });
+  assert.equal(sourceResponse.status, 201);
+  const source = await sourceResponse.json();
+  const { fixtureDetails, fixtureEvidence } =
+    await import("../src/catalogue/fixtures");
+  const created = await post("/api/admin/opportunities", {
+    sourceId: source.id,
+    details: { ...fixtureDetails, title: "HTTP reviewed factory course" },
+    evidence: fixtureEvidence,
+    note: "Record HTTP integration fixture.",
+  });
+  assert.equal(created.status, 201);
+  const draft = await created.json();
+  assert.equal(
+    (await fetch(base + "/api/opportunities/" + draft.id)).status,
+    404,
+  );
+  const reviewPath = "/api/admin/opportunities/" + draft.id + "/review";
+  assert.equal(
+    (
+      await post(reviewPath, {
+        expectedRevision: 1,
+        action: "publish",
+        note: "Missing evidence attestation.",
+      })
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await post(reviewPath, {
+        expectedRevision: 1,
+        action: "publish",
+        verified: true,
+        note: "Check all supplied fixture evidence.",
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await post(reviewPath, {
+        expectedRevision: 1,
+        action: "publish",
+        verified: true,
+        note: "Stale revision must be rejected.",
+      })
+    ).status,
+    409,
+  );
+  assert.match(
+    await (await fetch(base + "/opportunities/" + draft.id)).text(),
+    /HTTP reviewed factory course/,
+  );
+  assert.equal(
+    (await (await fetch(base + "/api/opportunities?q=HTTP&language=en")).json())
+      .total,
+    1,
+  );
+  assert.equal(
+    (await post("/api/me/saved", { opportunityId: draft.id }, b)).status,
+    200,
+  );
+  assert.equal(
+    (
+      await post(reviewPath, {
+        expectedRevision: 2,
+        action: "close",
+        note: "Close the HTTP fixture record.",
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (await post("/api/me/saved", { opportunityId: draft.id }, b)).status,
+    404,
+  );
+  assert.equal(
+    (await (await fetch(base + "/api/opportunities?q=HTTP")).json()).total,
+    0,
+  );
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/admin/opportunities/" + draft.id + "/review", {
+          headers: { Cookie: admin },
+        })
+      ).json()
+    ).length,
+    3,
+  );
+
   assert.match(
     await (await fetch(base + "/matches", { headers: { Cookie: a } })).text(),
     /http-alice@example.test/,
@@ -129,7 +251,7 @@ try {
         await fetch(base + "/api/me/saved", { headers: { Cookie: b } })
       ).json()
     ).length,
-    0,
+    1,
   );
   const logout = await fetch(base + "/api/auth/sign-out", {
     method: "POST",

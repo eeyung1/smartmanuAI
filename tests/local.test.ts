@@ -1,3 +1,4 @@
+import { seedLocalCatalogue } from "../src/catalogue/fixtures";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
@@ -60,6 +61,7 @@ test("real magic links isolate two users; replay and forged ownership rejected",
   const dir = await mkdtemp(join(tmpdir(), "smartmanu-auth-"));
   const db = await openDatabase(dir);
   try {
+    await seedLocalCatalogue(db.sql);
     const auth = await createLocalAuth(db, dir);
     const a = await login(auth, dir, "alice@example.test");
     const b = await login(auth, dir, "bob@example.test");

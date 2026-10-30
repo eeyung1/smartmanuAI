@@ -189,3 +189,84 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+.catalogue {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 20px;
+}
+.catalogue article {
+  max-width: none;
+}
+.filters {
+  display: flex;
+  gap: 14px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+.filters label {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.filters input,
+.filters select {
+  margin-bottom: 0;
+}
+.filters button {
+  margin-bottom: 0;
+}
+.pagination {
+  margin: 24px 0;
+  display: flex;
+  gap: 24px;
+}
+.muted {
+  font-size: 13px;
+  color: var(--muted);
+}
+main > section {
+  margin: 32px 0;
+}
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  font: inherit;
+  border: 1px solid #a5b7ae;
+  border-radius: 6px;
+}
+fieldset {
+  border: 1px solid var(--line);
+  margin: 20px 0;
+  padding: 16px;
+}
+.inline {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.inline input {
+  width: auto;
+  margin: 0;
+}
+.coverage {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.secondary {
+  background: #e2eae4;
+  color: var(--ink);
+  margin: 10px;
+}
+.form ~ section {
+  max-width: 700px;
+}
+details {
+  margin: 16px 0;
+}
+article + article {
+  margin-top: 20px;
+}
+.catalogue article + article {
+  margin-top: 0;
+}
