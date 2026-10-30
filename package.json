@@ -21,7 +21,8 @@
     "check": "npm run format:check && npm run typecheck && npm test && npm run build && npm run test:http && npm run agent:build && npm run spike",
     "setup:local": "node scripts/setup-local.mjs",
     "seed:local": "node --env-file=.env.local --import tsx scripts/seed-local.ts",
-    "admin:grant": "node --env-file=.env.local --import tsx scripts/grant-admin.ts"
+    "admin:grant": "node --env-file=.env.local --import tsx scripts/grant-admin.ts",
+    "research:once": "node --env-file=.env.local --import tsx scripts/research-once.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.13",
