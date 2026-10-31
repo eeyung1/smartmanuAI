@@ -208,7 +208,12 @@ for (const kind of ["pglite", "postgres"])
           );
           assert.equal(await planOneDigest(db.sql), "queued");
           assert.equal(await dispatchDigest(db.sql), "accepted");
-          return prepareDeliverySimulation(db.sql, user);
+          const prepared = await prepareDeliverySimulation(db.sql, user);
+          await db.sql.query(
+            "UPDATE delivery_simulations SET available_at=NOW()-INTERVAL '1 second' WHERE id=$1",
+            [prepared.id],
+          );
+          return prepared;
         }
         const first = await digest();
         assert.equal(
@@ -240,7 +245,7 @@ for (const kind of ["pglite", "postgres"])
           null,
         );
         await db.sql.query(
-          "UPDATE delivery_simulations SET available_at=NOW() WHERE id=$1",
+          "UPDATE delivery_simulations SET available_at=NOW()-INTERVAL '1 second' WHERE id=$1",
           [first.id],
         );
         assert.equal(
@@ -268,7 +273,7 @@ for (const kind of ["pglite", "postgres"])
         );
         await db.sql.query("UPDATE delivery_simulation_quota SET reserved=0");
         await db.sql.query(
-          "UPDATE delivery_simulations SET available_at=NOW() WHERE id=$1",
+          "UPDATE delivery_simulations SET available_at=NOW()-INTERVAL '1 second' WHERE id=$1",
           [first.id],
         );
         claim = await claimDelivery(db.sql, { daily: 10, monthly: 10 });
@@ -280,7 +285,7 @@ for (const kind of ["pglite", "postgres"])
           code: "rate_limited",
         });
         await db.sql.query(
-          "UPDATE delivery_simulations SET available_at=NOW() WHERE id=$1",
+          "UPDATE delivery_simulations SET available_at=NOW()-INTERVAL '1 second' WHERE id=$1",
           [first.id],
         );
         claim = await claimDelivery(db.sql, { daily: 10, monthly: 10 });
@@ -326,7 +331,7 @@ for (const kind of ["pglite", "postgres"])
           "discarded",
         );
         await db.sql.query(
-          "UPDATE delivery_simulations SET state='retry',available_at=NOW(),first_attempt_at=NOW()-INTERVAL '24 hours' WHERE id=$1",
+          "UPDATE delivery_simulations SET state='retry',available_at=NOW()-INTERVAL '1 second',first_attempt_at=NOW()-INTERVAL '24 hours' WHERE id=$1",
           [second.id],
         );
         assert.equal(
