@@ -473,6 +473,83 @@ try {
     ).status,
     200,
   );
+
+  assert.equal((await fetch(base + "/api/me/telegram")).status, 401);
+  const tg = (path: string, body: unknown, cookie = a) =>
+    fetch(base + path, {
+      method: "POST",
+      headers: {
+        Cookie: cookie,
+        Origin: base,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  assert.equal(
+    (await tg("/api/me/telegram", { userId: "someone-else" })).status,
+    400,
+  );
+  const linkResponse = await tg("/api/me/telegram", {});
+  assert.equal(linkResponse.status, 200);
+  const telegramLink = await linkResponse.json();
+  assert.equal((await tg("/api/me/telegram", {})).status, 429);
+  const hook = {
+    update_id: 998877,
+    message: {
+      date: Math.floor(Date.now() / 1000),
+      chat: { id: 123000, type: "private" },
+      from: { id: 123000, is_bot: false },
+      text: telegramLink.startCommand,
+    },
+  };
+  const webhook = (secret: string) =>
+    fetch(base + "/api/webhooks/telegram", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Telegram-Bot-Api-Secret-Token": secret,
+      },
+      body: JSON.stringify(hook),
+    });
+  assert.equal((await webhook("invalid")).status, 401);
+  assert.equal(
+    (await webhook(process.env.TELEGRAM_WEBHOOK_SECRET!)).status,
+    200,
+  );
+  assert.equal(
+    (await webhook(process.env.TELEGRAM_WEBHOOK_SECRET!)).status,
+    200,
+  );
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/telegram", { headers: { Cookie: b } })
+      ).json()
+    ).state,
+    "disconnected",
+  );
+  const changeBinding = (body: unknown, cookie = a) =>
+    fetch(base + "/api/me/telegram", {
+      method: "PATCH",
+      headers: {
+        Cookie: cookie,
+        Origin: base,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  assert.equal(
+    (await changeBinding({ action: "confirm", expectedVersion: 0 }, b)).status,
+    409,
+  );
+  assert.equal(
+    (await changeBinding({ action: "confirm", expectedVersion: 1 })).status,
+    200,
+  );
+  assert.equal(
+    (await changeBinding({ action: "disconnect", expectedVersion: 2 })).status,
+    200,
+  );
   const logout = await fetch(base + "/api/auth/sign-out", {
     method: "POST",
     headers: { Cookie: a, Origin: base, "Content-Type": "application/json" },

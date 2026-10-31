@@ -100,3 +100,8 @@ Stage 5 has a local implementation of deterministic matching, expanded preferenc
 ## 11 Notification planning checkpoint on 31 October 2026
 
 Stage 6 has local consent and single-channel settings, timezone-aware daily/weekly digest planning, 10-item overflow, material-event deduplication and transactional local-sink dispatch with current-state checks. Pausing or changing settings cancels pending local digests. The consent version explicitly covers simulation, not future live delivery. See the digest report for validation and boundaries. Verified bindings, provider delivery/webhooks, signed unsubscribe, reminders, quotas, translations, retention/deletion and scheduled hosting remain pending. Stage 6 and public release are not marked complete.
+
+
+## 12 Telegram binding checkpoint on 31 October 2026
+
+Stage 6 now includes a local Telegram linking protocol with expiring hashed codes, owner confirmation, encrypted destinations, authenticated/deduplicated webhooks and ordered revocation. Disconnect/block handling pauses selected Telegram digests and cancels their queued events. See the Telegram report for tests and deployment boundaries. No bot is registered and no real message is sent. Live verification, providers, consent integration, key lifecycle, retention and launch gates remain pending.
