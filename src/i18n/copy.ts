@@ -13,7 +13,7 @@ const en = {
   footer:
     "Local prototype · Synthetic opportunities · Notifications stay in a local test sink",
   partial:
-    "Navigation and sign-in are translated. Other screens and source wording currently remain in English or their original language.",
+    "Navigation, sign-in, catalogue and private workspace are translated. Alert settings, privacy screens and service messages may still use English. Source wording is unchanged.",
   eyebrow: "YOUR OPPORTUNITY SPACE",
   welcome: "Welcome back.",
   signInIntro:
@@ -37,7 +37,8 @@ const zh: Record<keyof typeof en, string> = {
   saving: "正在应用…",
   localeError: "无法更改显示语言，请重试。",
   footer: "本地原型 · 模拟学习机会 · 通知仅保存在本地测试收件箱中",
-  partial: "导航和登录页面已翻译。其他页面和来源文字目前仍使用英语或原始语言。",
+  partial:
+    "导航、登录、目录和私人空间已翻译。提醒设置、隐私页面和部分服务消息可能仍使用英语。来源文字保持原文。",
   eyebrow: "您的学习机会空间",
   welcome: "欢迎回来。",
   signInIntro:

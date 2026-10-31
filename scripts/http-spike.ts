@@ -94,7 +94,7 @@ try {
   ).text();
   assert.match(chineseSignIn, /<html lang="zh-Hans"/);
   assert.match(chineseSignIn, /欢迎回来/);
-  assert.match(chineseSignIn, /其他页面和来源文字/);
+  assert.match(chineseSignIn, /来源文字保持原文/);
   const englishSignIn = await (await fetch(base + "/sign-in")).text();
   assert.match(englishSignIn, /<html lang="en"/);
   assert.match(englishSignIn, /Welcome back/);
@@ -727,6 +727,138 @@ try {
   assert.equal(independent.interfaceLanguage, "zh-Hans");
   assert.equal(independent.alertLanguage, "zh-Hans");
   assert.deepEqual(independent.teachingLanguages, ["en"]);
+  const translatedDraftResponse = await post("/api/admin/opportunities", {
+    sourceId: source.id,
+    details: {
+      ...fixtureDetails,
+      title: "Save",
+      summary:
+        "Save is the original source title. Source fees and eligibility remain unchanged.",
+      funding: "tuition_only",
+      tuitionCovered: true,
+      participationFree: false,
+      applicationFee: "CNY 400 non-refundable",
+      certificateFee: null,
+      deadline: "2027-03-31",
+      deadlineText: "31 March 2027; source timezone not stated.",
+    },
+    evidence: fixtureEvidence,
+    note: "Create source-wording translation fixture.",
+  });
+  assert.equal(translatedDraftResponse.status, 201);
+  const translatedDraft = await translatedDraftResponse.json();
+  assert.equal(
+    (
+      await post("/api/admin/opportunities/" + translatedDraft.id + "/review", {
+        expectedRevision: 1,
+        action: "publish",
+        verified: true,
+        note: "Review translation fixture funding and source facts.",
+      })
+    ).status,
+    200,
+  );
+  const catalogueZH = await (
+    await fetch(base + "/opportunities?q=Save&funding=tuition_only", {
+      headers: { Cookie: localeCookie },
+    })
+  ).text();
+  assert.match(catalogueZH, /查找机会/);
+  assert.match(catalogueZH, /仅覆盖学费/);
+  assert.match(catalogueZH, /CNY 400 non-refundable/);
+  assert.match(catalogueZH, /2027-03-31/);
+  assert.match(catalogueZH, /<span lang="">Save<\/span>/);
+  assert.match(catalogueZH, /name="funding"/);
+  assert.match(
+    catalogueZH,
+    /<option value="tuition_only"[^>]*>仅覆盖学费<\/option>/,
+  );
+  const translatedDetails = await (
+    await fetch(base + "/opportunities/" + translatedDraft.id, {
+      headers: { Cookie: localeCookie },
+    })
+  ).text();
+  assert.match(translatedDetails, /<h1 lang="">Save<\/h1>/);
+  assert.match(translatedDetails, /资助及剩余费用/);
+  assert.match(translatedDetails, /CNY 400 non-refundable/);
+  assert.match(translatedDetails, /<dt>证书费<\/dt><dd>未说明<\/dd>/);
+  assert.match(translatedDetails, /仅有日期，时区未说明/);
+  assert.match(
+    translatedDetails,
+    /Synthetic fixture only. Not a real enrollment opportunity./,
+  );
+  assert.match(translatedDetails, /收藏此机会/);
+  const emptyZH = await (
+    await fetch(base + "/opportunities?q=no-such-translation-fixture", {
+      headers: { Cookie: localeCookie },
+    })
+  ).text();
+  assert.match(emptyZH, /没有符合这些筛选条件的已审核机会/);
+  const languageUser = await login("http-language@example.test");
+  const languageProfile = {
+    interfaceLanguage: "zh-Hans",
+    alertLanguage: "en",
+    teachingLanguages: ["en"],
+    qualification: "bachelor",
+  };
+  const languageSaved = await fetch(base + "/api/me/profile", {
+    method: "PATCH",
+    headers: {
+      Cookie: languageUser,
+      Origin: base,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(languageProfile),
+  });
+  assert.equal(languageSaved.status, 200);
+  assert.equal((await languageSaved.json()).qualification, "bachelor");
+  assert.equal(
+    (
+      await post(
+        "/api/me/saved",
+        { opportunityId: translatedDraft.id },
+        languageUser,
+      )
+    ).status,
+    200,
+  );
+  const privateZH = await (
+    await fetch(base + "/matches", { headers: { Cookie: languageUser } })
+  ).text();
+  assert.match(privateZH, /您的偏好/);
+  assert.match(privateZH, /已收藏和已隐藏的机会/);
+  assert.match(privateZH, /申请状态由您自行填写/);
+  assert.match(privateZH, /符合您的资助偏好/);
+  assert.match(privateZH, /暂无结构化的国籍、年龄及学历要求/);
+  assert.match(privateZH, /<option value="bachelor"[^>]*>本科<\/option>/);
+  assert.match(
+    privateZH,
+    /<option value="applied"[^>]*>已申请（自行填报）<\/option>/,
+  );
+  assert.match(privateZH, /value="en"/);
+  assert.equal(
+    (
+      await changeTracker(
+        {
+          opportunityId: translatedDraft.id,
+          expectedVersion: 1,
+          action: "status",
+          status: "applied",
+        },
+        languageUser,
+      )
+    ).status,
+    200,
+  );
+  const languageTracker = await (
+    await fetch(base + "/api/me/tracker", { headers: { Cookie: languageUser } })
+  ).json();
+  assert.equal(languageTracker[0].status, "applied");
+  const untouchedLanguageProfile = await (
+    await fetch(base + "/api/me/profile", { headers: { Cookie: languageUser } })
+  ).json();
+  assert.equal(untouchedLanguageProfile.alertLanguage, "en");
+  assert.deepEqual(untouchedLanguageProfile.teachingLanguages, ["en"]);
   const privacyCookie = await login("http-privacy@example.test");
   const exportPath = "/api/me/privacy/export";
   assert.equal((await fetch(base + exportPath)).status, 401);
@@ -814,7 +946,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated sign-in and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, stable form values and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

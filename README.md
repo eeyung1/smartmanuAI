@@ -56,7 +56,8 @@ Implemented locally:
 - [x] Saved status tracking, dismissal and restoration across revisions
 - [x] English/Simplified Chinese navigation, sign-in and independent display selection
 - [x] English/Simplified Chinese digest templates with original source facts and explicit fallback
-- [ ] Completed translated catalogue, private workspace, alert settings and privacy screens
+- [x] English/Simplified Chinese catalogue, detail pages, preferences, match explanations and tracker controls
+- [ ] Completed translated alert settings, privacy screens and service errors
 - [x] Notification consent, channel selection, timezone digests and local opt-out
 - [x] Local digest cap, overflow, deduplication and send-time eligibility checks
 - [x] Local Telegram linking, encrypted binding, webhook validation and revocation

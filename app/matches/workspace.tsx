@@ -1,4 +1,5 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -29,6 +30,13 @@ export default function Workspace({
   initialTracker: Awaited<ReturnType<typeof listTracker>>;
   initialMatches: Matches;
 }) {
+  const {
+    locale,
+    t,
+    label,
+    reason: explain,
+    message: translateMessage,
+  } = useScreenText();
   const router = useRouter();
   const [matches, setMatches] = useState(initialMatches),
     [tracker, setTracker] = useState(initialTracker),
@@ -112,15 +120,13 @@ export default function Workspace({
     },
   ] as const;
   return (
-    <>
+    <div lang={locale}>
       <section className="form">
-        <h2>Your preferences</h2>
+        <h2>{t("Your preferences")}</h2>
         <p>
-          Interface and alert language choices are stored separately. This
-          prototype translates navigation, sign-in and alert templates into
-          English or Simplified Chinese. Other screens and source wording remain
-          in their original language. Age and qualification are optional;
-          unknowns remain needs checking.
+          {t(
+            "Interface, alert and teaching languages are independent. Source wording remains unchanged. Age and qualification are optional; unknown eligibility still needs checking.",
+          )}{" "}
         </p>
         <form
           onSubmit={(e) => {
@@ -157,16 +163,16 @@ export default function Workspace({
           {(["interfaceLanguage", "alertLanguage"] as const).map((name) => (
             <label key={name}>
               {name === "interfaceLanguage"
-                ? "Interface language"
-                : "Alert language"}
+                ? t("Interface language")
+                : t("Alert language")}
               <select name={name} defaultValue={p[name]}>
-                <option value="en">English</option>
-                <option value="zh-Hans">Simplified Chinese</option>
+                <option value="en">{t("English")}</option>
+                <option value="zh-Hans">{t("Simplified Chinese")}</option>
               </select>
             </label>
           ))}
           <label>
-            Nationality (two-letter country code)
+            {t("Nationality (two-letter country code)")}{" "}
             <input
               name="nationality"
               defaultValue={p.nationality ?? ""}
@@ -175,7 +181,7 @@ export default function Workspace({
             />
           </label>
           <label>
-            Age (optional)
+            {t("Age (optional)")}{" "}
             <input
               name="age"
               type="number"
@@ -185,27 +191,29 @@ export default function Workspace({
             />
           </label>
           <label>
-            Highest qualification
+            {t("Highest qualification")}{" "}
             <select name="qualification" defaultValue={p.qualification ?? ""}>
-              <option value="">Not supplied</option>
+              <option value="">{t("Not supplied")}</option>
               {["secondary", "bachelor", "master", "doctorate", "other"].map(
                 (v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>
+                    {label(v)}
+                  </option>
                 ),
               )}
             </select>
           </label>
           <label>
-            Topics, separated by commas
+            {t("Topics, separated by commas")}{" "}
             <input
               name="topics"
               defaultValue={p.topics.join(", ")}
-              placeholder="smart manufacturing, digital twins"
+              placeholder={t("smart manufacturing, digital twins")}
               maxLength={700}
             />
           </label>
           <label>
-            Preferred in-person country codes, separated by commas
+            {t("Preferred in-person country codes, separated by commas")}{" "}
             <input
               name="countries"
               defaultValue={p.countries.join(", ")}
@@ -215,7 +223,7 @@ export default function Workspace({
           </label>
           {groups.map((g) => (
             <fieldset key={g.name}>
-              <legend>{g.label}</legend>
+              <legend>{t(g.label)}</legend>
               {g.values.map((value) => (
                 <label className="inline" key={value}>
                   <input
@@ -224,34 +232,38 @@ export default function Workspace({
                     value={value}
                     defaultChecked={(p[g.name] as string[]).includes(value)}
                   />
-                  {value.replaceAll("_", " ")}
+                  {label(value)}
                 </label>
               ))}
             </fieldset>
           ))}
-          <button disabled={busy}>Save preferences and refresh matches</button>
+          <button disabled={busy}>
+            {t("Save preferences and refresh matches")}
+          </button>
         </form>
       </section>
       <section>
-        <h2>Your matches</h2>
+        <h2>{t("Your matches")}</h2>
         {matches.profileRequired ? (
-          <p>Save your preferences to see matches.</p>
+          <p>{t("Save your preferences to see matches.")}</p>
         ) : (
           <p>
-            {matches.total} matches · Profile version {matches.profileVersion} ·
-            Rules {matches.rulesVersion}
+            {matches.total} {t("matches · Profile version")}{" "}
+            {matches.profileVersion} {t("· Rules")} {matches.rulesVersion}
           </p>
         )}
         {matches.truncated ? (
           <p>
-            Matching is limited to the latest 1,000 reviewed records. Broader
-            catalogue coverage is pending.
+            {t(
+              "Matching is limited to the latest 1,000 reviewed records. Broader catalogue coverage is pending.",
+            )}{" "}
           </p>
         ) : null}
         {!matches.profileRequired && !matches.items.length ? (
           <p>
-            No current matches. Review your preferences or explore the
-            catalogue.
+            {t(
+              "No current matches. Review your preferences or explore the catalogue.",
+            )}{" "}
           </p>
         ) : null}
         <div className="catalogue">
@@ -259,28 +271,28 @@ export default function Workspace({
             <article key={item.id}>
               <h3>
                 <Link href={"/opportunities/" + encodeURIComponent(item.id)}>
-                  {item.details.title}
+                  <span lang="">{item.details.title}</span>
                 </Link>
               </h3>
-              {item.synthetic ? <p>Synthetic fixture</p> : null}
-              <p>{item.details.summary}</p>
+              {item.synthetic ? <p>{t("Synthetic fixture")}</p> : null}
+              <p lang="">{item.details.summary}</p>
               <p>
-                Needs checking · Relevance score {item.score} · Record revision{" "}
-                {item.revision}
+                {t("Needs checking · Relevance score")} {item.score}{" "}
+                {t("· Record revision")} {item.revision}
               </p>
               <ul>
                 {item.reasons.map((reason) => (
-                  <li key={reason}>{reason}</li>
+                  <li key={reason}>{explain(reason)}</li>
                 ))}
               </ul>
               <details>
-                <summary>Eligibility and information to check</summary>
+                <summary>{t("Eligibility and information to check")}</summary>
                 <ul>
                   {item.unknowns.map((reason) => (
-                    <li key={reason}>{reason}</li>
+                    <li key={reason}>{explain(reason)}</li>
                   ))}
                 </ul>
-                <p>{item.details.eligibility}</p>
+                <p lang="">{item.details.eligibility}</p>
               </details>
               <button
                 disabled={busy}
@@ -294,25 +306,25 @@ export default function Workspace({
                   })
                 }
               >
-                Save
+                {t("Save")}{" "}
               </button>
               <button
                 className="secondary"
                 disabled={busy}
                 onClick={() => track(item.id, item.trackerVersion, "dismiss")}
               >
-                Dismiss
+                {t("Dismiss")}{" "}
               </button>
             </article>
           ))}
         </div>
-        <nav aria-label="Match pages" className="pagination">
+        <nav aria-label={t("Match pages")} className="pagination">
           {matches.page > 1 ? (
             <button
               disabled={busy}
               onClick={() => void perform(() => reload(matches.page - 1))}
             >
-              Previous
+              {t("Previous")}{" "}
             </button>
           ) : null}
           {matches.page * matches.pageSize < matches.total ? (
@@ -320,16 +332,17 @@ export default function Workspace({
               disabled={busy}
               onClick={() => void perform(() => reload(matches.page + 1))}
             >
-              Next
+              {t("Next")}{" "}
             </button>
           ) : null}
         </nav>
       </section>
       <section>
-        <h2>Saved and dismissed opportunities</h2>
+        <h2>{t("Saved and dismissed opportunities")}</h2>
         <p>
-          Application status is self-reported. Closed or unavailable records
-          remain in your tracker.
+          {t(
+            "Application status is self-reported. Closed or unavailable records remain in your tracker.",
+          )}{" "}
         </p>
         {tracker.length ? (
           tracker.map((item) => (
@@ -342,24 +355,26 @@ export default function Workspace({
                       encodeURIComponent(item.opportunity_id)
                     }
                   >
-                    {item.title ?? "Opportunity"}
+                    {item.title ?? t("Opportunity")}
                   </Link>
                 ) : (
-                  (item.title ?? "Unavailable opportunity")
+                  (item.title ?? t("Unavailable opportunity"))
                 )}
               </h3>
               <p>
-                {item.state ?? "Unavailable"}
+                {item.state ? label(item.state) : t("Unavailable")}
                 {item.dismissed
                   ? item.materialChanged
-                    ? " · Material change since dismissal; may appear in matches again."
-                    : " · Dismissed"
+                    ? t(
+                        " · Material change since dismissal; may appear in matches again.",
+                      )
+                    : t(" · Dismissed")
                   : ""}
               </p>
               {item.saved ? (
                 <>
                   <label>
-                    Application status
+                    {t("Application status")}{" "}
                     <select
                       value={item.status}
                       disabled={busy}
@@ -373,7 +388,9 @@ export default function Workspace({
                       }
                     >
                       {["interested", "applying", "applied"].map((v) => (
-                        <option key={v}>{v}</option>
+                        <option key={v} value={v}>
+                          {label(v)}
+                        </option>
                       ))}
                     </select>
                   </label>
@@ -384,7 +401,7 @@ export default function Workspace({
                       track(item.opportunity_id, item.version, "remove")
                     }
                   >
-                    Remove from saved
+                    {t("Remove from saved")}{" "}
                   </button>
                 </>
               ) : null}
@@ -395,7 +412,7 @@ export default function Workspace({
                     track(item.opportunity_id, item.version, "restore")
                   }
                 >
-                  Restore to matches
+                  {t("Restore to matches")}{" "}
                 </button>
               ) : item.available ? (
                 <button
@@ -404,15 +421,15 @@ export default function Workspace({
                     track(item.opportunity_id, item.version, "dismiss")
                   }
                 >
-                  Dismiss from matches
+                  {t("Dismiss from matches")}{" "}
                 </button>
               ) : null}
             </article>
           ))
         ) : (
-          <p>No saved or dismissed opportunities yet.</p>
+          <p>{t("No saved or dismissed opportunities yet.")}</p>
         )}
-        <Link href="/opportunities">Explore all opportunities</Link>
+        <Link href="/opportunities">{t("Explore all opportunities")}</Link>
       </section>
       <button
         disabled={busy}
@@ -423,11 +440,11 @@ export default function Workspace({
           })
         }
       >
-        Sign out
+        {t("Sign out")}{" "}
       </button>
       <p role="status" aria-live="polite">
-        {notice}
+        {translateMessage(notice)}
       </p>
-    </>
+    </div>
   );
 }
