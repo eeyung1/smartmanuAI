@@ -1,4 +1,5 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 import type { readNotificationSettings } from "@/src/jobs/digests";
 type Settings = Awaited<ReturnType<typeof readNotificationSettings>>;
@@ -10,6 +11,7 @@ export default function NotificationSettings({
   initial: Settings;
   initialHistory: History;
 }) {
+  const { locale, t, label, message: translateMessage } = useScreenText();
   const [settings, setSettings] = useState(initial),
     [history, setHistory] = useState(initialHistory),
     [enabled, setEnabled] = useState(initial.enabled),
@@ -48,13 +50,14 @@ export default function NotificationSettings({
     }
   }
   return (
-    <>
+    <div lang={locale}>
       <section className="form">
-        <h2>Digest settings</h2>
+        <h2>{t("Digest settings")}</h2>
         {settings.emailSuppressionReason ? (
           <p>
-            Email digest suppression: {settings.emailSuppressionReason}. Use
-            another channel or contact support.
+            {t("Email digest suppression:")}{" "}
+            {label(settings.emailSuppressionReason)}
+            {t(". Use another channel or contact support.")}{" "}
           </p>
         ) : null}
         <form
@@ -78,24 +81,26 @@ export default function NotificationSettings({
               checked={enabled}
               onChange={(e) => setEnabled(e.target.checked)}
             />
-            Enable local digest simulation
+            {t("Enable local digest simulation")}{" "}
           </label>
           <label>
-            Channel
+            {t("Channel")}{" "}
             <select name="channel" defaultValue={settings.channel}>
-              <option value="email">Email — local simulation</option>
-              <option value="telegram">Telegram — local simulation</option>
+              <option value="email">{t("Email — local simulation")}</option>
+              <option value="telegram">
+                {t("Telegram — local simulation")}
+              </option>
             </select>
           </label>
           <label>
-            Frequency
+            {t("Frequency")}{" "}
             <select name="frequency" defaultValue={settings.frequency}>
-              <option value="daily">Daily at 09:00</option>
-              <option value="weekly">Monday at 09:00</option>
+              <option value="daily">{t("Daily at 09:00")}</option>
+              <option value="weekly">{t("Monday at 09:00")}</option>
             </select>
           </label>
           <label>
-            IANA timezone
+            {t("IANA timezone")}{" "}
             <input
               name="timezone"
               defaultValue={settings.timezone}
@@ -111,10 +116,11 @@ export default function NotificationSettings({
               required={enabled}
               defaultChecked={!!settings.consentVersion}
             />
-            I opt into opportunity digests in the local simulation. A live
-            channel will need separate setup and consent.
+            {t(
+              "I opt into opportunity digests in the local simulation. A live channel will need separate setup and consent.",
+            )}{" "}
           </label>
-          <button disabled={busy}>Save digest settings</button>
+          <button disabled={busy}>{t("Save digest settings")}</button>
         </form>
         <button
           className="secondary"
@@ -140,22 +146,22 @@ export default function NotificationSettings({
             }
           }}
         >
-          Create a local email unsubscribe test link
+          {t("Create a local email unsubscribe test link")}{" "}
         </button>
         {testLink ? (
           <p>
             <a href={testLink} rel="noreferrer">
-              Open unsubscribe confirmation
+              {t("Open unsubscribe confirmation")}{" "}
             </a>{" "}
-            · Local test link; keep it private.
+            {t("· Local test link; keep it private.")}{" "}
           </p>
         ) : null}
         <p>
-          Saved state:{" "}
-          {settings.enabled ? "Enabled for the local sink" : "Paused"}. Next
-          scheduled time:{" "}
+          {t("Saved state:")}{" "}
+          {settings.enabled ? t("Enabled for the local sink") : t("Paused")}
+          {t(". Next scheduled time:")}{" "}
           {settings.nextDueAt
-            ? new Intl.DateTimeFormat("en", {
+            ? new Intl.DateTimeFormat(locale === "zh-Hans" ? "zh-CN" : "en", {
                 dateStyle: "medium",
                 timeStyle: "short",
                 timeZone: settings.timezone,
@@ -163,7 +169,7 @@ export default function NotificationSettings({
               " (" +
               settings.timezone +
               ")"
-            : "None"}
+            : t("None")}
           .
         </p>
         <button
@@ -180,36 +186,38 @@ export default function NotificationSettings({
             })
           }
         >
-          Pause digests now
+          {t("Pause digests now")}{" "}
         </button>
       </section>
       <section>
-        <h2>Recent local digests</h2>
+        <h2>{t("Recent local digests")}</h2>
         {history.length ? (
           <ul>
             {history.map((item) => (
               <li key={item.id}>
-                {item.slot} · {item.channel} ·{" "}
+                {item.slot} · {label(item.channel)} ·{" "}
                 {item.state === "accepted"
-                  ? "Accepted by local sink"
-                  : item.state}
+                  ? t("Accepted by local sink")
+                  : label(item.state)}
               </li>
             ))}
           </ul>
         ) : (
           <p>
-            No digests planned yet. The local digest worker runs separately.
+            {t(
+              "No digests planned yet. The local digest worker runs separately.",
+            )}{" "}
           </p>
         )}
         <p>
-          Digests contain at most 10 current unseen matches. Empty digests are
-          skipped. English fallback is disclosed when a selected alert
-          translation is unavailable.
+          {t(
+            "Digests contain at most 10 current unseen matches. Empty digests are skipped. English fallback is disclosed when a selected alert translation is unavailable.",
+          )}{" "}
         </p>
       </section>
       <p role="status" aria-live="polite">
-        {message}
+        {translateMessage(message)}
       </p>
-    </>
+    </div>
   );
 }

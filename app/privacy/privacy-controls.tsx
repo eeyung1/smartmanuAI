@@ -1,34 +1,32 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import DeletionStatus from "./deletion-status";
 import Link from "next/link";
 import { useState } from "react";
 export default function PrivacyControls() {
+  const { locale, t, message: translateMessage } = useScreenText();
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [receipt, setReceipt] = useState("");
   return (
-    <>
+    <div lang={locale}>
       <section>
-        <h2>Export profile and activity</h2>
+        <h2>{t("Export profile and activity")}</h2>
         <p>
-          The JSON export excludes sign-in credentials, session/link tokens and
-          private security material. It includes saved activity and notification
-          settings.
+          {t(
+            "The JSON export excludes sign-in credentials, session/link tokens and private security material. It includes saved activity and notification settings.",
+          )}{" "}
         </p>
         <a className="button" href="/api/me/privacy/export">
-          Download account export
+          {t("Download account export")}{" "}
         </a>
       </section>
       <section className="form">
-        <h2>Request account deletion</h2>
+        <h2>{t("Request account deletion")}</h2>
         <p>
-          This immediately pauses alerts, cancels pending work and signs you out
-          on all devices. It cannot recall an already-started provider request.
-          The worker removes your private application database records and local
-          authentication mail, while keeping shared opportunities. Accounts with
-          public review contributions need operator assistance. Provider
-          records, security suppression markers and backup expiry still require
-          a production retention policy.
+          {t(
+            "This immediately pauses alerts, cancels pending work and signs you out on all devices. It cannot recall an already-started provider request. The worker removes your private application database records and local authentication mail, while keeping shared opportunities. Accounts with public review contributions need operator assistance. Provider records, security suppression markers and backup expiry still require a production retention policy.",
+          )}{" "}
         </p>
         <form
           onSubmit={async (e) => {
@@ -57,7 +55,7 @@ export default function PrivacyControls() {
           }}
         >
           <label>
-            Type DELETE to confirm
+            {t("Type DELETE to confirm")}{" "}
             <input
               name="confirmation"
               required
@@ -66,13 +64,15 @@ export default function PrivacyControls() {
             />
           </label>
           <button disabled={busy || !!receipt}>
-            Request deletion and sign out
+            {t("Request deletion and sign out")}{" "}
           </button>
         </form>
       </section>
       <DeletionStatus key={receipt} initialReceipt={receipt} />
-      <Link href="/privacy/status">Check a receipt without signing in</Link>
-      <p role="status">{message}</p>
-    </>
+      <Link href="/privacy/status">
+        {t("Check a receipt without signing in")}
+      </Link>
+      <p role="status">{translateMessage(message)}</p>
+    </div>
   );
 }

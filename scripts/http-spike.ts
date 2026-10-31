@@ -94,7 +94,7 @@ try {
   ).text();
   assert.match(chineseSignIn, /<html lang="zh-Hans"/);
   assert.match(chineseSignIn, /欢迎回来/);
-  assert.match(chineseSignIn, /来源文字保持原文/);
+  assert.match(chineseSignIn, /来源文字、诊断代码和部分服务响应保持原文/);
   const englishSignIn = await (await fetch(base + "/sign-in")).text();
   assert.match(englishSignIn, /<html lang="en"/);
   assert.match(englishSignIn, /Welcome back/);
@@ -859,6 +859,201 @@ try {
   ).json();
   assert.equal(untouchedLanguageProfile.alertLanguage, "en");
   assert.deepEqual(untouchedLanguageProfile.teachingLanguages, ["en"]);
+  const alertsZH = await (
+    await fetch(base + "/notifications", { headers: { Cookie: languageUser } })
+  ).text();
+  assert.match(alertsZH, /摘要设置/);
+  assert.match(alertsZH, /真实渠道需要单独设置并另行取得同意/);
+  assert.match(alertsZH, /<option value="email"[^>]*>邮件——本地模拟<\/option>/);
+  assert.match(alertsZH, /<option value="weekly"[^>]*>每周一 09:00<\/option>/);
+  assert.match(alertsZH, /name="consent"/);
+  const chineseSettings = await fetch(base + "/api/me/notifications", {
+    method: "PATCH",
+    headers: {
+      Cookie: languageUser,
+      Origin: base,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      expectedVersion: 0,
+      enabled: true,
+      channel: "email",
+      frequency: "weekly",
+      timezone: "Asia/Shanghai",
+      consent: true,
+    }),
+  });
+  assert.equal(chineseSettings.status, 200);
+  assert.equal((await chineseSettings.json()).timezone, "Asia/Shanghai");
+  const scheduledZH = await (
+    await fetch(base + "/notifications", { headers: { Cookie: languageUser } })
+  ).text();
+  assert.match(scheduledZH, /Asia\/Shanghai/);
+  assert.match(scheduledZH, /下次计划时间/);
+  const chineseLink = await tg("/api/me/telegram", {}, languageUser);
+  assert.equal(chineseLink.status, 200);
+  const chineseCommand = (await chineseLink.json()).startCommand;
+  assert.ok(chineseCommand.startsWith("/start "));
+  assert.equal(
+    (
+      await fetch(base + "/api/webhooks/telegram", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Telegram-Bot-Api-Secret-Token":
+            process.env.TELEGRAM_WEBHOOK_SECRET!,
+        },
+        body: JSON.stringify({
+          update_id: 998878,
+          message: {
+            date: Math.floor(Date.now() / 1000),
+            chat: { id: 123001, type: "private" },
+            from: { id: 123001, is_bot: false },
+            text: chineseCommand,
+          },
+        }),
+      })
+    ).status,
+    200,
+  );
+  const pendingZH = await (
+    await fetch(base + "/notifications", { headers: { Cookie: languageUser } })
+  ).text();
+  assert.match(pendingZH, /待确认/);
+  assert.match(pendingZH, /确认此本地绑定/);
+  assert.equal(
+    (
+      await fetch(base + "/api/me/telegram", {
+        method: "PATCH",
+        headers: {
+          Cookie: languageUser,
+          Origin: base,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "confirm", expectedVersion: 1 }),
+      })
+    ).status,
+    200,
+  );
+  const confirmedZH = await (
+    await fetch(base + "/notifications", { headers: { Cookie: languageUser } })
+  ).text();
+  assert.match(confirmedZH, /已在本地确认/);
+  assert.match(confirmedZH, /未连接任何真实渠道/);
+  const chineseUnsubscribe = await tg(
+    "/api/me/email-unsubscribe",
+    {},
+    languageUser,
+  );
+  assert.equal(chineseUnsubscribe.status, 200);
+  const chineseUnsubscribeURL = (await chineseUnsubscribe.json()).url;
+  const landingZH = await fetch(chineseUnsubscribeURL, {
+    headers: { Cookie: localeCookie },
+  });
+  assert.equal(landingZH.status, 200);
+  assert.equal(landingZH.headers.get("content-language"), "zh-Hans");
+  assert.equal(landingZH.headers.get("referrer-policy"), "no-referrer");
+  assert.ok(
+    landingZH.headers
+      .get("content-security-policy")
+      ?.includes("form-action 'self'"),
+  );
+  const landingHTML = await landingZH.text();
+  assert.match(landingHTML, /<html lang="zh-Hans">/);
+  assert.match(landingHTML, /打开此页面不会更改设置/);
+  assert.match(landingHTML, /name="confirm" value="unsubscribe"/);
+  const headZH = await fetch(chineseUnsubscribeURL, {
+    method: "HEAD",
+    headers: { Cookie: localeCookie },
+  });
+  assert.equal(headZH.status, 200);
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/notifications", {
+          headers: { Cookie: languageUser },
+        })
+      ).json()
+    ).settings.enabled,
+    true,
+  );
+  const tokenZH = new URL(chineseUnsubscribeURL).searchParams.get("token")!;
+  const confirmedUnsubscribeZH = await fetch(
+    base + "/api/notifications/unsubscribe",
+    {
+      method: "POST",
+      headers: {
+        Cookie: localeCookie,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        token: tokenZH,
+        confirm: "unsubscribe",
+      }).toString(),
+    },
+  );
+  assert.equal(confirmedUnsubscribeZH.status, 200);
+  assert.equal(await confirmedUnsubscribeZH.text(), "邮件摘要退订请求已处理。");
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/notifications", {
+          headers: { Cookie: languageUser },
+        })
+      ).json()
+    ).settings.enabled,
+    false,
+  );
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/telegram", {
+          headers: { Cookie: languageUser },
+        })
+      ).json()
+    ).state,
+    "active",
+  );
+  const machineUnsubscribeZH = await fetch(
+    base +
+      "/api/notifications/unsubscribe?token=" +
+      encodeURIComponent(tokenZH),
+    {
+      method: "POST",
+      headers: {
+        Cookie: localeCookie,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "List-Unsubscribe=One-Click",
+    },
+  );
+  assert.equal(machineUnsubscribeZH.status, 200);
+  assert.equal(machineUnsubscribeZH.headers.get("content-language"), "en");
+  assert.equal(
+    await machineUnsubscribeZH.text(),
+    "Email digest unsubscribe request processed.",
+  );
+  const invalidLandingZH = await fetch(base + "/unsubscribe?token=invalid", {
+    headers: { Cookie: localeCookie },
+  });
+  assert.equal(invalidLandingZH.status, 400);
+  assert.match(await invalidLandingZH.text(), /此链接无效/);
+  const privacyZH = await (
+    await fetch(base + "/privacy", { headers: { Cookie: languageUser } })
+  ).text();
+  assert.match(privacyZH, /隐私控制/);
+  assert.match(privacyZH, /最近十分钟内登录/);
+  assert.match(privacyZH, /输入 DELETE 以确认/);
+  assert.match(privacyZH, /pattern="DELETE"/);
+  assert.match(privacyZH, /公开审核贡献的账户需要工作人员协助/);
+  assert.match(privacyZH, /不能访问账户数据/);
+  assert.match(privacyZH, /href="\/api\/me\/privacy\/export"/);
+  const statusZH = await (
+    await fetch(base + "/privacy/status", { headers: { Cookie: localeCookie } })
+  ).text();
+  assert.match(statusZH, /删除请求状态/);
+  assert.match(statusZH, /浏览器不会保存此回执/);
+  assert.ok(!statusZH.includes("http-language@example.test"));
   const privacyCookie = await login("http-privacy@example.test");
   const exportPath = "/api/me/privacy/export";
   assert.equal((await fetch(base + exportPath)).status, 401);
@@ -946,7 +1141,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, stable form values and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, stable form values and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

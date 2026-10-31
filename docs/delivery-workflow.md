@@ -127,3 +127,7 @@ Stage 5/6 now includes English/Simplified Chinese display selection, navigation 
 ## 17 Catalogue and workspace translation checkpoint on 31 October 2026
 
 The English/Simplified Chinese interface now includes catalogue filters/details, private preferences, deterministic match explanations and saved tracker controls. Source facts retain original wording and translated option labels keep stable API values. See [language support](language-support.md) for source-preservation and form-contract checks. Alert settings, privacy screens, remaining service errors, linguistic/browser review and live release gates remain open. No source translation model or paid execution is enabled.
+
+## 18 Alert and privacy translation checkpoint on 31 October 2026
+
+Local user screens now include translated digest consent/schedules, Telegram binding and delivery simulations, privacy export/deletion, public receipt status and standalone unsubscribe pages. Stable action/consent/token values and purge boundaries are preserved. See [language support](language-support.md) for browser-cookie versus machine one-click behavior and validation. Admin translations, full service-error coverage, linguistic/browser review, retention policies, live channels and public release remain open.

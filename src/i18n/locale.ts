@@ -14,3 +14,12 @@ export function resolveAlertLanguage(requested: unknown) {
 export function localeCookie(locale: Locale) {
   return `${LOCALE_COOKIE}=${locale}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax`;
 }
+
+export function localeFromCookie(header: string | null): Locale | null {
+  const value = header
+    ?.split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(LOCALE_COOKIE + "="))
+    ?.slice(LOCALE_COOKIE.length + 1);
+  return isLocale(value) ? value : null;
+}

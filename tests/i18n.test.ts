@@ -140,3 +140,35 @@ test("screen translation keeps typed values, interpolated counts and source topi
   assert.equal(screenText("en", "Your matches"), "Your matches");
   assert.equal(screenLabel("en", "applied"), "Applied");
 });
+
+test("localized controls preserve consent, deletion and uncertain-send scope", async () => {
+  const { screenLabel, screenMessage, screenText } =
+    await import("../src/i18n/screens");
+  const { localeFromCookie } = await import("../src/i18n/locale");
+  assert.equal(
+    localeFromCookie("session=private; smartmanu_locale=zh-Hans"),
+    "zh-Hans",
+  );
+  assert.equal(localeFromCookie("smartmanu_locale=<script>"), null);
+  assert.equal(localeFromCookie("other_smartmanu_locale=zh-Hans"), null);
+  assert.equal(localeFromCookie(null), null);
+  assert.equal(screenLabel("zh-Hans", "uncertain"), "结果不确定——需要人工核查");
+  assert.equal(screenLabel("zh-Hans", "active"), "已在本地确认");
+  assert.equal(screenLabel("zh-Hans", "rejected"), "目录审核未通过的记录");
+  assert.ok(screenText("zh-Hans", "Type DELETE to confirm").includes("DELETE"));
+  assert.ok(
+    screenMessage(
+      "zh-Hans",
+      "Sign in again before exporting or deleting account data.",
+    ).includes("重新登录"),
+  );
+  const done = screenMessage(
+    "zh-Hans",
+    "Application database account and local authentication mail purged. Operational suppression markers and backup expiry are separate.",
+  );
+  assert.ok(done.includes("不在此次清理范围内"));
+  assert.equal(
+    screenText("zh-Hans", "Diagnostic code: {code}", { code: "worker_lost" }),
+    "诊断代码：worker_lost",
+  );
+});

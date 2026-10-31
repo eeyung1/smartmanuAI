@@ -35,9 +35,7 @@ export default async function Layout({
           <p className="locale-notice">{copy.partial}</p>
         ) : null}
         <main lang="en">
-          <LocaleProvider locale={locale} key={locale}>
-            {children}
-          </LocaleProvider>
+          <LocaleProvider locale={locale}>{children}</LocaleProvider>
         </main>
         <footer>{copy.footer}</footer>
       </body>
