@@ -90,3 +90,8 @@ Stage 3 has a local implementation of source registration, evidence-backed draft
 ## 9 Source pipeline checkpoint on 30 October 2026
 
 Stage 4 now includes a local source queue with persisted leases, bounded retrieval, snapshot deduplication, evidence validation and private-draft extraction. The admin dashboard controls source permissions and shows candidate text and job failures. The optional Gateway adapter is gated by explicit configuration and a worst-case budget reservation; no model or paid service has been selected or called. See the source pipeline report for tested behavior and remaining gaps. A live-source/model pilot, general web search, semantic reconciliation, actual-cost reconciliation, recurring worker hosting and arbitrary in-flight eve recovery remain open. Stage 4 and public release are not marked complete.
+
+
+## 10 Matching and tracker checkpoint on 31 October 2026
+
+Stage 5 has a local implementation of deterministic matching, expanded preferences, source-supported eligibility rules, profile versions and owner-scoped application tracking. Material-fact fingerprints keep cosmetic edits from undoing dismissals. Saved history uses public titles and draft closure cannot bypass publication review. See the matching/tracker report for limits and validation. Full FR04–FR06 acceptance, translation, browser validation and launch privacy decisions remain pending; no public-release gate is waived.

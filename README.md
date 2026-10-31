@@ -14,6 +14,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 8. [Local scaffold and validation](docs/local-spike.md)
 9. [Reviewed catalogue implementation](docs/catalogue-implementation.md)
 10. [Source collection and extraction pipeline](docs/source-pipeline.md)
+11. [Personalized matching and tracking](docs/matching-tracker.md)
 
 ## Local development
 
@@ -45,7 +46,9 @@ Implemented locally:
 - [x] Durable source-collection jobs, bounded retrieval and snapshot deduplication
 - [x] Evidence-checked extraction into private drafts and admin collection controls
 - [ ] Live-source/model pilot and open-web discovery
-- [ ] Personalized matching and completed translated interfaces
+- [x] Explainable personalized matches with explicit eligibility unknowns
+- [x] Saved status tracking, dismissal and restoration across revisions
+- [ ] Completed translated interfaces and alert content
 - [ ] Email and Telegram delivery
 - [ ] Public pilot and deployment
 

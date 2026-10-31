@@ -90,6 +90,14 @@ export async function reviewOpportunity(
       throw new CatalogueError(400, "Revise the draft before publishing.");
     if (v.action === "revise" && (!v.details || !v.evidence))
       throw new CatalogueError(400, "A revision needs details and evidence.");
+    if (
+      v.action === "close" &&
+      !["published", "closed"].includes(String(record.state))
+    )
+      throw new CatalogueError(
+        400,
+        "Only published records can be closed. Reject an unpublished draft instead.",
+      );
     const details = detailsSchema.parse(v.details ?? record.details),
       evidence = evidenceSchema.parse(v.evidence ?? record.evidence);
     const state =
