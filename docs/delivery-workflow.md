@@ -95,3 +95,8 @@ Stage 4 now includes a local source queue with persisted leases, bounded retriev
 ## 10 Matching and tracker checkpoint on 31 October 2026
 
 Stage 5 has a local implementation of deterministic matching, expanded preferences, source-supported eligibility rules, profile versions and owner-scoped application tracking. Material-fact fingerprints keep cosmetic edits from undoing dismissals. Saved history uses public titles and draft closure cannot bypass publication review. See the matching/tracker report for limits and validation. Full FR04–FR06 acceptance, translation, browser validation and launch privacy decisions remain pending; no public-release gate is waived.
+
+
+## 11 Notification planning checkpoint on 31 October 2026
+
+Stage 6 has local consent and single-channel settings, timezone-aware daily/weekly digest planning, 10-item overflow, material-event deduplication and transactional local-sink dispatch with current-state checks. Pausing or changing settings cancels pending local digests. The consent version explicitly covers simulation, not future live delivery. See the digest report for validation and boundaries. Verified bindings, provider delivery/webhooks, signed unsubscribe, reminders, quotas, translations, retention/deletion and scheduled hosting remain pending. Stage 6 and public release are not marked complete.
