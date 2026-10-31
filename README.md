@@ -18,6 +18,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 12. [Consent and local digests](docs/notification-digests.md)
 13. [Telegram linking and revocation](docs/telegram-linking.md)
 14. [Email suppression and unsubscribe](docs/email-controls.md)
+15. [Outbound delivery simulation](docs/outbound-simulation.md)
 
 ## Local development
 
@@ -56,6 +57,7 @@ Implemented locally:
 - [x] Local digest cap, overflow, deduplication and send-time eligibility checks
 - [x] Local Telegram linking, encrypted binding, webhook validation and revocation
 - [x] Signed email unsubscribe and authenticated bounce/complaint suppression
+- [x] Outbound request adapters, quota/retry simulation and uncertain-send fencing
 - [ ] Verified live channel connections and email/Telegram delivery
 - [ ] Public pilot and deployment
 
