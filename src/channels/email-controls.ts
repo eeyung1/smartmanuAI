@@ -129,9 +129,7 @@ export async function emailSuppression(
   config: EmailControls,
 ) {
   const user = (
-    await sql.query("SELECT email FROM auth_user WHERE id=$1 FOR SHARE", [
-      userId,
-    ])
+    await sql.query("SELECT email FROM auth_user WHERE id=$1", [userId])
   ).rows[0];
   if (!user) return null;
   const row = (

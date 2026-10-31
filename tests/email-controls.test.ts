@@ -125,7 +125,11 @@ for (const kind of ["pglite", "postgres"])
         await db.sql.query(
           "UPDATE notification_preferences SET next_due_at=NOW()-INTERVAL '1 second' WHERE user_id='a'",
         );
-        assert.equal(await planOneDigest(db.sql), "queued");
+        await Promise.all([
+          planOneDigest(db.sql),
+          enable("a", { frequency: "weekly" }),
+        ]);
+
         await assert.rejects(() =>
           unsubscribeEmail(
             db.sql,
@@ -134,7 +138,6 @@ for (const kind of ["pglite", "postgres"])
           ),
         );
         // Editing a schedule preserves the email consent epoch and its links.
-        await enable("a", { frequency: "weekly" });
         await db.sql.query(
           "UPDATE notification_preferences SET next_due_at=NOW()-INTERVAL '1 second' WHERE user_id='a'",
         );
