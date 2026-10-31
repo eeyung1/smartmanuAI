@@ -1,10 +1,14 @@
+import { interfaceLocale } from "@/src/i18n/server";
+import { screenText } from "@/src/i18n/screens";
 import DeletionStatus from "../deletion-status";
-export default function PrivacyStatus() {
+export default async function PrivacyStatus() {
+  const locale = await interfaceLocale();
+  const t = (key: string) => screenText(locale, key);
   return (
-    <>
-      <p className="eyebrow">ACCOUNT DELETION</p>
-      <h1>Deletion request status.</h1>
+    <div lang={locale}>
+      <p className="eyebrow">{t("ACCOUNT DELETION")}</p>
+      <h1>{t("Deletion request status.")}</h1>
       <DeletionStatus />
-    </>
+    </div>
   );
 }

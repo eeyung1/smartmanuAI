@@ -1,4 +1,5 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 export default function DeliveryTests({
   initial,
@@ -11,6 +12,7 @@ export default function DeliveryTests({
     error_code: string | null;
   }[];
 }) {
+  const { locale, t, label, message: translateMessage } = useScreenText();
   const [items, setItems] = useState(initial),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
@@ -42,40 +44,43 @@ export default function DeliveryTests({
     }
   }
   return (
-    <section>
-      <h2>Outbound delivery simulation</h2>
+    <section lang={locale}>
+      <h2>{t("Outbound delivery simulation")}</h2>
       <p>
-        Only synthetic digests are eligible. These tests use fake provider
-        credentials and an injected fixture transport. No live sender is
-        connected.
+        {t(
+          "Only synthetic digests are eligible. These tests use fake provider credentials and an injected fixture transport. No live sender is connected.",
+        )}{" "}
       </p>
       <button disabled={busy} onClick={() => void act(true)}>
-        Prepare latest local digest for testing
+        {t("Prepare latest local digest for testing")}{" "}
       </button>
       <button
         disabled={busy}
         className="secondary"
         onClick={() => void act(false)}
       >
-        Refresh delivery tests
+        {t("Refresh delivery tests")}{" "}
       </button>
       {items.length ? (
         <ul>
           {items.map((item) => (
             <li key={item.id}>
-              {item.channel} ·{" "}
+              {label(item.channel)} ·{" "}
               {item.state === "accepted"
-                ? "Fixture provider accepted"
-                : item.state}{" "}
-              · Attempts {item.attempts}
-              {item.error_code ? " · " + item.error_code : ""}
+                ? t("Fixture provider accepted")
+                : label(item.state)}{" "}
+              {t("· Attempts")} {item.attempts}
+              {item.error_code
+                ? " · " +
+                  t("Diagnostic code: {code}", { code: item.error_code })
+                : ""}
             </li>
           ))}
         </ul>
       ) : (
-        <p>No outbound tests yet.</p>
+        <p>{t("No outbound tests yet.")}</p>
       )}
-      <p role="status">{message}</p>
+      <p role="status">{translateMessage(message)}</p>
     </section>
   );
 }

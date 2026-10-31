@@ -1,22 +1,25 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 export default function DeletionStatus({
   initialReceipt = "",
 }: {
   initialReceipt?: string;
 }) {
+  const { locale, t, message: translateMessage } = useScreenText();
   const [receipt, setReceipt] = useState(initialReceipt),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
   return (
-    <section>
-      <h2>Check a deletion receipt</h2>
+    <section lang={locale}>
+      <h2>{t("Check a deletion receipt")}</h2>
       <p>
-        The receipt grants access only to status, not account data. Keep it
-        private. It is not saved in this browser.
+        {t(
+          "The receipt grants access only to status, not account data. Keep it private. It is not saved in this browser.",
+        )}{" "}
       </p>
       <label>
-        Private receipt
+        {t("Private receipt")}{" "}
         <input
           value={receipt}
           onChange={(e) => setReceipt(e.target.value)}
@@ -47,9 +50,9 @@ export default function DeletionStatus({
           }
         }}
       >
-        Check status
+        {t("Check status")}{" "}
       </button>
-      <p role="status">{message}</p>
+      <p role="status">{translateMessage(message)}</p>
     </section>
   );
 }

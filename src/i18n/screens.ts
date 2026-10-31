@@ -1,5 +1,7 @@
+import { controlChinese } from "./controls";
 import type { Locale } from "./locale";
 export const screenChinese: Record<string, string> = {
+  ...controlChinese,
   "SMART MANUFACTURING OPPORTUNITIES": "智能制造学习机会",
   "Find your next": "寻找您的下一个",
   "step forward.": "进步机会。",
@@ -229,6 +231,25 @@ const enumEnglish: Record<string, string> = {
   applied: "Applied",
   published: "Published",
   closed: "Closed",
+  draft: "Draft catalogue record",
+  rejected: "Rejected catalogue record",
+  email: "Email",
+  telegram: "Telegram",
+  pending: "Pending confirmation",
+  active: "Locally confirmed",
+  disconnected: "Disconnected",
+  revoked: "Revoked",
+  blocked: "Blocked",
+  queued: "Queued for local worker",
+  ready: "Ready for fixture worker",
+  sending: "Sending simulation",
+  retry: "Retry queued",
+  quota_wait: "Waiting for quota",
+  failed: "Failed",
+  uncertain: "Uncertain — requires review",
+  suppressed: "Suppressed",
+  bounce: "Bounce",
+  complaint: "Complaint",
 };
 export function screenLabel(locale: Locale, value: string) {
   return screenText(

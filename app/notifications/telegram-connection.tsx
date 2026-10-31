@@ -1,4 +1,5 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 import type { telegramStatus } from "@/src/channels/telegram";
 type Status = Awaited<ReturnType<typeof telegramStatus>>;
@@ -9,6 +10,7 @@ export default function TelegramConnection({
   initial: Status;
   available: boolean;
 }) {
+  const { locale, t, label, message: translateMessage } = useScreenText();
   const [status, setStatus] = useState(initial),
     [code, setCode] = useState(""),
     [expires, setExpires] = useState(""),
@@ -47,30 +49,35 @@ export default function TelegramConnection({
     }
   }
   return (
-    <section className="form">
-      <h2>Telegram connection test</h2>
+    <section className="form" lang={locale}>
+      <h2>{t("Telegram connection test")}</h2>
       <p>
-        This is a local test flow, not a live Telegram bot. A simulated
-        private-chat webhook creates a pending binding; confirmation here is
-        required. Linking never enables digests automatically.
+        {t(
+          "This is a local test flow, not a live Telegram bot. A simulated private-chat webhook creates a pending binding; confirmation here is required. Linking never enables digests automatically.",
+        )}{" "}
       </p>
       <p>
-        Status: {status.state}
-        {status.chatSuffix ? " · Chat ending " + status.chatSuffix : ""}
+        {t("Status:")} {label(status.state)}
+        {status.chatSuffix
+          ? t(" · Chat ending {suffix}", { suffix: status.chatSuffix })
+          : ""}
       </p>
       {!available ? (
-        <p>Connection tests are unavailable in this environment.</p>
+        <p>{t("Connection tests are unavailable in this environment.")}</p>
       ) : (
-        <>
+        <div lang={locale}>
           <button disabled={busy} onClick={() => void action("POST", {})}>
-            Create local linking code
+            {t("Create local linking code")}{" "}
           </button>
           {code ? (
             <>
               <p>
-                Private test command: <code>{code}</code>
+                {t("Private test command:")} <code>{code}</code>
               </p>
-              <p>Expires: {expires}. Keep this code private.</p>
+              <p>
+                {t("Expires:")} {expires}
+                {t(". Keep this code private.")}
+              </p>
             </>
           ) : null}
           <button
@@ -89,7 +96,7 @@ export default function TelegramConnection({
               }
             }}
           >
-            Refresh connection status
+            {t("Refresh connection status")}{" "}
           </button>
           {status.state === "pending" ? (
             <button
@@ -101,7 +108,7 @@ export default function TelegramConnection({
                 })
               }
             >
-              Confirm this local binding
+              {t("Confirm this local binding")}{" "}
             </button>
           ) : null}
           <button
@@ -114,11 +121,11 @@ export default function TelegramConnection({
               })
             }
           >
-            Disconnect and cancel linking codes
+            {t("Disconnect and cancel linking codes")}{" "}
           </button>
-        </>
+        </div>
       )}
-      <p role="status">{message}</p>
+      <p role="status">{translateMessage(message)}</p>
     </section>
   );
 }
