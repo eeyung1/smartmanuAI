@@ -66,6 +66,44 @@ try {
   assert.ok(ready, "Web server did not become ready");
   assert.match(await (await fetch(base)).text(), /Synthetic training provider/);
   assert.equal((await fetch(base + "/api/me/profile")).status, 401);
+  const changeLocale = (body: unknown, origin = base) =>
+    fetch(base + "/api/locale", {
+      method: "POST",
+      headers: { Origin: origin, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  assert.equal(
+    (await changeLocale({ locale: "zh-Hans" }, "https://attacker.example.test"))
+      .status,
+    403,
+  );
+  assert.equal((await changeLocale({ locale: "fr" })).status, 400);
+  assert.equal(
+    (await changeLocale({ locale: "en", userId: "other" })).status,
+    400,
+  );
+  const localeResponse = await changeLocale({ locale: "zh-Hans" });
+  assert.equal(localeResponse.status, 200);
+  assert.equal(localeResponse.headers.get("cache-control"), "no-store");
+  const localeHeader = localeResponse.headers.getSetCookie()[0];
+  assert.ok(localeHeader.includes("HttpOnly"));
+  assert.ok(localeHeader.includes("SameSite=Lax"));
+  const localeCookie = localeHeader.split(";")[0];
+  const chineseSignIn = await (
+    await fetch(base + "/sign-in", { headers: { Cookie: localeCookie } })
+  ).text();
+  assert.match(chineseSignIn, /<html lang="zh-Hans"/);
+  assert.match(chineseSignIn, /欢迎回来/);
+  assert.match(chineseSignIn, /其他页面和来源文字/);
+  const englishSignIn = await (await fetch(base + "/sign-in")).text();
+  assert.match(englishSignIn, /<html lang="en"/);
+  assert.match(englishSignIn, /Welcome back/);
+  const invalidCookie = await (
+    await fetch(base + "/sign-in", {
+      headers: { Cookie: "smartmanu_locale=invalid" },
+    })
+  ).text();
+  assert.match(invalidCookie, /<html lang="en"/);
   const a = await login("http-alice@example.test");
   const b = await login("http-bob@example.test");
   const admin = await login("reviewer@example.test");
@@ -658,6 +696,37 @@ try {
     400,
   );
   assert.equal((await tg("/api/me/delivery-tests", {})).status, 409);
+  const localizedProfile = await fetch(base + "/api/me/profile", {
+    method: "PATCH",
+    headers: { Cookie: a, Origin: base, "Content-Type": "application/json" },
+    body: JSON.stringify({ ...preferences, interfaceLanguage: "zh-Hans" }),
+  });
+  assert.equal(localizedProfile.status, 200);
+  assert.ok(
+    localizedProfile.headers
+      .getSetCookie()[0]
+      .includes("smartmanu_locale=zh-Hans"),
+  );
+  const savedLocalePage = await (
+    await fetch(base + "/sign-in", { headers: { Cookie: a } })
+  ).text();
+  assert.match(savedLocalePage, /<html lang="zh-Hans"/);
+  const otherLocalePage = await (
+    await fetch(base + "/sign-in", { headers: { Cookie: b } })
+  ).text();
+  assert.match(otherLocalePage, /<html lang="en"/);
+  const overridden = await (
+    await fetch(base + "/sign-in", {
+      headers: { Cookie: a + "; smartmanu_locale=en" },
+    })
+  ).text();
+  assert.match(overridden, /<html lang="en"/);
+  const independent = await (
+    await fetch(base + "/api/me/profile", { headers: { Cookie: a } })
+  ).json();
+  assert.equal(independent.interfaceLanguage, "zh-Hans");
+  assert.equal(independent.alertLanguage, "zh-Hans");
+  assert.deepEqual(independent.teachingLanguages, ["en"]);
   const privacyCookie = await login("http-privacy@example.test");
   const exportPath = "/api/me/privacy/export";
   assert.equal((await fetch(base + exportPath)).status, 401);
@@ -745,7 +814,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated sign-in and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

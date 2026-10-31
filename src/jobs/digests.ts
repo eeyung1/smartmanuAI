@@ -3,6 +3,8 @@ import {
   emailSuppression,
   mintUnsubscribeToken,
 } from "../channels/email-controls";
+import { resolveAlertLanguage } from "../i18n/locale";
+import { renderAlertText } from "../i18n/alerts";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { SQL } from "../db";
@@ -352,6 +354,7 @@ export async function dispatchDigest(sql: SQL, now = new Date()) {
             now,
           )
         : null;
+    const language = resolveAlertLanguage(profile?.language ?? "en");
     const payload = {
       mode: "local_sink",
       unsubscribe: unsubscribeToken
@@ -362,9 +365,13 @@ export async function dispatchDigest(sql: SQL, now = new Date()) {
             postBody: "List-Unsubscribe=One-Click",
           }
         : null,
-      language: "en",
-      requestedLanguage: profile?.language ?? "en",
-      translationFallback: (profile?.language ?? "en") !== "en",
+      ...language,
+      templateVersion: "1",
+      renderedText: renderAlertText({
+        ...language,
+        items,
+        synthetic: items.every((item) => item.synthetic),
+      }),
       slot: digest.slot,
       items,
     };

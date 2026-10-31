@@ -173,8 +173,15 @@ for (const kind of ["pglite", "postgres"])
         assert.equal(
           (messages[0].payload as { translationFallback: boolean })
             .translationFallback,
-          true,
+          false,
         );
+        const localized = messages[0].payload as {
+          language: string;
+          renderedText: string;
+        };
+        assert.equal(localized.language, "zh-Hans");
+        assert.ok(localized.renderedText.includes("申请费"));
+        assert.ok(localized.renderedText.includes("未说明"));
         await due(1);
         assert.equal(await planOneDigest(db.sql), "queued");
         assert.equal(await dispatchDigest(db.sql), "accepted");

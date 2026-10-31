@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { alertCopy, renderAlertText } from "../i18n/alerts";
 export type ProviderRequest = {
   url: string;
   headers: Record<string, string>;
@@ -32,6 +33,7 @@ export const itemSchema = z.object({
 export const simulationPayloadSchema = z.object({
   mode: z.literal("local_sink"),
   items: z.array(itemSchema).min(1).max(10),
+  language: z.enum(["en", "zh-Hans"]).default("en"),
   translationFallback: z.boolean(),
   unsubscribe: z
     .object({
@@ -50,11 +52,6 @@ const escape = (v: string) =>
         c
       ]!,
   );
-const short = (v: string | null, max = 35) =>
-  v === null
-    ? "Not stated"
-    : Array.from(v).slice(0, max).join("") +
-      (Array.from(v).length > max ? "…" : "");
 export function buildSimulationRequest(
   channel: "email" | "telegram",
   recipient: string,
@@ -62,17 +59,8 @@ export function buildSimulationRequest(
   key: string,
 ): ProviderRequest {
   const origin = "https://smartmanu.example.test";
-  const text = [
-    "SYNTHETIC DELIVERY TEST — not an application opportunity.",
-    payload.translationFallback
-      ? "English fallback; selected translation unavailable."
-      : "English digest.",
-    "Eligibility needs checking. Open details for complete costs.",
-    ...payload.items.map(
-      (item) =>
-        `${short(item.title, 80)}\n${item.funding.replaceAll("_", " ")} · Deadline: ${short(item.deadline, 20)}\nApplication fee: ${short(item.applicationFee)}; certificate: ${short(item.certificateFee)}\n${origin}/opportunities/${encodeURIComponent(item.id)}`,
-    ),
-  ].join("\n\n");
+  const copy = alertCopy(payload.translationFallback ? "en" : payload.language);
+  const text = renderAlertText({ ...payload, synthetic: true });
   if (channel === "telegram") {
     if (
       !/^[1-9]\d{0,15}$/.test(recipient) ||
@@ -117,15 +105,22 @@ export function buildSimulationRequest(
     body: JSON.stringify({
       from: "smartmanuAI test <alerts@smartmanu.example.test>",
       to: [recipient],
-      subject: "smartmanuAI synthetic digest test",
+      subject: copy.subject,
       text:
-        text + "\n\nUnsubscribe: " + origin + payload.unsubscribe.landingPath,
+        text +
+        "\n\n" +
+        copy.unsubscribe +
+        ": " +
+        origin +
+        payload.unsubscribe.landingPath,
       html:
         "<pre>" +
         escape(text) +
         '</pre><p><a href="' +
         escape(origin + payload.unsubscribe.landingPath) +
-        '">Pause email digests</a></p>',
+        '">' +
+        copy.pause +
+        "</a></p>",
       headers: {
         "List-Unsubscribe": "<" + origin + payload.unsubscribe.postPath + ">",
         "List-Unsubscribe-Post": payload.unsubscribe.postBody,
