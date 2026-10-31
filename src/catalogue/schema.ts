@@ -25,8 +25,31 @@ export const sourceSchema = z
     synthetic: z.boolean().default(false),
   })
   .strict();
+export const eligibilityRulesSchema = z
+  .object({
+    nationalities: z
+      .array(z.string().regex(/^(?:[A-Z]{2}|ALL)$/))
+      .min(1)
+      .max(250)
+      .nullable(),
+    minAge: z.number().int().min(0).max(120).nullable(),
+    maxAge: z.number().int().min(0).max(120).nullable(),
+    minQualification: z
+      .enum(["secondary", "bachelor", "master", "doctorate"])
+      .nullable(),
+  })
+  .strict()
+  .refine(
+    (v) => v.minAge === null || v.maxAge === null || v.minAge <= v.maxAge,
+    "Minimum age cannot exceed maximum age.",
+  );
 export const detailsSchema = z
   .object({
+    studyLevel: z
+      .enum(["bachelor", "master", "doctorate"])
+      .nullable()
+      .default(null),
+    eligibilityRules: eligibilityRulesSchema.nullable().default(null),
     title: z.string().trim().min(3).max(200),
     organizer: z.string().trim().min(2).max(200),
     summary: z.string().trim().min(10).max(2000),

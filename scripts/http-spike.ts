@@ -4,6 +4,7 @@ import { once } from "node:events";
 import { mkdtemp, open, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { preferencesSchema } from "../src/domain/profile";
 import { localConfig } from "../src/config";
 import { openDatabase } from "../src/db";
 import { seedLocalCatalogue } from "../src/catalogue/fixtures";
@@ -272,7 +273,7 @@ try {
     body: JSON.stringify(preferences),
   });
   assert.equal(saved.status, 200);
-  assert.deepEqual(await saved.json(), preferences);
+  assert.deepEqual(await saved.json(), preferencesSchema.parse(preferences));
   assert.equal(
     await (
       await fetch(base + "/api/me/profile", { headers: { Cookie: b } })
@@ -325,6 +326,95 @@ try {
       ).json()
     ).length,
     1,
+  );
+
+  assert.equal((await fetch(base + "/api/me/matches")).status, 401);
+  assert.equal(
+    (
+      await fetch(base + "/api/me/matches?userId=someone-else", {
+        headers: { Cookie: a },
+      })
+    ).status,
+    400,
+  );
+  const myMatches = await (
+    await fetch(base + "/api/me/matches", { headers: { Cookie: a } })
+  ).json();
+  assert.ok(
+    myMatches.items.some(
+      (item: { id: string }) => item.id === "synthetic-course",
+    ),
+  );
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/matches", { headers: { Cookie: b } })
+      ).json()
+    ).profileRequired,
+    true,
+  );
+  async function changeTracker(body: unknown, cookie = a, origin = base) {
+    return fetch(base + "/api/me/tracker", {
+      method: "PATCH",
+      headers: {
+        Cookie: cookie,
+        Origin: origin,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  }
+  const tracked = {
+    opportunityId: "synthetic-course",
+    expectedVersion: 1,
+    action: "status",
+    status: "applying",
+  };
+  assert.equal((await changeTracker(tracked, b)).status, 409);
+  assert.equal(
+    (await changeTracker({ ...tracked, userId: "someone-else" })).status,
+    400,
+  );
+  assert.equal(
+    (await changeTracker(tracked, a, "https://attacker.example.test")).status,
+    403,
+  );
+  assert.equal((await changeTracker(tracked)).status, 200);
+  assert.equal((await changeTracker(tracked)).status, 409);
+  assert.equal(
+    (
+      await changeTracker({
+        opportunityId: "synthetic-course",
+        expectedVersion: 2,
+        action: "dismiss",
+      })
+    ).status,
+    200,
+  );
+  assert.ok(
+    !(
+      await (
+        await fetch(base + "/api/me/matches", { headers: { Cookie: a } })
+      ).json()
+    ).items.some((item: { id: string }) => item.id === "synthetic-course"),
+  );
+  assert.equal(
+    (
+      await changeTracker({
+        opportunityId: "synthetic-course",
+        expectedVersion: 3,
+        action: "restore",
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/tracker", { headers: { Cookie: a } })
+      ).json()
+    )[0].status,
+    "applying",
   );
   const logout = await fetch(base + "/api/auth/sign-out", {
     method: "POST",

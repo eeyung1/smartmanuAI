@@ -16,6 +16,8 @@ type Row = {
 };
 type Source = { id: string; name: string; url: string; synthetic: boolean };
 const initialDetails: Details = {
+  studyLevel: null,
+  eligibilityRules: null,
   title: "",
   organizer: "",
   summary: "",
@@ -136,6 +138,28 @@ export default function ReviewWorkspace({
           onSubmit={(e) => {
             e.preventDefault();
             const f = new FormData(e.currentTarget);
+            const draftForm = e.currentTarget;
+            const countries = String(f.get("nationalities") ?? "")
+              .split(",")
+              .map((v) => v.trim().toUpperCase())
+              .filter(Boolean);
+            const minAge = String(f.get("minAge") ?? ""),
+              maxAge = String(f.get("maxAge") ?? ""),
+              minQualification = String(f.get("minQualification") ?? "");
+            const submittedDetails = {
+              ...details,
+              studyLevel: f.get("studyLevel") || null,
+              eligibilityRules:
+                countries.length || minAge || maxAge || minQualification
+                  ? {
+                      nationalities: countries.length ? countries : null,
+                      minAge: minAge ? Number(minAge) : null,
+                      maxAge: maxAge ? Number(maxAge) : null,
+                      minQualification: minQualification || null,
+                    }
+                  : null,
+            };
+
             void perform(async () => {
               if (editing)
                 await request(
@@ -143,7 +167,7 @@ export default function ReviewWorkspace({
                   {
                     action: "revise",
                     expectedRevision: editing.revision,
-                    details,
+                    details: submittedDetails,
                     evidence,
                     note: f.get("note"),
                   },
@@ -151,10 +175,11 @@ export default function ReviewWorkspace({
               else
                 await request("/api/admin/opportunities", {
                   sourceId: f.get("sourceId"),
-                  details,
+                  details: submittedDetails,
                   evidence,
                   note: f.get("note"),
                 });
+              draftForm.reset();
               setEditing(null);
               setDetails(initialDetails);
               setEvidence({
@@ -338,6 +363,64 @@ export default function ReviewWorkspace({
               required
             />
           </label>
+          <fieldset key={editing?.id ?? "new-rules"}>
+            <legend>Structured eligibility for matching</legend>
+            <p>
+              Enter only requirements supported by the eligibility source
+              excerpt. Blank means unknown. ALL means the source explicitly
+              permits all nationalities.
+            </p>
+            <label>
+              Scholarship study level
+              <select name="studyLevel" defaultValue={details.studyLevel ?? ""}>
+                <option value="">Not stated</option>
+                {["bachelor", "master", "doctorate"].map((v) => (
+                  <option key={v}>{v}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Allowed nationality codes, separated by commas
+              <input
+                name="nationalities"
+                defaultValue={
+                  details.eligibilityRules?.nationalities?.join(", ") ?? ""
+                }
+              />
+            </label>
+            <label>
+              Minimum age
+              <input
+                name="minAge"
+                type="number"
+                min={0}
+                max={120}
+                defaultValue={details.eligibilityRules?.minAge ?? ""}
+              />
+            </label>
+            <label>
+              Maximum age
+              <input
+                name="maxAge"
+                type="number"
+                min={0}
+                max={120}
+                defaultValue={details.eligibilityRules?.maxAge ?? ""}
+              />
+            </label>
+            <label>
+              Minimum qualification
+              <select
+                name="minQualification"
+                defaultValue={details.eligibilityRules?.minQualification ?? ""}
+              >
+                <option value="">Not stated</option>
+                {["secondary", "bachelor", "master", "doctorate"].map((v) => (
+                  <option key={v}>{v}</option>
+                ))}
+              </select>
+            </label>
+          </fieldset>
           <fieldset>
             <legend>Supporting source excerpts</legend>
             {(["title", "funding", "deadline", "eligibility"] as const).map(
@@ -399,6 +482,18 @@ export default function ReviewWorkspace({
                 {row.details.applicationFee ?? "Not stated"}
               </p>
               <p>Eligibility: {row.details.eligibility}</p>
+              <p>
+                Study level: {row.details.studyLevel ?? "Not stated"}.
+                Nationalities:{" "}
+                {row.details.eligibilityRules?.nationalities?.join(", ") ??
+                  "Not stated"}
+                . Age:{" "}
+                {row.details.eligibilityRules?.minAge ?? "Unknown minimum"} to{" "}
+                {row.details.eligibilityRules?.maxAge ?? "unknown maximum"}.
+                Minimum qualification:{" "}
+                {row.details.eligibilityRules?.minQualification ?? "Not stated"}
+                .
+              </p>
               <p>Deadline: {row.details.deadline ?? "Not stated"}</p>
               <p>
                 Source:{" "}
