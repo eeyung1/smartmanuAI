@@ -16,6 +16,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 10. [Source collection and extraction pipeline](docs/source-pipeline.md)
 11. [Personalized matching and tracking](docs/matching-tracker.md)
 12. [Consent and local digests](docs/notification-digests.md)
+13. [Telegram linking and revocation](docs/telegram-linking.md)
 
 ## Local development
 
@@ -52,7 +53,8 @@ Implemented locally:
 - [ ] Completed translated interfaces and alert content
 - [x] Notification consent, channel selection, timezone digests and local opt-out
 - [x] Local digest cap, overflow, deduplication and send-time eligibility checks
-- [ ] Verified channel connections and live email/Telegram delivery
+- [x] Local Telegram linking, encrypted binding, webhook validation and revocation
+- [ ] Verified live channel connections and email/Telegram delivery
 - [ ] Public pilot and deployment
 
 To review records with the default embedded database, sign in first, stop the development server, then run `npm run admin:grant -- your-name@example.test` and restart the server before visiting `/admin/review`. Run migration and seed commands while the server is stopped as well; the embedded database must have only one owning process. This local command grants a role; there is no public role-grant endpoint. Optional fixtures are not real opportunities.
