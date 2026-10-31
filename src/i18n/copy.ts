@@ -13,7 +13,7 @@ const en = {
   footer:
     "Local prototype · Synthetic opportunities · Notifications stay in a local test sink",
   partial:
-    "User-facing screens support English and Simplified Chinese. Source wording, diagnostic codes and some service responses remain in their original language. Admin tools and browser language review are pending.",
+    "User-facing screens support English and Simplified Chinese. Source wording, diagnostic codes and some service responses remain in their original language.",
   eyebrow: "YOUR OPPORTUNITY SPACE",
   welcome: "Welcome back.",
   signInIntro:
@@ -38,7 +38,7 @@ const zh: Record<keyof typeof en, string> = {
   localeError: "无法更改显示语言，请重试。",
   footer: "本地原型 · 模拟学习机会 · 通知仅保存在本地测试收件箱中",
   partial:
-    "用户页面支持英语和简体中文。来源文字、诊断代码和部分服务响应保持原文。管理工具翻译及浏览器语言检查尚待完成。",
+    "用户页面支持英语和简体中文。来源文字、诊断代码和部分服务响应保持原文。",
   eyebrow: "您的学习机会空间",
   welcome: "欢迎回来。",
   signInIntro:
