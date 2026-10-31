@@ -658,6 +658,82 @@ try {
     400,
   );
   assert.equal((await tg("/api/me/delivery-tests", {})).status, 409);
+  const privacyCookie = await login("http-privacy@example.test");
+  const exportPath = "/api/me/privacy/export";
+  assert.equal((await fetch(base + exportPath)).status, 401);
+  const exported = await fetch(base + exportPath, {
+    headers: { Cookie: privacyCookie },
+  });
+  assert.equal(exported.status, 200);
+  assert.equal(exported.headers.get("cache-control"), "no-store");
+  const accountData = await exported.json();
+  assert.equal(accountData.account.email, "http-privacy@example.test");
+  assert.ok(!JSON.stringify(accountData).includes("http-alice@example.test"));
+  assert.equal(
+    (
+      await fetch(base + exportPath + "?userId=other", {
+        headers: { Cookie: privacyCookie },
+      })
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await post(
+        "/api/me/privacy/delete",
+        { confirmation: "wrong" },
+        privacyCookie,
+      )
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await post(
+        "/api/me/privacy/delete",
+        { confirmation: "DELETE", userId: "other" },
+        privacyCookie,
+      )
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await fetch(base + "/api/me/privacy/delete", {
+        method: "POST",
+        headers: {
+          Cookie: privacyCookie,
+          Origin: "https://attacker.example.test",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ confirmation: "DELETE" }),
+      })
+    ).status,
+    403,
+  );
+  const deletion = await post(
+    "/api/me/privacy/delete",
+    { confirmation: "DELETE" },
+    privacyCookie,
+  );
+  assert.equal(deletion.status, 202);
+  const { receipt } = await deletion.json();
+  assert.equal(
+    (
+      await fetch(base + "/api/me/profile", {
+        headers: { Cookie: privacyCookie },
+      })
+    ).status,
+    401,
+  );
+  const status = await fetch(base + "/api/privacy/status?receipt=" + receipt);
+  assert.equal(status.headers.get("cache-control"), "no-store");
+  assert.equal((await status.json()).state, "queued");
+  assert.equal(
+    (await fetch(base + "/api/privacy/status?receipt=invalid")).status,
+    404,
+  );
+  assert.equal((await fetch(base + "/privacy/status")).status, 200);
   const logout = await fetch(base + "/api/auth/sign-out", {
     method: "POST",
     headers: { Cookie: a, Origin: base, "Content-Type": "application/json" },

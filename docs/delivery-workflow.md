@@ -115,3 +115,7 @@ Stage 6 now includes signed local email unsubscribe capabilities, consent epochs
 ## 14 Outbound adapter checkpoint on 31 October 2026
 
 Stage 6 has fixture-only email/Telegram request adapters and a separate encrypted simulation queue. The worker freezes idempotency identity, reserves day/month quota atomically, caps known-rejection retries and fences ambiguous/crashed attempts as uncertain. Accepted email correlation can be repaired without another send. See the outbound simulation report for tests and boundaries. No live transport or credentials are enabled; provider qualification, production intents, operational reconciliation, scheduling, retention and release gates remain pending.
+
+## 15 Account privacy checkpoint on 31 October 2026
+
+Local account export and queued deletion now include recent-authentication checks, immediate session/channel revocation, pending-write guards, private receipt lookup and a restartable purge worker. See [account privacy](account-privacy.md) for scope and validation. Shared reviewer attribution needs operator-assisted handling; retention, backups, provider erasure, browser validation and public-release gates remain open. This checkpoint does not authorize deployment.

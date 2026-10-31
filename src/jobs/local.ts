@@ -31,7 +31,16 @@ export async function queueNotification(
   );
 }
 export async function dispatchOne(sql: SQL) {
+  const candidate = (
+    await sql.query(
+      "SELECT id,user_id FROM outbox WHERE state='queued' ORDER BY id LIMIT 1",
+    )
+  ).rows[0];
+  if (!candidate) return "empty";
   return sql.transaction(async (tx) => {
+    await tx.query("SELECT id FROM auth_user WHERE id=$1 FOR NO KEY UPDATE", [
+      candidate.user_id,
+    ]);
     const item = (
       await tx.query<{
         id: string;
@@ -39,7 +48,8 @@ export async function dispatchOne(sql: SQL) {
         user_id: string;
         payload: Record<string, unknown>;
       }>(
-        "SELECT * FROM outbox WHERE state='queued' ORDER BY id LIMIT 1 FOR UPDATE SKIP LOCKED",
+        "SELECT * FROM outbox WHERE state='queued' AND id=$1 FOR UPDATE SKIP LOCKED",
+        [candidate.id],
       )
     ).rows[0];
     if (!item) return "empty";
