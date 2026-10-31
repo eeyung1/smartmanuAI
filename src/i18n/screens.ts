@@ -1,7 +1,9 @@
+import { adminChinese, researchStateLabels } from "./admin";
 import { controlChinese } from "./controls";
 import type { Locale } from "./locale";
 export const screenChinese: Record<string, string> = {
   ...controlChinese,
+  ...adminChinese,
   "SMART MANUFACTURING OPPORTUNITIES": "智能制造学习机会",
   "Find your next": "寻找您的下一个",
   "step forward.": "进步机会。",
@@ -231,6 +233,10 @@ const enumEnglish: Record<string, string> = {
   applied: "Applied",
   published: "Published",
   closed: "Closed",
+  title: "Title",
+  funding: "Funding",
+  deadline: "Deadline",
+  eligibility: "Eligibility",
   draft: "Draft catalogue record",
   rejected: "Rejected catalogue record",
   email: "Email",
@@ -271,4 +277,16 @@ export function screenMessage(locale: Locale, value: string) {
   if (locale === "zh-Hans" && !Object.hasOwn(screenChinese, value))
     return "服务消息（原文）：" + value;
   return screenText(locale, value);
+}
+
+export function researchState(
+  locale: Locale,
+  kind: "job" | "candidate",
+  value: string,
+) {
+  const labels = researchStateLabels[kind];
+  return screenText(
+    locale,
+    Object.hasOwn(labels, value) ? labels[value] : value,
+  );
 }

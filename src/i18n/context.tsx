@@ -6,6 +6,7 @@ import {
   screenLabel,
   matchExplanation,
   screenMessage,
+  researchState,
 } from "./screens";
 const Context = createContext<Locale>("en");
 export function LocaleProvider({
@@ -25,6 +26,8 @@ export function useScreenText() {
       screenText(locale, key, values),
     label: (value: string) => screenLabel(locale, value),
     reason: (value: string) => matchExplanation(locale, value),
+    research: (kind: "job" | "candidate", value: string) =>
+      researchState(locale, kind, value),
     message: (value: string) => screenMessage(locale, value),
   };
 }

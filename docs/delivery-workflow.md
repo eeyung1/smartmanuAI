@@ -131,3 +131,7 @@ The English/Simplified Chinese interface now includes catalogue filters/details,
 ## 18 Alert and privacy translation checkpoint on 31 October 2026
 
 Local user screens now include translated digest consent/schedules, Telegram binding and delivery simulations, privacy export/deletion, public receipt status and standalone unsubscribe pages. Stable action/consent/token values and purge boundaries are preserved. See [language support](language-support.md) for browser-cookie versus machine one-click behavior and validation. Admin translations, full service-error coverage, linguistic/browser review, retention policies, live channels and public release remain open.
+
+## 19 Admin translation checkpoint on 31 October 2026
+
+The local English/Simplified Chinese interface now covers admin catalogue review and source-collection/manual-extraction controls. Review/permission semantics, source evidence, JSON contracts, tri-state costs and audit notes remain unchanged. See [language support](language-support.md) for the seeded extraction-to-review HTTP checks. Remaining service/framework errors, linguistic/browser review, live-source/model validation and all public-release gates remain open.

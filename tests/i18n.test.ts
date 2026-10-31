@@ -172,3 +172,38 @@ test("localized controls preserve consent, deletion and uncertain-send scope", a
     "诊断代码：worker_lost",
   );
 });
+
+test("admin labels keep collection and candidate states distinct from Telegram confirmation", async () => {
+  const { researchState, screenLabel, screenText, screenMessage } =
+    await import("../src/i18n/screens");
+  assert.equal(
+    researchState("zh-Hans", "candidate", "pending"),
+    "候选记录等待验证",
+  );
+  assert.equal(screenLabel("zh-Hans", "pending"), "待确认");
+  assert.equal(researchState("zh-Hans", "job", "done"), "采集已完成");
+  assert.equal(
+    researchState("en", "candidate", "drafted"),
+    "Candidate drafted",
+  );
+  assert.ok(
+    screenText(
+      "zh-Hans",
+      "Enter only requirements supported by the eligibility source excerpt. Blank means unknown. ALL means the source explicitly permits all nationalities.",
+    ).includes("ALL"),
+  );
+  assert.ok(
+    screenText(
+      "zh-Hans",
+      "Application fee and currency or leave blank if unknown",
+    ).includes("未知时请留空"),
+  );
+  assert.equal(
+    screenMessage(
+      "zh-Hans",
+      "Verify the official source and field evidence before publishing.",
+    ),
+    "发布前请核实官方来源及字段证据。",
+  );
+  assert.equal(screenLabel("zh-Hans", "title"), "标题");
+});
