@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomUUID, randomBytes } from "node:crypto";
 import { Pool } from "pg";
 import { openDatabase } from "../src/db";
 import {
@@ -22,6 +22,10 @@ import {
   dispatchDigest,
   digestHistory,
 } from "../src/jobs/digests";
+process.env.SMARTMANU_EMAIL_MODE = "local";
+process.env.EMAIL_WEBHOOK_SIGNING_SECRET =
+  "whsec_" + randomBytes(32).toString("base64");
+process.env.NOTIFICATION_UNSUBSCRIBE_KEY = randomBytes(32).toString("hex");
 test("digest scheduling uses local 09:00, Monday slots and DST offsets", () => {
   const next = (
     date: string,

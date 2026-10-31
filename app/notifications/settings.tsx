@@ -15,6 +15,7 @@ export default function NotificationSettings({
     [enabled, setEnabled] = useState(initial.enabled),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
+  const [testLink, setTestLink] = useState("");
   async function save(body: unknown) {
     setBusy(true);
     setMessage("");
@@ -50,6 +51,12 @@ export default function NotificationSettings({
     <>
       <section className="form">
         <h2>Digest settings</h2>
+        {settings.emailSuppressionReason ? (
+          <p>
+            Email digest suppression: {settings.emailSuppressionReason}. Use
+            another channel or contact support.
+          </p>
+        ) : null}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -109,6 +116,40 @@ export default function NotificationSettings({
           </label>
           <button disabled={busy}>Save digest settings</button>
         </form>
+        <button
+          className="secondary"
+          disabled={busy || !settings.enabled || settings.channel !== "email"}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              const r = await fetch("/api/me/email-unsubscribe", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: "{}",
+              });
+              const value = await r.json();
+              if (!r.ok)
+                throw Error(
+                  value.error ?? "Unable to create a local test link.",
+                );
+              setTestLink(value.url);
+            } catch (e) {
+              setMessage((e as Error).message);
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          Create a local email unsubscribe test link
+        </button>
+        {testLink ? (
+          <p>
+            <a href={testLink} rel="noreferrer">
+              Open unsubscribe confirmation
+            </a>{" "}
+            · Local test link; keep it private.
+          </p>
+        ) : null}
         <p>
           Saved state:{" "}
           {settings.enabled ? "Enabled for the local sink" : "Paused"}. Next

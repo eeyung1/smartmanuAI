@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
@@ -550,6 +551,101 @@ try {
     (await changeBinding({ action: "disconnect", expectedVersion: 2 })).status,
     200,
   );
+
+  const currentAlerts = (
+    await (
+      await fetch(base + "/api/me/notifications", { headers: { Cookie: a } })
+    ).json()
+  ).settings;
+  assert.equal(
+    (
+      await updateAlerts({
+        ...alertSettings,
+        expectedVersion: currentAlerts.version,
+        channel: "email",
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (await tg("/api/me/email-unsubscribe", { userId: "someone-else" })).status,
+    400,
+  );
+  const unsubscribeResponse = await tg("/api/me/email-unsubscribe", {});
+  assert.equal(unsubscribeResponse.status, 200);
+  const unsubscribeURL = (await unsubscribeResponse.json()).url;
+  const landing = await fetch(unsubscribeURL);
+  assert.equal(landing.status, 200);
+  assert.equal(landing.headers.get("referrer-policy"), "no-referrer");
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/notifications", { headers: { Cookie: a } })
+      ).json()
+    ).settings.enabled,
+    true,
+  );
+  const nonce = new URL(unsubscribeURL).searchParams.get("token")!;
+  assert.equal(
+    (
+      await fetch(
+        base +
+          "/api/notifications/unsubscribe?token=" +
+          encodeURIComponent(nonce),
+      )
+    ).status,
+    405,
+  );
+  const oneClick = () =>
+    fetch(
+      base +
+        "/api/notifications/unsubscribe?token=" +
+        encodeURIComponent(nonce),
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "List-Unsubscribe=One-Click",
+      },
+    );
+  assert.equal((await oneClick()).status, 200);
+  assert.equal((await oneClick()).status, 200);
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/notifications", { headers: { Cookie: a } })
+      ).json()
+    ).settings.enabled,
+    false,
+  );
+  const emailBody = JSON.stringify({
+      type: "email.bounced",
+      data: {
+        email_id: "synthetic-http-attempt",
+        to: ["http-alice@example.test"],
+      },
+    }),
+    emailTimestamp = String(Math.floor(Date.now() / 1000)),
+    emailId = "msg_http_email";
+  const emailSignature = createHmac(
+    "sha256",
+    Buffer.from(process.env.EMAIL_WEBHOOK_SIGNING_SECRET!.slice(6), "base64"),
+  )
+    .update(emailId + "." + emailTimestamp + "." + emailBody)
+    .digest("base64");
+  const emailHook = (signature: string) =>
+    fetch(base + "/api/webhooks/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "svix-id": emailId,
+        "svix-timestamp": emailTimestamp,
+        "svix-signature": "v1," + signature,
+      },
+      body: emailBody,
+    });
+  assert.equal((await emailHook("invalid")).status, 401);
+  assert.equal((await emailHook(emailSignature)).status, 200);
+  assert.equal((await emailHook(emailSignature)).status, 200);
   const logout = await fetch(base + "/api/auth/sign-out", {
     method: "POST",
     headers: { Cookie: a, Origin: base, "Content-Type": "application/json" },

@@ -105,3 +105,8 @@ Stage 6 has local consent and single-channel settings, timezone-aware daily/week
 ## 12 Telegram binding checkpoint on 31 October 2026
 
 Stage 6 now includes a local Telegram linking protocol with expiring hashed codes, owner confirmation, encrypted destinations, authenticated/deduplicated webhooks and ordered revocation. Disconnect/block handling pauses selected Telegram digests and cancels their queued events. See the Telegram report for tests and deployment boundaries. No bot is registered and no real message is sent. Live verification, providers, consent integration, key lifecycle, retention and launch gates remain pending.
+
+
+## 13 Email-control checkpoint on 31 October 2026
+
+Stage 6 now includes signed local email unsubscribe capabilities, consent epochs, non-mutating landing pages and POST confirmation. A Resend/Svix-shaped verifier authenticates raw callback bytes, deduplicates events and reconciles early callbacks against trusted digest attempts. Sticky destination suppression stops queued and future local email digests while preserving other channels. See the email-control report for tested behavior and limits. Live sending-domain/DKIM qualification, real provider sending, mailbox interoperability, operational suppression review, key rotation, retention/deletion and public release remain pending.
