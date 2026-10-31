@@ -1,5 +1,6 @@
 import Link from "next/link";
 import "./style.css";
+import { LocaleProvider } from "@/src/i18n/context";
 import LanguageSelector from "./language-selector";
 import { interfaceLocale } from "@/src/i18n/server";
 import { interfaceCopy } from "@/src/i18n/copy";
@@ -33,7 +34,11 @@ export default async function Layout({
         {locale === "zh-Hans" ? (
           <p className="locale-notice">{copy.partial}</p>
         ) : null}
-        <main lang="en">{children}</main>
+        <main lang="en">
+          <LocaleProvider locale={locale} key={locale}>
+            {children}
+          </LocaleProvider>
+        </main>
         <footer>{copy.footer}</footer>
       </body>
     </html>

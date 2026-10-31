@@ -115,3 +115,28 @@ test("ten localized digest items fit a Telegram preview without splitting Unicod
     assert.ok(request.text.includes("…"));
   }
 });
+
+test("screen translation keeps typed values, interpolated counts and source topics separate", async () => {
+  const { screenText, screenLabel, matchExplanation, screenMessage } =
+    await import("../src/i18n/screens");
+  assert.equal(
+    screenText("zh-Hans", "Results: {count}", { count: 12 }),
+    "结果：12",
+  );
+  assert.equal(screenLabel("zh-Hans", "tuition_only"), "仅覆盖学费");
+  assert.equal(screenLabel("zh-Hans", "applied"), "已申请（自行填报）");
+  assert.equal(
+    matchExplanation("zh-Hans", "Topic overlap: smart manufacturing, Save."),
+    "相关主题： smart manufacturing, Save.",
+  );
+  assert.equal(
+    screenMessage("zh-Hans", "Your tracker changed. Reload and retry."),
+    "跟踪列表已更改，请重新加载后重试。",
+  );
+  assert.equal(
+    screenMessage("zh-Hans", "Unmapped service failure"),
+    "服务消息（原文）：Unmapped service failure",
+  );
+  assert.equal(screenText("en", "Your matches"), "Your matches");
+  assert.equal(screenLabel("en", "applied"), "Applied");
+});

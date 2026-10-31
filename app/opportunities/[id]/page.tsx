@@ -1,3 +1,5 @@
+import { interfaceLocale } from "@/src/i18n/server";
+import { screenText, screenLabel } from "@/src/i18n/screens";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDatabase } from "@/src/db";
@@ -16,6 +18,10 @@ export default async function Detail({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const locale = await interfaceLocale();
+  const t = (key: string, values?: Record<string, string | number>) =>
+    screenText(locale, key, values);
+  const label = (value: string) => screenLabel(locale, value);
   const item = await publicOpportunity(
     (await getDatabase()).sql,
     (await params).id,
@@ -23,89 +29,103 @@ export default async function Detail({
   if (!item) notFound();
   const d = item.details;
   return (
-    <>
-      <Link href="/opportunities">Back to opportunities</Link>
+    <div lang={locale}>
+      <Link href="/opportunities">{t("Back to opportunities")}</Link>
       <p className="eyebrow">
-        {d.category} · {d.mode === "online" ? "Online" : d.country}
+        {label(d.category)} · {d.mode === "online" ? t("Online") : d.country}
       </p>
-      <h1>{d.title}</h1>
-      <p className="intro">{d.organizer}</p>
+      <h1 lang="">{d.title}</h1>
+      <p className="intro" lang="">
+        {d.organizer}
+      </p>
       {item.synthetic ? (
         <div className="notice">
-          Synthetic fixture for local testing. This is not a real opportunity.
+          {t(
+            "Synthetic fixture for local testing. This is not a real opportunity.",
+          )}{" "}
         </div>
       ) : null}
       {!item.available ? (
         <div className="notice">
-          This opportunity is closed or needs a fresh source check. New saves
-          and application actions are paused.
+          {t(
+            "This opportunity is closed or needs a fresh source check. New saves and application actions are paused.",
+          )}{" "}
         </div>
       ) : null}
-      <p>{d.summary}</p>
+      <p lang="">{d.summary}</p>
       <section>
-        <h2>Funding and remaining costs</h2>
+        <h2>{t("Funding and remaining costs")}</h2>
         <p className="tags">
-          <span>{d.funding.replaceAll("_", " ")}</span>
+          <span>{label(d.funding)}</span>
         </p>
         <dl>
           {Object.entries({
-            Tuition: coverage(d.tuitionCovered),
-            Accommodation: coverage(d.accommodationCovered),
-            "Living costs": coverage(d.livingCostsCovered),
+            Tuition: t(coverage(d.tuitionCovered)),
+            Accommodation: t(coverage(d.accommodationCovered)),
+            "Living costs": t(coverage(d.livingCostsCovered)),
             "Participation fee":
               d.participationFree === true
-                ? "Free"
+                ? t("Free")
                 : d.participationFree === false
-                  ? "Not free"
-                  : "Not stated",
-            "Application fee": d.applicationFee ?? "Not stated",
-            "Certificate fee": d.certificateFee ?? "Not stated",
-            "Travel costs": d.travelCosts ?? "Not stated",
-            "Coverage duration": d.coverageDuration ?? "Not stated",
+                  ? t("Not free")
+                  : t("Not stated"),
+            "Application fee": d.applicationFee ?? t("Not stated"),
+            "Certificate fee": d.certificateFee ?? t("Not stated"),
+            "Travel costs": d.travelCosts ?? t("Not stated"),
+            "Coverage duration": d.coverageDuration ?? t("Not stated"),
           }).map(([name, value]) => (
             <div key={name}>
-              <dt>{name}</dt>
+              <dt>{t(name)}</dt>
               <dd>{value}</dd>
             </div>
           ))}
         </dl>
       </section>
       <section>
-        <h2>Eligibility and deadline</h2>
-        <p>{d.eligibility}</p>
+        <h2>{t("Eligibility and deadline")}</h2>
+        <p lang="">{d.eligibility}</p>
         <p>
-          Teaching language:{" "}
-          {d.teachingLanguage === "unknown" ? "Not stated" : d.teachingLanguage}
+          {t("Teaching language:")} {label(d.teachingLanguage)}
         </p>
         <p>
-          Application deadline: {d.deadline ?? "Not stated"}
-          {d.deadline ? " · Date only; timezone not stated." : ""}
+          {t("Application deadline:")} {d.deadline ?? t("Not stated")}
+          {d.deadline ? t(" · Date only; timezone not stated.") : ""}
         </p>
-        {d.deadlineText ? <p>Source wording: {d.deadlineText}</p> : null}
-        <p>Topics: {d.topics.join(", ")}</p>
+        {d.deadlineText ? (
+          <p>
+            {t("Source wording:")} {d.deadlineText}
+          </p>
+        ) : null}
+        <p>
+          {t("Topics:")} {d.topics.join(", ")}
+        </p>
       </section>
       <section>
-        <h2>Official source</h2>
+        <h2>{t("Official source")}</h2>
         <p>{item.source_name}</p>
         {!item.synthetic ? (
           <a href={item.source_url} rel="noopener noreferrer" target="_blank">
             {item.available
-              ? "Open official application information"
-              : "Read the source information"}
+              ? t("Open official application information")
+              : t("Read the source information")}
           </a>
         ) : (
-          <p>No live application link is available for synthetic records.</p>
+          <p>
+            {t("No live application link is available for synthetic records.")}
+          </p>
         )}
         <p>
-          Last verified: {item.verified_at?.slice(0, 10) ?? "Not stated"} ·
-          Revision {item.revision}
+          {t("Last verified:")}{" "}
+          {item.verified_at?.slice(0, 10) ?? t("Not stated")} {t("· Revision")}{" "}
+          {item.revision}
         </p>
         <p>
-          Requirements can change. Review the official information before
-          applying.
+          {t(
+            "Requirements can change. Review the official information before applying.",
+          )}{" "}
         </p>
         {item.available ? <SaveButton id={item.id} /> : null}
       </section>
-    </>
+    </div>
   );
 }

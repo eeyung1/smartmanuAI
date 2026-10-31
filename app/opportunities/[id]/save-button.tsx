@@ -1,6 +1,8 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 export default function SaveButton({ id }: { id: string }) {
+  const { t, message: translateMessage } = useScreenText();
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   return (
@@ -31,9 +33,9 @@ export default function SaveButton({ id }: { id: string }) {
           }
         }}
       >
-        {busy ? "Saving…" : "Save opportunity"}
+        {busy ? t("Saving…") : t("Save opportunity")}
       </button>
-      <p role="status">{message}</p>
+      <p role="status">{translateMessage(message)}</p>
     </>
   );
 }

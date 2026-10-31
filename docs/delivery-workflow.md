@@ -123,3 +123,7 @@ Local account export and queued deletion now include recent-authentication check
 ## 16 Language support checkpoint on 31 October 2026
 
 Stage 5/6 now includes English/Simplified Chinese display selection, navigation and sign-in, plus localized local digest and outbound simulation templates. Display, alert and teaching language choices remain independent. Original source wording and uncertain fees/dates are preserved; unsupported or legacy templates use explicit English fallback. See [language support](language-support.md) for tests, cookie precedence and remaining untranslated screens. Complete interface translation, linguistic/browser review, live delivery and release gates remain open.
+
+## 17 Catalogue and workspace translation checkpoint on 31 October 2026
+
+The English/Simplified Chinese interface now includes catalogue filters/details, private preferences, deterministic match explanations and saved tracker controls. Source facts retain original wording and translated option labels keep stable API values. See [language support](language-support.md) for source-preservation and form-contract checks. Alert settings, privacy screens, remaining service errors, linguistic/browser review and live release gates remain open. No source translation model or paid execution is enabled.
