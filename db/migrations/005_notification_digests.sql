@@ -1,0 +1,10 @@
+ALTER TABLE notification_preferences ADD COLUMN version integer NOT NULL DEFAULT 1;
+ALTER TABLE notification_preferences ADD COLUMN consent_version text;
+ALTER TABLE notification_preferences ADD COLUMN timezone text NOT NULL DEFAULT 'UTC';
+ALTER TABLE notification_preferences ADD COLUMN frequency text NOT NULL DEFAULT 'weekly' CHECK(frequency IN ('daily','weekly'));
+ALTER TABLE notification_preferences ADD COLUMN next_due_at timestamptz;
+CREATE TABLE notification_digests (id text PRIMARY KEY,user_id text NOT NULL REFERENCES auth_user(id) ON DELETE CASCADE,preference_version integer NOT NULL,channel text NOT NULL CHECK(channel IN ('email','telegram')),slot text NOT NULL,state text NOT NULL DEFAULT 'queued' CHECK(state IN ('queued','accepted','suppressed')),created_at timestamptz NOT NULL DEFAULT NOW(),payload jsonb,UNIQUE(user_id,slot,preference_version));
+CREATE UNIQUE INDEX notification_digest_pending ON notification_digests(user_id) WHERE state='queued';
+CREATE TABLE notification_digest_events (user_id text NOT NULL REFERENCES auth_user(id) ON DELETE CASCADE,event_key text NOT NULL,opportunity_id text NOT NULL REFERENCES opportunities(id),fingerprint text NOT NULL,digest_id text NOT NULL REFERENCES notification_digests(id) ON DELETE CASCADE,state text NOT NULL DEFAULT 'planned' CHECK(state IN ('planned','accepted')),PRIMARY KEY(user_id,event_key));
+CREATE INDEX notification_digest_event_digest ON notification_digest_events(digest_id);
+CREATE INDEX notification_preferences_due ON notification_preferences(next_due_at) WHERE enabled;

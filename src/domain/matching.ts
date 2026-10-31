@@ -154,7 +154,12 @@ export function evaluateMatch(profile: Preferences, details: Details) {
     eligibility: "needs_checking" as const,
   };
 }
-export async function matchesForUser(sql: SQL, userId: string, page = 1) {
+export async function matchesForUser(
+  sql: SQL,
+  userId: string,
+  page = 1,
+  pageSize = 12,
+) {
   const stored = (
     await sql.query(
       "SELECT preferences,version FROM profiles WHERE user_id=$1",
@@ -169,7 +174,7 @@ export async function matchesForUser(sql: SQL, userId: string, page = 1) {
       items: [],
       total: 0,
       page,
-      pageSize: 12,
+      pageSize,
       truncated: false,
     };
   const profile = preferencesSchema.parse(stored.preferences);
@@ -210,10 +215,10 @@ export async function matchesForUser(sql: SQL, userId: string, page = 1) {
     profileRequired: false,
     profileVersion: Number(stored.version),
     rulesVersion: MATCH_RULES_VERSION,
-    items: ranked.slice((page - 1) * 12, page * 12),
+    items: ranked.slice((page - 1) * pageSize, page * pageSize),
     total: ranked.length,
     page,
-    pageSize: 12,
+    pageSize,
     truncated: rows.length > 1000,
   };
 }

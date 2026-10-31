@@ -416,6 +416,63 @@ try {
     )[0].status,
     "applying",
   );
+
+  assert.equal((await fetch(base + "/api/me/notifications")).status, 401);
+  assert.equal(
+    (await fetch(base + "/notifications", { headers: { Cookie: a } })).status,
+    200,
+  );
+  const alertSettings = {
+    expectedVersion: 0,
+    enabled: true,
+    channel: "telegram",
+    frequency: "weekly",
+    timezone: "Africa/Lagos",
+    consent: true,
+  };
+  const updateAlerts = (body: unknown, origin = base) =>
+    fetch(base + "/api/me/notifications", {
+      method: "PATCH",
+      headers: {
+        Cookie: a,
+        Origin: origin,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  assert.equal(
+    (await updateAlerts({ ...alertSettings, consent: false })).status,
+    400,
+  );
+  assert.equal(
+    (await updateAlerts({ ...alertSettings, userId: "someone-else" })).status,
+    400,
+  );
+  assert.equal(
+    (await updateAlerts(alertSettings, "https://attacker.example.test")).status,
+    403,
+  );
+  assert.equal((await updateAlerts(alertSettings)).status, 200);
+  assert.equal((await updateAlerts(alertSettings)).status, 409);
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/notifications", { headers: { Cookie: b } })
+      ).json()
+    ).settings.enabled,
+    false,
+  );
+  assert.equal(
+    (
+      await updateAlerts({
+        ...alertSettings,
+        expectedVersion: 1,
+        enabled: false,
+        consent: false,
+      })
+    ).status,
+    200,
+  );
   const logout = await fetch(base + "/api/auth/sign-out", {
     method: "POST",
     headers: { Cookie: a, Origin: base, "Content-Type": "application/json" },

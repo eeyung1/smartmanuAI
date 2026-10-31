@@ -22,7 +22,8 @@
     "setup:local": "node scripts/setup-local.mjs",
     "seed:local": "node --env-file=.env.local --import tsx scripts/seed-local.ts",
     "admin:grant": "node --env-file=.env.local --import tsx scripts/grant-admin.ts",
-    "research:once": "node --env-file=.env.local --import tsx scripts/research-once.ts"
+    "research:once": "node --env-file=.env.local --import tsx scripts/research-once.ts",
+    "digest:once": "node --env-file=.env.local --import tsx scripts/digest-once.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.13",

@@ -15,6 +15,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 9. [Reviewed catalogue implementation](docs/catalogue-implementation.md)
 10. [Source collection and extraction pipeline](docs/source-pipeline.md)
 11. [Personalized matching and tracking](docs/matching-tracker.md)
+12. [Consent and local digests](docs/notification-digests.md)
 
 ## Local development
 
@@ -49,12 +50,14 @@ Implemented locally:
 - [x] Explainable personalized matches with explicit eligibility unknowns
 - [x] Saved status tracking, dismissal and restoration across revisions
 - [ ] Completed translated interfaces and alert content
-- [ ] Email and Telegram delivery
+- [x] Notification consent, channel selection, timezone digests and local opt-out
+- [x] Local digest cap, overflow, deduplication and send-time eligibility checks
+- [ ] Verified channel connections and live email/Telegram delivery
 - [ ] Public pilot and deployment
 
 To review records with the default embedded database, sign in first, stop the development server, then run `npm run admin:grant -- your-name@example.test` and restart the server before visiting `/admin/review`. Run migration and seed commands while the server is stopped as well; the embedded database must have only one owning process. This local command grants a role; there is no public role-grant endpoint. Optional fixtures are not real opportunities.
 
-The catalogue integration suite runs on PGlite locally. CI also runs it against PostgreSQL 16, using isolated schemas. Set `TEST_DATABASE_URL` to an expendable local PostgreSQL database to run that case locally; it is explicitly skipped when absent.
+The catalogue, research, matching and digest integration suites run on PGlite locally. CI also runs them against PostgreSQL 16, using isolated schemas. Set `TEST_DATABASE_URL` to an expendable local PostgreSQL database to run that case locally; it is explicitly skipped when absent.
 
 Source collection and optional model extraction are documented in the pipeline guide. Both live collection and paid execution require explicit configuration. Tests use fixtures; no paid calls or recurring infrastructure have been enabled.
 

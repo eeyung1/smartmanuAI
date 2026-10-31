@@ -71,7 +71,9 @@ export async function saveItem(
   opportunityId: string,
 ) {
   await sql.transaction(async (tx) => {
-    await tx.query("SELECT id FROM auth_user WHERE id=$1 FOR UPDATE", [userId]);
+    await tx.query("SELECT id FROM auth_user WHERE id=$1 FOR NO KEY UPDATE", [
+      userId,
+    ]);
     await tx.query("SELECT id FROM opportunities WHERE id=$1 FOR SHARE", [
       opportunityId,
     ]);
