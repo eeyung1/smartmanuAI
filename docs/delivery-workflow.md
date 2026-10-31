@@ -110,3 +110,8 @@ Stage 6 now includes a local Telegram linking protocol with expiring hashed code
 ## 13 Email-control checkpoint on 31 October 2026
 
 Stage 6 now includes signed local email unsubscribe capabilities, consent epochs, non-mutating landing pages and POST confirmation. A Resend/Svix-shaped verifier authenticates raw callback bytes, deduplicates events and reconciles early callbacks against trusted digest attempts. Sticky destination suppression stops queued and future local email digests while preserving other channels. See the email-control report for tested behavior and limits. Live sending-domain/DKIM qualification, real provider sending, mailbox interoperability, operational suppression review, key rotation, retention/deletion and public release remain pending.
+
+
+## 14 Outbound adapter checkpoint on 31 October 2026
+
+Stage 6 has fixture-only email/Telegram request adapters and a separate encrypted simulation queue. The worker freezes idempotency identity, reserves day/month quota atomically, caps known-rejection retries and fences ambiguous/crashed attempts as uncertain. Accepted email correlation can be repaired without another send. See the outbound simulation report for tests and boundaries. No live transport or credentials are enabled; provider qualification, production intents, operational reconciliation, scheduling, retention and release gates remain pending.

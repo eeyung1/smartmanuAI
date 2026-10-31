@@ -5,6 +5,8 @@ const values = {
   BETTER_AUTH_URL: "http://127.0.0.1:3000",
   BETTER_AUTH_SECRET: randomBytes(32).toString("hex"),
   EVE_SPIKE_PASSWORD: randomBytes(32).toString("hex"),
+  SMARTMANU_DELIVERY_MODE: "local",
+  DELIVERY_SIMULATION_KEY: randomBytes(32).toString("hex"),
   SMARTMANU_EMAIL_MODE: "local",
   EMAIL_WEBHOOK_SIGNING_SECRET: "whsec_" + randomBytes(32).toString("base64"),
   NOTIFICATION_UNSUBSCRIBE_KEY: randomBytes(32).toString("hex"),

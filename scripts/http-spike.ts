@@ -646,6 +646,18 @@ try {
   assert.equal((await emailHook("invalid")).status, 401);
   assert.equal((await emailHook(emailSignature)).status, 200);
   assert.equal((await emailHook(emailSignature)).status, 200);
+
+  assert.equal((await fetch(base + "/api/me/delivery-tests")).status, 401);
+  assert.equal(
+    (await fetch(base + "/api/me/delivery-tests", { headers: { Cookie: a } }))
+      .status,
+    200,
+  );
+  assert.equal(
+    (await tg("/api/me/delivery-tests", { userId: "someone-else" })).status,
+    400,
+  );
+  assert.equal((await tg("/api/me/delivery-tests", {})).status, 409);
   const logout = await fetch(base + "/api/auth/sign-out", {
     method: "POST",
     headers: { Cookie: a, Origin: base, "Content-Type": "application/json" },
