@@ -1,4 +1,5 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 import type { Details } from "@/src/catalogue/schema";
 type Row = {
@@ -44,6 +45,7 @@ export default function ReviewWorkspace({
 }: {
   initial: { sources: Source[]; opportunities: Row[] };
 }) {
+  const { locale, t, label, message: translateMessage } = useScreenText();
   const [data, setData] = useState(initial),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
@@ -79,10 +81,10 @@ export default function ReviewWorkspace({
       setBusy(false);
     }
   }
-  function field(key: keyof Details, label: string) {
+  function field(key: keyof Details, caption: string) {
     return (
       <label key={key}>
-        {label}
+        {t(caption)}
         <input
           value={String(details[key] ?? "")}
           onChange={(e) =>
@@ -93,9 +95,9 @@ export default function ReviewWorkspace({
     );
   }
   return (
-    <>
+    <div lang={locale}>
       <section>
-        <h2>Add an official source</h2>
+        <h2>{t("Add an official source")}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -113,11 +115,11 @@ export default function ReviewWorkspace({
           }}
         >
           <label>
-            Source name
+            {t("Source name")}{" "}
             <input name="name" required minLength={3} maxLength={200} />
           </label>
           <label>
-            Source URL
+            {t("Source URL")}{" "}
             <input
               name="url"
               required
@@ -127,13 +129,13 @@ export default function ReviewWorkspace({
           </label>
           <label className="inline">
             <input type="checkbox" name="synthetic" />
-            This is a synthetic local test source
+            {t("This is a synthetic local test source")}{" "}
           </label>
-          <button disabled={busy}>Register source</button>
+          <button disabled={busy}>{t("Register source")}</button>
         </form>
       </section>
       <section>
-        <h2>{editing ? "Revise opportunity" : "Create a draft"}</h2>
+        <h2>{editing ? t("Revise opportunity") : t("Create a draft")}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -193,7 +195,7 @@ export default function ReviewWorkspace({
           }}
         >
           <label>
-            Source
+            {t("Source")}{" "}
             <select
               name="sourceId"
               defaultValue={editing?.source_id}
@@ -201,7 +203,7 @@ export default function ReviewWorkspace({
               disabled={!!editing}
               required
             >
-              <option value="">Select a registered source</option>
+              <option value="">{t("Select a registered source")}</option>
               {data.sources.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -212,7 +214,7 @@ export default function ReviewWorkspace({
           {field("title", "Title")}
           {field("organizer", "Organizer")}
           <label>
-            Summary
+            {t("Summary")}{" "}
             <textarea
               value={details.summary}
               onChange={(e) =>
@@ -223,7 +225,7 @@ export default function ReviewWorkspace({
             />
           </label>
           <label>
-            Type
+            {t("Type")}{" "}
             <select
               value={details.category}
               onChange={(e) =>
@@ -233,13 +235,13 @@ export default function ReviewWorkspace({
                 })
               }
             >
-              <option value="course">Course</option>
-              <option value="event">Event</option>
-              <option value="scholarship">Scholarship</option>
+              <option value="course">{t("Course")}</option>
+              <option value="event">{t("Event")}</option>
+              <option value="scholarship">{t("Scholarship")}</option>
             </select>
           </label>
           <label>
-            Mode
+            {t("Mode")}{" "}
             <select
               value={details.mode}
               onChange={(e) =>
@@ -249,8 +251,8 @@ export default function ReviewWorkspace({
                 })
               }
             >
-              <option value="online">Online</option>
-              <option value="in_person">In person</option>
+              <option value="online">{t("Online")}</option>
+              <option value="in_person">{t("In person")}</option>
             </select>
           </label>
           {field(
@@ -258,7 +260,7 @@ export default function ReviewWorkspace({
             "Country code such as CN or leave blank for online",
           )}
           <label>
-            Teaching language
+            {t("Teaching language")}{" "}
             <select
               value={details.teachingLanguage}
               onChange={(e) =>
@@ -270,12 +272,14 @@ export default function ReviewWorkspace({
               }
             >
               {["unknown", "en", "zh", "other"].map((v) => (
-                <option key={v}>{v}</option>
+                <option key={v} value={v}>
+                  {label(v)}
+                </option>
               ))}
             </select>
           </label>
           <label>
-            Funding
+            {t("Funding")}{" "}
             <select
               value={details.funding}
               onChange={(e) =>
@@ -292,7 +296,9 @@ export default function ReviewWorkspace({
                 "fully_funded",
                 "partial",
               ].map((v) => (
-                <option key={v}>{v}</option>
+                <option key={v} value={v}>
+                  {label(v)}
+                </option>
               ))}
             </select>
           </label>
@@ -306,14 +312,14 @@ export default function ReviewWorkspace({
               ] as const
             ).map((key) => (
               <label key={key}>
-                {
+                {t(
                   {
                     tuitionCovered: "Tuition covered",
                     accommodationCovered: "Accommodation covered",
                     livingCostsCovered: "Living costs covered",
                     participationFree: "Participation free",
-                  }[key]
-                }
+                  }[key],
+                )}
                 <select
                   value={
                     details[key] === null ? "unknown" : String(details[key])
@@ -328,9 +334,9 @@ export default function ReviewWorkspace({
                     })
                   }
                 >
-                  <option value="unknown">Not stated</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
+                  <option value="unknown">{t("Not stated")}</option>
+                  <option value="true">{t("Yes")}</option>
+                  <option value="false">{t("No")}</option>
                 </select>
               </label>
             ))}
@@ -343,7 +349,7 @@ export default function ReviewWorkspace({
           {field("travelCosts", "Travel costs or leave blank if unknown")}
           {field("coverageDuration", "Funding duration and renewal conditions")}
           <label>
-            Deadline date
+            {t("Deadline date")}{" "}
             <input
               type="date"
               value={details.deadline ?? ""}
@@ -354,7 +360,7 @@ export default function ReviewWorkspace({
           </label>
           {field("deadlineText", "Deadline wording copied from source")}
           <label>
-            Eligibility
+            {t("Eligibility")}{" "}
             <textarea
               value={details.eligibility}
               onChange={(e) =>
@@ -364,23 +370,25 @@ export default function ReviewWorkspace({
             />
           </label>
           <fieldset key={editing?.id ?? "new-rules"}>
-            <legend>Structured eligibility for matching</legend>
+            <legend>{t("Structured eligibility for matching")}</legend>
             <p>
-              Enter only requirements supported by the eligibility source
-              excerpt. Blank means unknown. ALL means the source explicitly
-              permits all nationalities.
+              {t(
+                "Enter only requirements supported by the eligibility source excerpt. Blank means unknown. ALL means the source explicitly permits all nationalities.",
+              )}{" "}
             </p>
             <label>
-              Scholarship study level
+              {t("Scholarship study level")}{" "}
               <select name="studyLevel" defaultValue={details.studyLevel ?? ""}>
-                <option value="">Not stated</option>
+                <option value="">{t("Not stated")}</option>
                 {["bachelor", "master", "doctorate"].map((v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>
+                    {label(v)}
+                  </option>
                 ))}
               </select>
             </label>
             <label>
-              Allowed nationality codes, separated by commas
+              {t("Allowed nationality codes, separated by commas")}{" "}
               <input
                 name="nationalities"
                 defaultValue={
@@ -389,7 +397,7 @@ export default function ReviewWorkspace({
               />
             </label>
             <label>
-              Minimum age
+              {t("Minimum age")}{" "}
               <input
                 name="minAge"
                 type="number"
@@ -399,7 +407,7 @@ export default function ReviewWorkspace({
               />
             </label>
             <label>
-              Maximum age
+              {t("Maximum age")}{" "}
               <input
                 name="maxAge"
                 type="number"
@@ -409,24 +417,26 @@ export default function ReviewWorkspace({
               />
             </label>
             <label>
-              Minimum qualification
+              {t("Minimum qualification")}{" "}
               <select
                 name="minQualification"
                 defaultValue={details.eligibilityRules?.minQualification ?? ""}
               >
-                <option value="">Not stated</option>
+                <option value="">{t("Not stated")}</option>
                 {["secondary", "bachelor", "master", "doctorate"].map((v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>
+                    {label(v)}
+                  </option>
                 ))}
               </select>
             </label>
           </fieldset>
           <fieldset>
-            <legend>Supporting source excerpts</legend>
+            <legend>{t("Supporting source excerpts")}</legend>
             {(["title", "funding", "deadline", "eligibility"] as const).map(
               (key) => (
                 <label key={key}>
-                  {key}
+                  {label(key)}
                   <textarea
                     value={evidence[key]}
                     required
@@ -441,10 +451,12 @@ export default function ReviewWorkspace({
             )}
           </fieldset>
           <label>
-            Review note
+            {t("Review note")}{" "}
             <input name="note" required minLength={5} maxLength={1000} />
           </label>
-          <button disabled={busy || !data.sources.length}>Save draft</button>
+          <button disabled={busy || !data.sources.length}>
+            {t("Save draft")}
+          </button>
           {editing ? (
             <button
               type="button"
@@ -460,58 +472,70 @@ export default function ReviewWorkspace({
                 });
               }}
             >
-              Cancel editing
+              {t("Cancel editing")}{" "}
             </button>
           ) : null}
         </form>
       </section>
       <section>
-        <h2>Review queue</h2>
+        <h2>{t("Review queue")}</h2>
         {data.opportunities.length === 0 ? (
-          <p>No draft opportunities yet.</p>
+          <p>{t("No draft opportunities yet.")}</p>
         ) : (
           data.opportunities.map((row) => (
             <article key={row.id}>
-              <h3>{row.details.title}</h3>
+              <h3 lang="">{row.details.title}</h3>
               <p>
-                {row.state} · Revision {row.revision}
+                {label(row.state)} {t("· Revision")} {row.revision}
               </p>
-              <p>{row.details.summary}</p>
+              <p lang="">{row.details.summary}</p>
               <p>
-                Funding: {row.details.funding} · Application fee:{" "}
-                {row.details.applicationFee ?? "Not stated"}
+                {t("Funding:")} {label(row.details.funding)}{" "}
+                {t("· Application fee:")}{" "}
+                {row.details.applicationFee ?? t("Not stated")}
               </p>
-              <p>Eligibility: {row.details.eligibility}</p>
               <p>
-                Study level: {row.details.studyLevel ?? "Not stated"}.
-                Nationalities:{" "}
+                {t("Eligibility:")}{" "}
+                <span lang="">{row.details.eligibility}</span>
+              </p>
+              <p>
+                {t("Study level:")}{" "}
+                {row.details.studyLevel
+                  ? label(row.details.studyLevel)
+                  : t("Not stated")}
+                {t(". Nationalities:")}{" "}
                 {row.details.eligibilityRules?.nationalities?.join(", ") ??
-                  "Not stated"}
-                . Age:{" "}
-                {row.details.eligibilityRules?.minAge ?? "Unknown minimum"} to{" "}
-                {row.details.eligibilityRules?.maxAge ?? "unknown maximum"}.
-                Minimum qualification:{" "}
-                {row.details.eligibilityRules?.minQualification ?? "Not stated"}
+                  t("Not stated")}
+                {t(". Age:")}{" "}
+                {row.details.eligibilityRules?.minAge ?? t("Unknown minimum")}{" "}
+                {t("to")}{" "}
+                {row.details.eligibilityRules?.maxAge ?? t("unknown maximum")}
+                {t(". Minimum qualification:")}{" "}
+                {row.details.eligibilityRules?.minQualification
+                  ? label(row.details.eligibilityRules.minQualification)
+                  : t("Not stated")}
                 .
               </p>
-              <p>Deadline: {row.details.deadline ?? "Not stated"}</p>
               <p>
-                Source:{" "}
+                {t("Deadline:")} {row.details.deadline ?? t("Not stated")}
+              </p>
+              <p>
+                {t("Source:")}{" "}
                 <a
                   href={data.sources.find((s) => s.id === row.source_id)?.url}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   {data.sources.find((s) => s.id === row.source_id)?.name ??
-                    "Source outside current source page"}
+                    t("Source outside current source page")}
                 </a>
               </p>
               <details>
-                <summary>Field evidence</summary>
+                <summary>{t("Field evidence")}</summary>
                 {Object.entries(row.evidence).map(([key, value]) => (
                   <p key={key}>
-                    <strong>{key}: </strong>
-                    {value}
+                    <strong>{label(key)}: </strong>
+                    <span lang="">{value}</span>
                   </p>
                 ))}
               </details>
@@ -524,7 +548,7 @@ export default function ReviewWorkspace({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               >
-                Edit details
+                {t("Edit details")}{" "}
               </button>
               <form
                 onSubmit={(e) => {
@@ -545,32 +569,34 @@ export default function ReviewWorkspace({
                 }}
               >
                 <label>
-                  Decision
+                  {t("Decision")}{" "}
                   <select name="action">
                     <option value="publish">
-                      Publish after checking source
+                      {t("Publish after checking source")}{" "}
                     </option>
-                    <option value="close">Close opportunity</option>
-                    <option value="reject">Reject draft</option>
+                    <option value="close">{t("Close opportunity")}</option>
+                    <option value="reject">{t("Reject draft")}</option>
                   </select>
                 </label>
                 <label className="inline">
-                  <input type="checkbox" name="verified" />I checked the
-                  official source and all field evidence
+                  <input type="checkbox" name="verified" />
+                  {t(
+                    "I checked the official source and all field evidence",
+                  )}{" "}
                 </label>
                 <label>
-                  Decision reason
+                  {t("Decision reason")}{" "}
                   <input name="note" required minLength={5} maxLength={1000} />
                 </label>
-                <button disabled={busy}>Record decision</button>
+                <button disabled={busy}>{t("Record decision")}</button>
               </form>
             </article>
           ))
         )}
       </section>
       <p role="status" aria-live="polite">
-        {message}
+        {translateMessage(message)}
       </p>
-    </>
+    </div>
   );
 }

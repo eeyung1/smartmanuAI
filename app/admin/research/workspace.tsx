@@ -1,4 +1,5 @@
 "use client";
+import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 type Dashboard = {
   sources: {
@@ -25,6 +26,7 @@ type Dashboard = {
   }[];
 };
 export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
+  const { locale, t, research, message: translateMessage } = useScreenText();
   const [data, setData] = useState(initial),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
@@ -50,20 +52,20 @@ export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
     }
   }
   return (
-    <>
+    <div lang={locale}>
       <section>
-        <h2>Registered sources</h2>
+        <h2>{t("Registered sources")}</h2>
         {data.sources.length ? (
           data.sources.map((source) => (
             <article key={source.id}>
-              <h3>{source.name}</h3>
+              <h3 lang="">{source.name}</h3>
               <p>{source.url}</p>
               <p>
                 {source.synthetic
-                  ? "Synthetic source; live collection unavailable."
+                  ? t("Synthetic source; live collection unavailable.")
                   : source.enabled
-                    ? "Collection enabled"
-                    : "Collection paused"}
+                    ? t("Collection enabled")
+                    : t("Collection paused")}
               </p>
               <form
                 onSubmit={(e) => {
@@ -84,10 +86,10 @@ export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
                     defaultChecked={source.enabled}
                     disabled={source.synthetic}
                   />
-                  Enable collection
+                  {t("Enable collection")}{" "}
                 </label>
                 <label>
-                  Permission and ownership review note
+                  {t("Permission and ownership review note")}{" "}
                   <input
                     name="note"
                     required
@@ -97,50 +99,57 @@ export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
                   />
                 </label>
                 <button disabled={busy || source.synthetic}>
-                  Save collection policy
+                  {t("Save collection policy")}{" "}
                 </button>
               </form>
             </article>
           ))
         ) : (
-          <p>Register a source in opportunity review first.</p>
+          <p>{t("Register a source in opportunity review first.")}</p>
         )}
       </section>
       <section>
-        <h2>Recent collection jobs</h2>
+        <h2>{t("Recent collection jobs")}</h2>
         {data.jobs.length ? (
           <ul>
             {data.jobs.map((j) => (
               <li key={j.id}>
                 {data.sources.find((s) => s.id === j.source_id)?.name ??
                   j.source_id}
-                : {j.state} · Attempt {j.attempts}
-                {j.error_code ? " · " + j.error_code : ""}
+                : {research("job", j.state)}
+                {t("· Attempt")} {j.attempts}
+                {j.error_code
+                  ? " · " + t("Diagnostic code: {code}", { code: j.error_code })
+                  : ""}
               </li>
             ))}
           </ul>
         ) : (
-          <p>No collection jobs yet.</p>
+          <p>{t("No collection jobs yet.")}</p>
         )}
       </section>
       <section>
-        <h2>Captured candidates</h2>
+        <h2>{t("Captured candidates")}</h2>
         <p>
-          Inspect source text and submit a structured extraction for validation.
-          This manual import does not call an AI service. Model execution is a
-          separate, explicitly configured worker action.
+          {t(
+            "Inspect source text and submit a structured extraction for validation. This manual import does not call an AI service. Model execution is a separate, explicitly configured worker action.",
+          )}{" "}
         </p>
         {data.candidates.length ? (
           data.candidates.map((c) => (
             <article key={c.id}>
-              <h3>Candidate {c.id}</h3>
+              <h3>
+                {t("Candidate")} {c.id}
+              </h3>
               <p>
-                {c.state}
-                {c.opportunity_id ? " · Draft " + c.opportunity_id : ""}
+                {research("candidate", c.state)}
+                {c.opportunity_id
+                  ? t(" · Draft {id}", { id: c.opportunity_id })
+                  : ""}
               </p>
               <details>
-                <summary>Captured source excerpt</summary>
-                <p>{c.content}</p>
+                <summary>{t("Captured source excerpt")}</summary>
+                <p lang="">{c.content}</p>
               </details>
               {c.state === "pending" ? (
                 <form
@@ -162,19 +171,26 @@ export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
                   }}
                 >
                   <label>
-                    Structured extraction JSON
+                    {t("Structured extraction JSON")}{" "}
                     <textarea name="extraction" required maxLength={16000} />
+                    <small>
+                      {t(
+                        "Keep JSON field names and enum values unchanged. Source text is evidence, not instructions.",
+                      )}
+                    </small>
                   </label>
-                  <button disabled={busy}>Validate and create draft</button>
+                  <button disabled={busy}>
+                    {t("Validate and create draft")}
+                  </button>
                 </form>
               ) : null}
             </article>
           ))
         ) : (
-          <p>No source snapshots captured yet.</p>
+          <p>{t("No source snapshots captured yet.")}</p>
         )}
       </section>
-      <p role="status">{message}</p>
-    </>
+      <p role="status">{translateMessage(message)}</p>
+    </div>
   );
 }

@@ -1,3 +1,5 @@
+import { interfaceLocale } from "@/src/i18n/server";
+import { screenText } from "@/src/i18n/screens";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
@@ -7,6 +9,8 @@ import { adminCatalogue } from "@/src/catalogue/service";
 import ReviewWorkspace from "./workspace";
 export const dynamic = "force-dynamic";
 export default async function Review() {
+  const locale = await interfaceLocale();
+  const t = (key: string) => screenText(locale, key);
   const session = await (
     await getAuth()
   ).api.getSession({ headers: await headers() });
@@ -18,15 +22,18 @@ export default async function Review() {
     notFound();
   }
   return (
-    <>
-      <p className="eyebrow">ADMINISTRATION</p>
-      <h1>Review before sharing.</h1>
+    <div lang={locale}>
+      <p className="eyebrow">{t("ADMINISTRATION")}</p>
+      <h1>{t("Review before sharing.")}</h1>
       <p>
-        Check the source and evidence before publishing. Edits return a record
-        to draft until reviewed again.
+        {t(
+          "Check the source and evidence before publishing. Edits return a record to draft until reviewed again.",
+        )}{" "}
       </p>
-      <Link href="/admin/research">Source collection and candidates</Link>
+      <Link href="/admin/research">
+        {t("Source collection and candidates")}
+      </Link>
       <ReviewWorkspace initial={JSON.parse(JSON.stringify(data))} />
-    </>
+    </div>
   );
 }

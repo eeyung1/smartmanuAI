@@ -1,3 +1,5 @@
+import { interfaceLocale } from "@/src/i18n/server";
+import { screenText } from "@/src/i18n/screens";
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
@@ -7,6 +9,8 @@ import { researchDashboard } from "@/src/research/collection";
 import ResearchWorkspace from "./workspace";
 export const dynamic = "force-dynamic";
 export default async function Research() {
+  const locale = await interfaceLocale();
+  const t = (key: string) => screenText(locale, key);
   const session = await (
     await getAuth()
   ).api.getSession({ headers: await headers() });
@@ -18,16 +22,16 @@ export default async function Research() {
     notFound();
   }
   return (
-    <>
-      <p className="eyebrow">SOURCE COLLECTION</p>
-      <h1>Evidence before extraction.</h1>
+    <div lang={locale}>
+      <p className="eyebrow">{t("SOURCE COLLECTION")}</p>
+      <h1>{t("Evidence before extraction.")}</h1>
       <p>
-        Enable collection only after checking source ownership and permitted
-        access. Collection runs in a separate worker. No source instructions are
-        executed.
+        {t(
+          "Enable collection only after checking source ownership and permitted access. Collection runs in a separate worker. No source instructions are executed.",
+        )}{" "}
       </p>
-      <Link href="/admin/review">Opportunity review</Link>
+      <Link href="/admin/review">{t("Opportunity review")}</Link>
       <ResearchWorkspace initial={JSON.parse(JSON.stringify(data))} />
-    </>
+    </div>
   );
 }
