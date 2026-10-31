@@ -1,3 +1,8 @@
+import {
+  emailControlsConfig,
+  emailSuppression,
+  mintUnsubscribeToken,
+} from "../channels/email-controls";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { SQL } from "../db";
@@ -30,8 +35,16 @@ export async function readNotificationSettings(sql: SQL, userId: string) {
       [userId],
     )
   ).rows[0];
+  let controls: ReturnType<typeof emailControlsConfig> | null = null;
+  try {
+    controls = emailControlsConfig();
+  } catch {}
+  const emailSuppressionReason = controls
+    ? await emailSuppression(sql, userId, controls)
+    : null;
   return {
     enabled: row?.enabled === true,
+    emailSuppressionReason,
     channel: (row?.channel ?? "email") as "email" | "telegram",
     version: Number(row?.version ?? 0),
     consentVersion: row?.consent_version ? String(row.consent_version) : null,
@@ -56,7 +69,7 @@ export async function saveNotificationSettings(
     ]);
     const row = (
       await tx.query(
-        "SELECT version FROM notification_preferences WHERE user_id=$1 FOR UPDATE",
+        "SELECT * FROM notification_preferences WHERE user_id=$1 FOR UPDATE",
         [userId],
       )
     ).rows[0];
@@ -65,11 +78,29 @@ export async function saveNotificationSettings(
         409,
         "Notification settings changed. Reload before saving.",
       );
+    if (
+      value.enabled &&
+      value.channel === "email" &&
+      (await emailSuppression(tx, userId, emailControlsConfig()))
+    )
+      throw new CatalogueError(
+        409,
+        "Email digests are suppressed after a bounce or complaint. Use another channel or contact support.",
+      );
+    const emailEpoch =
+      Number(row?.email_consent_epoch ?? 0) +
+      (value.enabled &&
+      value.channel === "email" &&
+      (!row?.enabled ||
+        row?.channel !== "email" ||
+        row?.consent_version !== LOCAL_CONSENT_VERSION)
+        ? 1
+        : 0);
     const next = value.enabled
       ? nextDigestSlot(now, value.timezone, value.frequency).toISOString()
       : null;
     await tx.query(
-      "INSERT INTO notification_preferences(user_id,enabled,channel,version,consent_version,timezone,frequency,next_due_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(user_id) DO UPDATE SET enabled=$2,channel=$3,version=$4,consent_version=$5,timezone=$6,frequency=$7,next_due_at=$8",
+      "INSERT INTO notification_preferences(user_id,enabled,channel,version,consent_version,timezone,frequency,next_due_at,email_consent_epoch) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(user_id) DO UPDATE SET enabled=$2,channel=$3,version=$4,consent_version=$5,timezone=$6,frequency=$7,next_due_at=$8,email_consent_epoch=$9",
       [
         userId,
         value.enabled,
@@ -79,6 +110,7 @@ export async function saveNotificationSettings(
         value.timezone,
         value.frequency,
         next,
+        emailEpoch,
       ],
     );
     await tx.query(
@@ -124,6 +156,16 @@ export async function planOneDigest(sql: SQL, now = new Date()) {
       ).rows.length
     )
       return "pending";
+    if (
+      pref.channel === "email" &&
+      (await emailSuppression(tx, userId, emailControlsConfig()))
+    ) {
+      await tx.query(
+        "UPDATE notification_preferences SET enabled=false,consent_version=NULL,next_due_at=NULL,version=version+1 WHERE user_id=$1",
+        [userId],
+      );
+      return "suppressed";
+    }
     const matches = await matchesForUser(tx, userId, 1, 1000);
     const seen = new Set(
       (
@@ -193,11 +235,21 @@ export async function dispatchDigest(sql: SQL, now = new Date()) {
       )
     ).rows[0];
     if (!digest) return "empty";
-    const valid =
+    let valid =
       pref?.enabled === true &&
       pref.consent_version === LOCAL_CONSENT_VERSION &&
       pref.version === digest.preference_version &&
       pref.channel === digest.channel;
+    if (
+      valid &&
+      digest.channel === "email" &&
+      (await emailSuppression(
+        tx,
+        String(candidate.user_id),
+        emailControlsConfig(),
+      ))
+    )
+      valid = false;
     const events = (
       await tx.query(
         "SELECT * FROM notification_digest_events WHERE digest_id=$1 AND state='planned'",
@@ -280,8 +332,26 @@ export async function dispatchDigest(sql: SQL, now = new Date()) {
         [candidate.user_id],
       )
     ).rows[0];
+    const unsubscribeToken =
+      digest.channel === "email"
+        ? await mintUnsubscribeToken(
+            tx,
+            String(candidate.user_id),
+            Number(pref.email_consent_epoch),
+            emailControlsConfig(),
+            now,
+          )
+        : null;
     const payload = {
       mode: "local_sink",
+      unsubscribe: unsubscribeToken
+        ? {
+            landingPath: "/unsubscribe?token=" + unsubscribeToken,
+            postPath:
+              "/api/notifications/unsubscribe?token=" + unsubscribeToken,
+            postBody: "List-Unsubscribe=One-Click",
+          }
+        : null,
       language: "en",
       requestedLanguage: profile?.language ?? "en",
       translationFallback: (profile?.language ?? "en") !== "en",

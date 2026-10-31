@@ -17,6 +17,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 11. [Personalized matching and tracking](docs/matching-tracker.md)
 12. [Consent and local digests](docs/notification-digests.md)
 13. [Telegram linking and revocation](docs/telegram-linking.md)
+14. [Email suppression and unsubscribe](docs/email-controls.md)
 
 ## Local development
 
@@ -54,6 +55,7 @@ Implemented locally:
 - [x] Notification consent, channel selection, timezone digests and local opt-out
 - [x] Local digest cap, overflow, deduplication and send-time eligibility checks
 - [x] Local Telegram linking, encrypted binding, webhook validation and revocation
+- [x] Signed email unsubscribe and authenticated bounce/complaint suppression
 - [ ] Verified live channel connections and email/Telegram delivery
 - [ ] Public pilot and deployment
 

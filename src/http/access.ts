@@ -24,7 +24,7 @@ export function apiError(error: unknown) {
     { status: 500 },
   );
 }
-export async function readJSON(request: Request) {
+export async function readBody(request: Request) {
   const reader = request.body?.getReader();
   if (!reader) throw new SyntaxError("Missing body");
   let size = 0;
@@ -39,5 +39,9 @@ export async function readJSON(request: Request) {
     }
     parts.push(value);
   }
-  return JSON.parse(Buffer.concat(parts).toString("utf8"));
+  return Buffer.concat(parts);
+}
+
+export async function readJSON(request: Request) {
+  return JSON.parse((await readBody(request)).toString("utf8"));
 }
