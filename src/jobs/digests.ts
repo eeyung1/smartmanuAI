@@ -125,11 +125,21 @@ export async function saveNotificationSettings(
   return readNotificationSettings(sql, userId);
 }
 export async function planOneDigest(sql: SQL, now = new Date()) {
+  const candidate = (
+    await sql.query(
+      "SELECT user_id FROM notification_preferences WHERE enabled AND consent_version=$2 AND next_due_at<=$1 ORDER BY next_due_at,user_id LIMIT 1",
+      [now.toISOString(), LOCAL_CONSENT_VERSION],
+    )
+  ).rows[0];
+  if (!candidate) return "empty";
   return sql.transaction(async (tx) => {
+    await tx.query("SELECT id FROM auth_user WHERE id=$1 FOR NO KEY UPDATE", [
+      candidate.user_id,
+    ]);
     const pref = (
       await tx.query(
-        "SELECT * FROM notification_preferences WHERE enabled AND consent_version=$2 AND next_due_at<=$1 ORDER BY next_due_at,user_id LIMIT 1 FOR UPDATE SKIP LOCKED",
-        [now.toISOString(), LOCAL_CONSENT_VERSION],
+        "SELECT * FROM notification_preferences WHERE enabled AND consent_version=$2 AND next_due_at<=$1 AND user_id=$3 FOR UPDATE SKIP LOCKED",
+        [now.toISOString(), LOCAL_CONSENT_VERSION, candidate.user_id],
       )
     ).rows[0];
     if (!pref) return "empty";

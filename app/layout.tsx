@@ -16,6 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/">Opportunities</Link>
             <Link href="/matches">My space</Link>
             <Link href="/notifications">Alerts</Link>
+            <Link href="/privacy">Privacy</Link>
             <Link href="/sign-in">Sign in</Link>
           </nav>
         </header>

@@ -24,7 +24,8 @@
     "admin:grant": "node --env-file=.env.local --import tsx scripts/grant-admin.ts",
     "research:once": "node --env-file=.env.local --import tsx scripts/research-once.ts",
     "digest:once": "node --env-file=.env.local --import tsx scripts/digest-once.ts",
-    "delivery:test:once": "node --env-file=.env.local --import tsx scripts/delivery-test-once.ts"
+    "delivery:test:once": "node --env-file=.env.local --import tsx scripts/delivery-test-once.ts",
+    "privacy:once": "node --env-file=.env.local --import tsx scripts/privacy-once.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.13",

@@ -19,6 +19,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 13. [Telegram linking and revocation](docs/telegram-linking.md)
 14. [Email suppression and unsubscribe](docs/email-controls.md)
 15. [Outbound delivery simulation](docs/outbound-simulation.md)
+16. [Account export and deletion](docs/account-privacy.md)
 
 ## Local development
 
@@ -58,6 +59,8 @@ Implemented locally:
 - [x] Local Telegram linking, encrypted binding, webhook validation and revocation
 - [x] Signed email unsubscribe and authenticated bounce/complaint suppression
 - [x] Outbound request adapters, quota/retry simulation and uncertain-send fencing
+- [x] Private profile/activity export, immediate deletion revocation and resumable local purge
+- [ ] Production retention, backup expiry and operator-assisted reviewer deletion
 - [ ] Verified live channel connections and email/Telegram delivery
 - [ ] Public pilot and deployment
 
