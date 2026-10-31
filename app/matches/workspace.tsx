@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Preferences } from "@/src/domain/profile";
 import type { listTracker } from "@/src/domain/tracker";
@@ -28,6 +29,7 @@ export default function Workspace({
   initialTracker: Awaited<ReturnType<typeof listTracker>>;
   initialMatches: Matches;
 }) {
+  const router = useRouter();
   const [matches, setMatches] = useState(initialMatches),
     [tracker, setTracker] = useState(initialTracker),
     [busy, setBusy] = useState(false),
@@ -115,8 +117,10 @@ export default function Workspace({
         <h2>Your preferences</h2>
         <p>
           Interface and alert language choices are stored separately. This
-          prototype displays English while translations are pending. Age and
-          qualification are optional; unknowns remain needs checking.
+          prototype translates navigation, sign-in and alert templates into
+          English or Simplified Chinese. Other screens and source wording remain
+          in their original language. Age and qualification are optional;
+          unknowns remain needs checking.
         </p>
         <form
           onSubmit={(e) => {
@@ -145,6 +149,7 @@ export default function Workspace({
                 ),
               });
               await reload(1);
+              router.refresh();
               setNotice("Preferences saved and matches refreshed.");
             });
           }}
@@ -156,9 +161,7 @@ export default function Workspace({
                 : "Alert language"}
               <select name={name} defaultValue={p[name]}>
                 <option value="en">English</option>
-                <option value="zh-Hans">
-                  Simplified Chinese — English fallback pending translation
-                </option>
+                <option value="zh-Hans">Simplified Chinese</option>
               </select>
             </label>
           ))}

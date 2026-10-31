@@ -1,6 +1,7 @@
 import { getAuth } from "@/src/auth";
 import { getDatabase } from "@/src/db";
 import { readProfile, saveProfile } from "@/src/domain/profile";
+import { localeCookie } from "@/src/i18n/locale";
 import { localConfig } from "@/src/config";
 export async function GET(request: Request) {
   const session = await (
@@ -21,13 +22,17 @@ export async function PATCH(request: Request) {
   if (!session)
     return Response.json({ error: "unauthorized" }, { status: 401 });
   try {
-    return Response.json(
-      await saveProfile(
-        (await getDatabase()).sql,
-        session.user.id,
-        await request.json(),
-      ),
+    const profile = await saveProfile(
+      (await getDatabase()).sql,
+      session.user.id,
+      await request.json(),
     );
+    return Response.json(profile, {
+      headers: {
+        "Set-Cookie": localeCookie(profile.interfaceLanguage),
+        "Cache-Control": "no-store",
+      },
+    });
   } catch {
     return Response.json({ error: "invalid_profile" }, { status: 400 });
   }

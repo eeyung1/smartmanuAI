@@ -119,3 +119,7 @@ Stage 6 has fixture-only email/Telegram request adapters and a separate encrypte
 ## 15 Account privacy checkpoint on 31 October 2026
 
 Local account export and queued deletion now include recent-authentication checks, immediate session/channel revocation, pending-write guards, private receipt lookup and a restartable purge worker. See [account privacy](account-privacy.md) for scope and validation. Shared reviewer attribution needs operator-assisted handling; retention, backups, provider erasure, browser validation and public-release gates remain open. This checkpoint does not authorize deployment.
+
+## 16 Language support checkpoint on 31 October 2026
+
+Stage 5/6 now includes English/Simplified Chinese display selection, navigation and sign-in, plus localized local digest and outbound simulation templates. Display, alert and teaching language choices remain independent. Original source wording and uncertain fees/dates are preserved; unsupported or legacy templates use explicit English fallback. See [language support](language-support.md) for tests, cookie precedence and remaining untranslated screens. Complete interface translation, linguistic/browser review, live delivery and release gates remain open.

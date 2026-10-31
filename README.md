@@ -20,6 +20,7 @@ Building a public platform for smart manufacturing scholarships in China and fre
 14. [Email suppression and unsubscribe](docs/email-controls.md)
 15. [Outbound delivery simulation](docs/outbound-simulation.md)
 16. [Account export and deletion](docs/account-privacy.md)
+17. [Language support and translated templates](docs/language-support.md)
 
 ## Local development
 
@@ -53,7 +54,9 @@ Implemented locally:
 - [ ] Live-source/model pilot and open-web discovery
 - [x] Explainable personalized matches with explicit eligibility unknowns
 - [x] Saved status tracking, dismissal and restoration across revisions
-- [ ] Completed translated interfaces and alert content
+- [x] English/Simplified Chinese navigation, sign-in and independent display selection
+- [x] English/Simplified Chinese digest templates with original source facts and explicit fallback
+- [ ] Completed translated catalogue, private workspace, alert settings and privacy screens
 - [x] Notification consent, channel selection, timezone digests and local opt-out
 - [x] Local digest cap, overflow, deduplication and send-time eligibility checks
 - [x] Local Telegram linking, encrypted binding, webhook validation and revocation
