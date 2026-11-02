@@ -160,3 +160,8 @@ Administrators can browse source policies, jobs and candidates in searchable pag
 ## 25 Collection-job recovery checkpoint on 2 November 2026
 
 Administrators now have a bilingual collection-job detail screen with audited cancellation and one queued replacement per failed/cancelled attempt. Expected state/attempts, ordered locks, active-job checks and lease fencing preserve worker and source-policy behavior. See [source pipeline](source-pipeline.md) for queue semantics, privacy handling and tests. Uncertain model usage, browser/linguistic review, live collection/provider pilots, retention and public-release gates remain open.
+
+
+## 26 Conditional collection checkpoint on 2 November 2026
+
+Source collection now supports persisted ETag/Last-Modified validators and fenced 304 completion without new candidate extraction or publication verification. URL/snapshot identity, conservative header validation and existing retrieval/lease boundaries remain enforced. See [source pipeline](source-pipeline.md) for protocol scope and database/stream tests. Live-source interoperability and measured bandwidth savings, uncertain model-cost recovery, browser review, retention and public-release gates remain open.
