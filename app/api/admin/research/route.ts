@@ -1,14 +1,30 @@
 import { z } from "zod";
 import { adminAccess, apiError, readJSON } from "@/src/http/access";
-import { collectionPolicy, researchDashboard } from "@/src/research/collection";
+import { collectionPolicy } from "@/src/research/collection";
+import { queryFields } from "@/src/catalogue/admin-browse";
+import {
+  selectedResearchData,
+  researchSelectionSchema,
+} from "@/src/research/browse";
 import { applyExtraction } from "@/src/research/extraction";
 export async function GET(request: Request) {
+  let response: Response;
   try {
     const { sql, userId } = await adminAccess(request);
-    return Response.json(await researchDashboard(sql, userId));
-  } catch (e) {
-    return apiError(e);
+    const selected = await selectedResearchData(
+      sql,
+      userId,
+      researchSelectionSchema.parse(
+        queryFields(new URL(request.url).searchParams),
+      ),
+    );
+    response = Response.json(selected.data);
+  } catch (error) {
+    response = apiError(error);
   }
+  response.headers.set("Cache-Control", "no-store");
+  response.headers.set("Referrer-Policy", "no-referrer");
+  return response;
 }
 export async function POST(request: Request) {
   try {

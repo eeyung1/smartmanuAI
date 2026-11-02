@@ -151,3 +151,7 @@ Administrators now have a read-only bilingual revision-history screen and bounde
 ## 23 Admin catalogue navigation checkpoint on 2 November 2026
 
 A searchable, paginated administrator catalogue now reaches records and sources beyond the editor's latest-100 bootstrap. Validated deep links load exact editor targets and retain the selected source through refreshes without changing revision/evidence/publication semantics. See [catalogue implementation](catalogue-implementation.md) for query limits, live-list ordering and validation. Research dashboard pagination, browser review, operational retention/provider validation and public-release gates remain open.
+
+## 24 Research navigation checkpoint on 2 November 2026
+
+Administrators can browse source policies, jobs and candidates in searchable pages of 25 and open exact older policy/review targets beyond the recent workspace limits. Selected records survive policy saves and manual candidate review, preserving original source text and private-draft publication boundaries. See [source pipeline](source-pipeline.md) for query validation, live-list ordering and verification. Browser/linguistic review, job/uncertain-cost recovery controls, retention, live provider/source pilots and public-release gates remain open.
