@@ -43,21 +43,29 @@ const initialDetails: Details = {
 };
 export default function ReviewWorkspace({
   initial,
+  initialEditing = null,
+  initialSourceId = null,
 }: {
   initial: { sources: Source[]; opportunities: Row[] };
+  initialEditing?: Row | null;
+  initialSourceId?: string | null;
 }) {
   const { locale, t, label, message: translateMessage } = useScreenText();
   const [data, setData] = useState(initial),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
-    [editing, setEditing] = useState<Row | null>(null),
-    [details, setDetails] = useState<Details>(initialDetails),
-    [evidence, setEvidence] = useState({
-      title: "",
-      funding: "",
-      deadline: "",
-      eligibility: "",
-    });
+    [editing, setEditing] = useState<Row | null>(initialEditing),
+    [details, setDetails] = useState<Details>(
+      initialEditing?.details ?? initialDetails,
+    ),
+    [evidence, setEvidence] = useState(
+      initialEditing?.evidence ?? {
+        title: "",
+        funding: "",
+        deadline: "",
+        eligibility: "",
+      },
+    );
   async function request(path: string, body: unknown) {
     const r = await fetch(path, {
       method: "POST",
@@ -73,7 +81,12 @@ export default function ReviewWorkspace({
     setMessage("");
     try {
       await fn();
-      const r = await fetch("/api/admin/opportunities");
+      const r = await fetch(
+        "/api/admin/opportunities" +
+          (initialSourceId
+            ? "?source=" + encodeURIComponent(initialSourceId)
+            : ""),
+      );
       if (!r.ok) throw new Error("Could not refresh the review queue.");
       setData(await r.json());
     } catch (e) {
@@ -199,7 +212,7 @@ export default function ReviewWorkspace({
             {t("Source")}{" "}
             <select
               name="sourceId"
-              defaultValue={editing?.source_id}
+              defaultValue={editing?.source_id ?? initialSourceId ?? ""}
               key={editing?.id ?? "new"}
               disabled={!!editing}
               required

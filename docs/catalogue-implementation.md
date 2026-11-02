@@ -27,7 +27,7 @@ The HTTP test exercises administrator access, draft privacy, publication, stale 
 
 ## Remaining work
 
-Source permissions and automated source validation, discovery and extraction, duplicate reconciliation, precise deadline timezones, multilingual UI, matching, complete saved status tracking, consent/channel setup and live provider delivery remain future slices. Admin lists are limited to the latest 100 sources and opportunities and need pagination before growth. The original revision API remains available; a bounded admin audit-history screen is described below. Arbitrary in-flight agent crash recovery remains a deployment blocker.
+Source permissions and automated source validation, discovery and extraction, duplicate reconciliation, precise deadline timezones, multilingual UI, matching, complete saved status tracking, consent/channel setup and live provider delivery remain future slices. The editor bootstrap is limited to the latest 100 sources and opportunities; the admin catalogue browser below provides access beyond that window. The source-policy research dashboard still needs broader pagination. The original revision API remains available; a bounded admin audit-history screen is described below. Arbitrary in-flight agent crash recovery remains a deployment blocker.
 
 ## Expanded discovery filters — 2 November 2026
 
@@ -51,4 +51,14 @@ Comparisons include state, details and evidence. Object key ordering is ignored,
 
 The history reader performs SELECTs only. It does not publish, restore, delete or rewrite revisions. Stored reasons and actor identifiers follow the existing shared-audit retention policy; this does not implement operator-assisted anonymization or immutable-database enforcement against a privileged SQL operator.
 
-Tests cover authorization, 27 revisions across two pages, a new revision between page reads, a cross-page fee comparison, timestamp precision, missing predecessor handling and unchanged record counts on PGlite/PostgreSQL 16. Production HTTP checks cover English/Chinese controls, positive-to-zero fee history, escaped hostile notes, private draft exclusion and denied access for ordinary users. Browser/keyboard/visual review and admin queue pagination remain pending.
+Tests cover authorization, 27 revisions across two pages, a new revision between page reads, a cross-page fee comparison, timestamp precision, missing predecessor handling and unchanged record counts on PGlite/PostgreSQL 16. Production HTTP checks cover English/Chinese controls, positive-to-zero fee history, escaped hostile notes, private draft exclusion and denied access for ordinary users. Browser/keyboard/visual review remains pending; the separate admin catalogue browser below addresses older record/source access.
+
+## Searchable admin catalogue — 2 November 2026
+
+`/admin/catalogue` provides administrator-only opportunity and source views in pages of 25. Opportunity search covers original titles, organizers and source names, with an optional publication-state filter. Source search covers names and URLs. Search is a literal case-insensitive substring: wildcard characters are escaped. English/Chinese controls preserve filters in pagination links; form search resets to page one. This is an offset-paginated live list, so edits can change ordering; it does not claim snapshot stability like the revision-history cursor.
+
+Each opportunity links to its audit history and `/admin/review?edit=ID`. Each source links to `/admin/review?source=ID` for draft creation. The editor validates one target at a time, loads an exact older target and its source even when outside the latest 100, and preserves that source during subsequent refreshes. Bootstrap arrays are bounded to the latest 100 plus at most one selected item. The existing review editor/API shape remains compatible, and existing revision-conflict, draft/publication and evidence rules remain in force. No source or record is published, paused or collected by browsing.
+
+New browse and editor GET responses use no-store/no-referrer, including authorization and validation failures. Duplicate/unknown parameters and contradictory source/state or edit/source selections are rejected. Ordinary-user pages remain generic not-found and API access is denied. Exact selection IDs, search text and SQL values are parameterized; original notes, URLs and source text are not translated in storage.
+
+Database/HTTP fixtures contain more than 100 private records and sources. Tests verify pagination/counts, literal and injection-like searches, old-target selection, original source retention after editing, denied access, unknown-target failures, Chinese links/selected options, and an older correction that remains a private draft. These fixtures do not represent live opportunities. Research-policy/job/candidate dashboard pagination, bulk actions, browser/keyboard/visual review and release gates remain pending.

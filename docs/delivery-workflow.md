@@ -147,3 +147,7 @@ The local public catalogue now supports combined topic, study-level, mode, China
 ## 22 Audit-history checkpoint on 2 November 2026
 
 Administrators now have a read-only bilingual revision-history screen and bounded API with stable revision cursors, stored actor/reason/time, original snapshots and field-level comparisons. Missing/unknown values and missing predecessors are explicit. See [catalogue implementation](catalogue-implementation.md) for access, pagination and validation boundaries. Legacy consumers, source records and publication actions are unchanged. Browser review, audit retention/anonymization policy, admin queue pagination and release gates remain open.
+
+## 23 Admin catalogue navigation checkpoint on 2 November 2026
+
+A searchable, paginated administrator catalogue now reaches records and sources beyond the editor's latest-100 bootstrap. Validated deep links load exact editor targets and retain the selected source through refreshes without changing revision/evidence/publication semantics. See [catalogue implementation](catalogue-implementation.md) for query limits, live-list ordering and validation. Research dashboard pagination, browser review, operational retention/provider validation and public-release gates remain open.
