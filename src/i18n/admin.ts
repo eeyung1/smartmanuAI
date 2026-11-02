@@ -1,4 +1,39 @@
 export const adminChinese: Record<string, string> = {
+  "Account deletion is pending.": "账户删除正在等待处理。",
+  "Collection job not found.": "未找到采集任务。",
+  "Collection job changed. Reload before acting.":
+    "采集任务已更改。请重新加载后再操作。",
+  "Only queued or running collection jobs can be cancelled.":
+    "只能取消排队中或运行中的采集任务。",
+  "Only failed or cancelled collection jobs can be retried.":
+    "只能重试失败或已取消的采集任务。",
+  "An enabled, non-synthetic source policy is required to retry collection.":
+    "重试采集需要已启用的非模拟来源策略。",
+  "This collection job already has a replacement.": "此采集任务已有替代任务。",
+  "This source already has an active collection job.":
+    "此来源已有活动中的采集任务。",
+  "Inspect collection job": "查看采集任务",
+  "Back to collection jobs": "返回采集任务列表",
+  "Collection job": "采集任务",
+  "Previous collection job": "上一个采集任务",
+  "Retry requires an enabled, non-synthetic source policy.":
+    "重试需要已启用的非模拟来源策略。",
+  "Job action history": "任务操作历史",
+  "Actions record the administrator and original reason. Provider usage and model reservations are not changed here.":
+    "操作会记录管理员及原始原因。此处不会更改服务商用量或模型预算预留。",
+  "Replacement queued": "替代任务已排队",
+  "Job cancelled": "任务已取消",
+  "Open replacement job": "打开替代任务",
+  "No manual job actions yet.": "尚无手动任务操作。",
+  "Saved. Reloaded job status requested.": "已保存。正在重新加载任务状态。",
+  "Cancelling stops this job and discards any late worker result. It does not pause future source schedules.":
+    "取消会停止此任务并丢弃工作进程迟到的结果，但不会暂停来源未来的采集计划。",
+  "Retry creates one queued replacement and retains the original attempt. Collection requires a separately running worker.":
+    "重试会创建一个排队中的替代任务并保留原始尝试。采集需要单独运行的工作进程。",
+  "Reason for this job action": "此次任务操作的原因",
+  "Cancel collection job": "取消采集任务",
+  "Queue replacement job": "排队替代任务",
+
   "Back to research dashboard": "返回研究控制台",
   "Research catalogue browser": "研究记录浏览器",
   "Research sections": "研究记录分区",

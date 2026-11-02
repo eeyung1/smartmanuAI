@@ -100,7 +100,7 @@ export async function requestAccountDeletion(
     if (!user) throw new CatalogueError(404, "Account not found.");
     const contributed = (
       await tx.query(
-        "SELECT 1 FROM sources WHERE created_by=$1 UNION ALL SELECT 1 FROM opportunity_revisions WHERE actor_id=$1 UNION ALL SELECT 1 FROM source_collection_policies WHERE actor_id=$1 LIMIT 1",
+        "SELECT 1 FROM sources WHERE created_by=$1 UNION ALL SELECT 1 FROM opportunity_revisions WHERE actor_id=$1 UNION ALL SELECT 1 FROM source_collection_policies WHERE actor_id=$1 UNION ALL SELECT 1 FROM research_job_actions WHERE actor_id=$1 LIMIT 1",
         [userId],
       )
     ).rows.length;
