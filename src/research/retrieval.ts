@@ -3,8 +3,30 @@ import { request } from "node:https";
 import { BlockList, isIP } from "node:net";
 import type { IncomingMessage } from "node:http";
 import { publicURL } from "../catalogue/schema";
+export type RetryAfter = { until: string | null; requiresReview: boolean };
+export function parseRetryAfter(
+  value: unknown,
+  now = new Date(),
+): RetryAfter | null {
+  if (typeof value !== "string" || value.length > 128) return null;
+  let delay: number;
+  if (/^\d+$/.test(value)) delay = Number(value) * 1000;
+  else {
+    const date = safeValidators({ lastModified: value }).lastModified;
+    if (!date) return null;
+    delay = Math.max(0, new Date(date).getTime() - now.getTime());
+  }
+  if (delay > 7 * 86400000) return { until: null, requiresReview: true };
+  return {
+    until: new Date(now.getTime() + delay).toISOString(),
+    requiresReview: false,
+  };
+}
 export class RetrievalError extends Error {
-  constructor(public code: string) {
+  constructor(
+    public code: string,
+    public retryAfter: RetryAfter | null = null,
+  ) {
     super(code);
   }
 }
@@ -199,6 +221,15 @@ export async function readSourceResponse(
   input: SourceValidators = safeValidators(),
 ): Promise<SourceResponse> {
   const requested = safeValidators(input);
+  if (response.statusCode === 429 || response.statusCode === 503) {
+    response.destroy();
+    throw new RetrievalError(
+      response.statusCode === 429
+        ? "source_rate_limited"
+        : "source_unavailable",
+      parseRetryAfter(response.headers["retry-after"]),
+    );
+  }
   if (response.statusCode === 304) {
     response.destroy();
     if (!requested.etag && !requested.lastModified)

@@ -165,3 +165,8 @@ Administrators now have a bilingual collection-job detail screen with audited ca
 ## 26 Conditional collection checkpoint on 2 November 2026
 
 Source collection now supports persisted ETag/Last-Modified validators and fenced 304 completion without new candidate extraction or publication verification. URL/snapshot identity, conservative header validation and existing retrieval/lease boundaries remain enforced. See [source pipeline](source-pipeline.md) for protocol scope and database/stream tests. Live-source interoperability and measured bandwidth savings, uncertain model-cost recovery, browser review, retention and public-release gates remain open.
+
+
+## 27 Retry-After checkpoint on 2 November 2026
+
+Collection now persists per-source Retry-After waits for 429/503 responses, retains them across restart and replacement jobs, and requires source-policy review for excessive waits. Failure completion is fenced by policy/current lease and admin screens expose delay/review state. See [source pipeline](source-pipeline.md) for accepted formats, limits, reset semantics and tests. Host-wide pacing, live-source interoperability, browser review, uncertain model-cost recovery and release gates remain open.

@@ -44,7 +44,12 @@ export default async function JobPage({
     Boolean(job.enabled) &&
     !job.synthetic &&
     !new URL(String(job.url)).hostname.endsWith(".test") &&
-    !retried;
+    !retried &&
+    !job.requires_review;
+  const timestamp = (value: unknown) =>
+    new Date(
+      value instanceof Date ? value.getTime() : String(value),
+    ).toISOString();
   const jobLink = (id: unknown) =>
     "/admin/research/jobs/" + encodeURIComponent(String(id));
   return (
@@ -64,6 +69,25 @@ export default async function JobPage({
         <p>{t("Diagnostic code: {code}", { code: String(job.error_code) })}</p>
       ) : null}
       <p>{t(job.enabled ? "Collection enabled" : "Collection paused")}</p>
+      {job.requires_review ? (
+        <p>{t("Retry-After pause requires source-policy review.")}</p>
+      ) : null}
+      {job.retry_after_at ? (
+        <p>
+          {t("Source retry not before (UTC)")}:{" "}
+          <time dateTime={timestamp(job.retry_after_at)}>
+            {timestamp(job.retry_after_at)}
+          </time>
+        </p>
+      ) : null}
+      {["queued", "failed"].includes(String(job.state)) ? (
+        <p>
+          {t("Job available at (UTC)")}:{" "}
+          <time dateTime={timestamp(job.available_at)}>
+            {timestamp(job.available_at)}
+          </time>
+        </p>
+      ) : null}
       <Link
         href={
           "/admin/research?source=" + encodeURIComponent(String(job.source_id))
@@ -95,7 +119,8 @@ export default async function JobPage({
       />
       {!canRetry &&
       ["failed", "cancelled"].includes(String(job.state)) &&
-      !retried ? (
+      !retried &&
+      !job.requires_review ? (
         <p>{t("Retry requires an enabled, non-synthetic source policy.")}</p>
       ) : null}
       <h2>{t("Job action history")}</h2>

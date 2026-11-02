@@ -172,6 +172,25 @@ await seed.sql.query(
   "INSERT INTO research_jobs(id,source_id,state,attempts,error_code) VALUES($1,$2,'failed',3,'source_timeout')",
   [recoveryFailedID, recoverySource.id],
 );
+const backoffSource = await createSource(seed.sql, "local-fixture-reviewer", {
+  name: "Backoff HTTP source fixture",
+  url: "https://university.example.edu/backoff-fixture",
+});
+await collectionPolicy(seed.sql, "local-fixture-reviewer", {
+  sourceId: backoffSource.id,
+  enabled: true,
+  permissionNote: "Fixture backoff policy; no live collection.",
+});
+const backoffJobID = randomUUID(),
+  backoffUntil = new Date(Date.now() + 3600000).toISOString();
+await seed.sql.query(
+  "INSERT INTO research_jobs(id,source_id,state,attempts,error_code,available_at) VALUES($1,$2,'failed',1,'source_rate_limited',$3)",
+  [backoffJobID, backoffSource.id, backoffUntil],
+);
+await seed.sql.query(
+  "INSERT INTO source_retry_after(source_id,retry_after_at,requires_review) VALUES($1,$2,true)",
+  [backoffSource.id, backoffUntil],
+);
 await seed.close();
 const log = await open(join(dir, "server.log"), "w");
 const server = spawn(
@@ -2109,6 +2128,62 @@ try {
     ).status,
     404,
   );
+  const backoffPath = "/api/admin/research/jobs/" + backoffJobID;
+  const backoffDetail = await (
+    await fetch(base + backoffPath, { headers: { Cookie: admin } })
+  ).json();
+  assert.equal(backoffDetail.job.requires_review, true);
+  const backoffHTML = await (
+    await fetch(base + "/admin/research/jobs/" + backoffJobID, {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).text();
+  assert.match(backoffHTML, /Retry-After 暂停需要审核来源策略/);
+  assert.match(backoffHTML, /来源重试不得早于/);
+  assert.ok(!backoffHTML.includes('name="note"'));
+  const backoffRetry = {
+    action: "retry",
+    expectedState: "failed",
+    expectedAttempts: 1,
+    note: "Operator reviewed this fixture source pause.",
+  };
+  assert.equal((await post(backoffPath, backoffRetry, admin)).status, 409);
+  assert.equal(
+    (
+      await post(
+        "/api/admin/research",
+        {
+          action: "policy",
+          sourceId: backoffSource.id,
+          enabled: true,
+          permissionNote: "Operator reviewed the fixture Retry-After pause.",
+        },
+        admin,
+      )
+    ).status,
+    200,
+  );
+  const backoffResume = await post(backoffPath, backoffRetry, admin);
+  assert.equal(backoffResume.status, 200);
+  const resumedBackoff = await backoffResume.json();
+  const delayedReplacement = await (
+    await fetch(
+      base + "/api/admin/research/jobs/" + resumedBackoff.replacementJobId,
+      { headers: { Cookie: admin } },
+    )
+  ).json();
+  assert.equal(delayedReplacement.job.requires_review, false);
+  assert.ok(
+    new Date(delayedReplacement.job.available_at).getTime() >=
+      new Date(backoffUntil).getTime(),
+  );
+  const delayedHTML = await (
+    await fetch(
+      base + "/admin/research/jobs/" + resumedBackoff.replacementJobId,
+      { headers: { Cookie: adminZHCookie } },
+    )
+  ).text();
+  assert.match(delayedHTML, /任务可执行时间/);
   const privacyCookie = await login("http-privacy@example.test");
   const exportPath = "/api/me/privacy/export";
   assert.equal((await fetch(base + exportPath)).status, 401);
@@ -2196,7 +2271,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, admin catalogue/older editor selection, research navigation and audited job recovery, stable form values and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, admin catalogue/older editor selection, research navigation, audited job recovery and Retry-After controls, stable form values and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));
