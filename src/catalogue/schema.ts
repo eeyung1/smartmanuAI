@@ -141,6 +141,13 @@ export const filtersSchema = z
   .object({
     q: z.string().trim().max(120).optional(),
     category: z.enum(["scholarship", "course", "event"]).optional(),
+    topic: z.string().trim().min(2).max(70).optional(),
+    studyLevel: z
+      .enum(["bachelor", "master", "doctorate", "not_stated"])
+      .optional(),
+    mode: z.enum(["online", "in_person"]).optional(),
+    country: z.enum(["CN", "not_stated"]).optional(),
+    deadline: z.enum(["next_30_days", "dated", "not_stated"]).optional(),
     language: z.enum(["en", "zh", "other", "unknown"]).optional(),
     funding: z
       .enum([
@@ -162,4 +169,14 @@ export function parseFilters(params: Record<string, unknown>) {
       ),
     ),
   );
+}
+
+export type PublicFilters = z.infer<typeof filtersSchema>;
+export function parseSearchFilters(params: URLSearchParams) {
+  const values: Record<string, unknown> = Object.create(null);
+  for (const key of new Set(params.keys())) {
+    const all = params.getAll(key);
+    values[key] = all.length === 1 ? all[0] : all;
+  }
+  return parseFilters(values);
 }

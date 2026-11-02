@@ -139,3 +139,7 @@ The local English/Simplified Chinese interface now covers admin catalogue review
 ## 20 Error recovery checkpoint on 2 November 2026
 
 The local application now translates fixed service/API error messages and provides custom English/Simplified Chinese production not-found, page-failure and root-layout fallback screens. Error details remain private and retry is explicit. A static error-message audit and rendered/HTTP checks cover translation gaps, secret-bearing exceptions and missing/restricted records. See [language support](language-support.md) for root-fallback locale behavior and validation boundaries. Third-party interoperability, browser/linguistic review, source/provider pilots and public-release gates remain open.
+
+## 21 Expanded catalogue filters checkpoint on 2 November 2026
+
+The local public catalogue now supports combined topic, study-level, mode, China/unstated-location and date-only deadline facets alongside existing search/type/language/funding filters. Query validation, literal topic matching and pagination preserve filter intent; invalid web filters show a message without broadening results. See [catalogue implementation](catalogue-implementation.md) for scope, UTC date policy and tests. Browser/linguistic validation, broader geographic facets, precise source-timezone deadlines and live-release gates remain open.
