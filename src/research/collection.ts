@@ -2,7 +2,13 @@ import { randomUUID, createHash } from "node:crypto";
 import { z } from "zod";
 import type { SQL } from "../db";
 import { CatalogueError, requireAdmin } from "../catalogue/service";
-import { RetrievalError, retrieveSource } from "./retrieval";
+import {
+  RetrievalError,
+  retrieveSourceResponse,
+  safeValidators,
+  type SourceValidators,
+  type SourceResponse,
+} from "./retrieval";
 const policySchema = z
   .object({
     sourceId: z.uuid(),
@@ -96,6 +102,7 @@ export async function finishCollection(
   sql: SQL,
   job: CollectionClaim,
   content: string,
+  validators: SourceValidators = safeValidators(),
 ) {
   if (!content.trim() || Buffer.byteLength(content) > 10000)
     throw new RetrievalError("invalid_snapshot");
@@ -126,6 +133,11 @@ export async function finishCollection(
       "INSERT INTO research_candidates(id,snapshot_id) VALUES($1,$2) ON CONFLICT(snapshot_id) DO NOTHING",
       [randomUUID(), inserted.id],
     );
+    const valid = safeValidators(validators);
+    await tx.query(
+      "INSERT INTO source_http_validators(source_id,snapshot_id,url,etag,last_modified) VALUES($1,$2,$3,$4,$5) ON CONFLICT(source_id) DO UPDATE SET snapshot_id=$2,url=$3,etag=$4,last_modified=$5,updated_at=NOW()",
+      [job.sourceId, inserted.id, job.url, valid.etag, valid.lastModified],
+    );
     await tx.query(
       "UPDATE research_jobs SET state='done',lease_token=NULL,lease_until=NULL,error_code=NULL WHERE id=$1",
       [job.id],
@@ -133,14 +145,97 @@ export async function finishCollection(
     return inserted.id === snapshotId ? "captured" : "unchanged";
   });
 }
+export type SourceCache = SourceValidators & {
+  snapshotId: string;
+  url: string;
+};
+export async function sourceCache(
+  sql: SQL,
+  job: CollectionClaim,
+): Promise<SourceCache | null> {
+  const row = (
+    await sql.query(
+      "SELECT snapshot_id,url,etag,last_modified FROM source_http_validators WHERE source_id=$1 AND url=$2",
+      [job.sourceId, job.url],
+    )
+  ).rows[0];
+  return row
+    ? {
+        snapshotId: String(row.snapshot_id),
+        url: String(row.url),
+        ...safeValidators({ etag: row.etag, lastModified: row.last_modified }),
+      }
+    : null;
+}
+export async function finishNotModified(
+  sql: SQL,
+  job: CollectionClaim,
+  cache: SourceCache | null,
+  validators: SourceValidators,
+) {
+  return sql.transaction(async (tx) => {
+    const policy = (
+      await tx.query(
+        "SELECT enabled FROM source_collection_policies WHERE source_id=$1 FOR UPDATE",
+        [job.sourceId],
+      )
+    ).rows[0];
+    const current = (
+      await tx.query(
+        "SELECT id FROM research_jobs WHERE id=$1 AND state='running' AND lease_token=$2 AND lease_until>NOW() FOR UPDATE",
+        [job.id, job.token],
+      )
+    ).rows[0];
+    if (!current || !policy?.enabled) return "discarded";
+    if (!cache || cache.url !== job.url || (!cache.etag && !cache.lastModified))
+      throw new RetrievalError("unexpected_not_modified");
+    const stored = (
+      await tx.query(
+        "SELECT snapshot_id,url,etag,last_modified FROM source_http_validators WHERE source_id=$1 FOR UPDATE",
+        [job.sourceId],
+      )
+    ).rows[0];
+    if (
+      !stored ||
+      stored.snapshot_id !== cache.snapshotId ||
+      stored.url !== cache.url ||
+      stored.etag !== cache.etag ||
+      stored.last_modified !== cache.lastModified
+    )
+      throw new RetrievalError("validator_cache_changed");
+    await tx.query(
+      "UPDATE source_snapshots SET last_seen_at=NOW() WHERE id=$1 AND source_id=$2",
+      [cache.snapshotId, job.sourceId],
+    );
+    const valid = safeValidators(validators);
+    await tx.query(
+      "UPDATE source_http_validators SET etag=$2,last_modified=$3,updated_at=NOW() WHERE source_id=$1",
+      [job.sourceId, valid.etag, valid.lastModified],
+    );
+    await tx.query(
+      "UPDATE research_jobs SET state='done',lease_token=NULL,lease_until=NULL,error_code=NULL WHERE id=$1",
+      [job.id],
+    );
+    return "not_modified";
+  });
+}
 export async function collectOne(
   sql: SQL,
-  retrieve: (url: string) => Promise<string> = retrieveSource,
+  retrieve: (
+    url: string,
+    validators: SourceValidators,
+  ) => Promise<string | SourceResponse> = retrieveSourceResponse,
 ) {
   const job = await claimCollection(sql);
   if (!job) return "empty";
   try {
-    return await finishCollection(sql, job, await retrieve(job.url));
+    const cache = await sourceCache(sql, job);
+    const result = await retrieve(job.url, safeValidators(cache ?? {}));
+    if (typeof result === "string")
+      return await finishCollection(sql, job, result);
+    if (result.status === "not_modified")
+      return await finishNotModified(sql, job, cache, result.validators);
+    return await finishCollection(sql, job, result.content, result.validators);
   } catch (error) {
     const code =
       error instanceof RetrievalError ? error.code : "collection_failed";

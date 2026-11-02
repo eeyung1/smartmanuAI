@@ -129,7 +129,104 @@ export async function readPage(response: IncomingMessage) {
     text = text.slice(0, Math.max(0, text.length - 100));
   return text;
 }
-export async function retrieveSource(input: string) {
+export type SourceValidators = {
+  etag: string | null;
+  lastModified: string | null;
+};
+export type SourceResponse =
+  | { status: "content"; content: string; validators: SourceValidators }
+  | { status: "not_modified"; validators: SourceValidators };
+export function safeValidators(
+  input: { etag?: unknown; lastModified?: unknown } = {},
+): SourceValidators {
+  const etag =
+    typeof input.etag === "string" &&
+    input.etag.length <= 512 &&
+    /^(?:W\/)?"[\x21\x23-\x7e]*"$/.test(input.etag)
+      ? input.etag
+      : null;
+  const date = input.lastModified;
+  const lastModified =
+    typeof date === "string" &&
+    /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(
+      date,
+    ) &&
+    new Date(date).toUTCString() === date
+      ? date
+      : null;
+  return { etag, lastModified };
+}
+export function conditionalHeaders(input: SourceValidators) {
+  const v = safeValidators(input);
+  return v.etag
+    ? { "If-None-Match": v.etag }
+    : v.lastModified
+      ? { "If-Modified-Since": v.lastModified }
+      : {};
+}
+function responseValidators(
+  response: IncomingMessage,
+  previous: SourceValidators,
+): SourceValidators {
+  const headers = response.headers,
+    control = headers["cache-control"],
+    vary = headers.vary;
+  // Only reuse validators for the fixed anonymous representation requested by this adapter.
+  if (typeof control === "string" && /\bno-store\b/i.test(control))
+    return safeValidators();
+  if (
+    vary &&
+    vary
+      .split(",")
+      .some(
+        (name) =>
+          !["accept", "accept-encoding", "user-agent"].includes(
+            name.trim().toLowerCase(),
+          ),
+      )
+  )
+    return safeValidators();
+  return safeValidators({
+    etag: headers.etag === undefined ? previous.etag : headers.etag,
+    lastModified:
+      headers["last-modified"] === undefined
+        ? previous.lastModified
+        : headers["last-modified"],
+  });
+}
+export async function readSourceResponse(
+  response: IncomingMessage,
+  input: SourceValidators = safeValidators(),
+): Promise<SourceResponse> {
+  const requested = safeValidators(input);
+  if (response.statusCode === 304) {
+    response.destroy();
+    if (!requested.etag && !requested.lastModified)
+      throw new RetrievalError("unexpected_not_modified");
+    const returned = safeValidators({ etag: response.headers.etag }).etag;
+    if (
+      requested.etag &&
+      response.headers.etag !== undefined &&
+      (!returned ||
+        returned.replace(/^W\//, "") !== requested.etag.replace(/^W\//, ""))
+    )
+      throw new RetrievalError("validator_mismatch");
+    return {
+      status: "not_modified",
+      validators: responseValidators(response, requested),
+    };
+  }
+  const content = await readPage(response);
+  return {
+    status: "content",
+    content,
+    validators: responseValidators(response, safeValidators()),
+  };
+}
+export async function retrieveSourceResponse(
+  input: string,
+  validators: SourceValidators = safeValidators(),
+): Promise<SourceResponse> {
   const url = new URL(publicURL.parse(input));
   if (url.hostname.endsWith(".test"))
     throw new RetrievalError("synthetic_source");
@@ -145,7 +242,7 @@ export async function retrieveSource(input: string) {
     ),
   ]);
   const pinned = validateAddresses(records);
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<SourceResponse>((resolve, reject) => {
     const req = request(
       url,
       {
@@ -157,15 +254,23 @@ export async function retrieveSource(input: string) {
           Accept: "text/html, text/plain",
           "Accept-Encoding": "identity",
           "User-Agent": "smartmanuAI/0.1",
+          ...conditionalHeaders(validators),
         },
         lookup: (_host, _options, callback) =>
           callback(null, pinned.address, pinned.family),
       },
       (response) => {
-        void readPage(response).then(resolve, reject);
+        void readSourceResponse(response, validators).then(resolve, reject);
       },
     );
     req.on("error", () => reject(new RetrievalError("source_network_error")));
     req.end();
   });
+}
+
+export async function retrieveSource(input: string) {
+  const result = await retrieveSourceResponse(input);
+  if (result.status !== "content")
+    throw new RetrievalError("unexpected_not_modified");
+  return result.content;
 }
