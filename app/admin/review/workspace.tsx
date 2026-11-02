@@ -1,5 +1,6 @@
 "use client";
 import { useScreenText } from "@/src/i18n/context";
+import Link from "next/link";
 import { useState } from "react";
 import type { Details } from "@/src/catalogue/schema";
 type Row = {
@@ -539,6 +540,15 @@ export default function ReviewWorkspace({
                   </p>
                 ))}
               </details>
+              <p>
+                <Link
+                  href={
+                    "/admin/review/" + encodeURIComponent(row.id) + "/history"
+                  }
+                >
+                  {t("View revision history")}
+                </Link>
+              </p>
               <button
                 className="secondary"
                 onClick={() => {

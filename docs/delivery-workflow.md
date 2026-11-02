@@ -143,3 +143,7 @@ The local application now translates fixed service/API error messages and provid
 ## 21 Expanded catalogue filters checkpoint on 2 November 2026
 
 The local public catalogue now supports combined topic, study-level, mode, China/unstated-location and date-only deadline facets alongside existing search/type/language/funding filters. Query validation, literal topic matching and pagination preserve filter intent; invalid web filters show a message without broadening results. See [catalogue implementation](catalogue-implementation.md) for scope, UTC date policy and tests. Browser/linguistic validation, broader geographic facets, precise source-timezone deadlines and live-release gates remain open.
+
+## 22 Audit-history checkpoint on 2 November 2026
+
+Administrators now have a read-only bilingual revision-history screen and bounded API with stable revision cursors, stored actor/reason/time, original snapshots and field-level comparisons. Missing/unknown values and missing predecessors are explicit. See [catalogue implementation](catalogue-implementation.md) for access, pagination and validation boundaries. Legacy consumers, source records and publication actions are unchanged. Browser review, audit retention/anonymization policy, admin queue pagination and release gates remain open.

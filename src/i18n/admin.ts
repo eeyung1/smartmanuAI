@@ -1,4 +1,30 @@
 export const adminChinese: Record<string, string> = {
+  "Back to review queue": "返回审核队列",
+  "Revision audit history": "版本审核历史",
+  "Current revision: {revision}": "当前版本：{revision}",
+  "Source (current registry)": "来源（当前登记信息）",
+  "Read-only history. Source wording and reviewer notes are shown unchanged. Times below are UTC audit timestamps, not source deadlines.":
+    "此历史记录仅供查阅，来源原文和审核说明保持不变。下方时间为 UTC 审核时间戳，不是来源截止时间。",
+  "Revision {revision}": "版本 {revision}",
+  "Recorded at (UTC)": "记录时间（UTC）",
+  "Actor identifier": "操作人员标识符",
+  "Review reason": "审核理由",
+  "Initial stored revision; no earlier snapshot exists.":
+    "这是首次保存的版本，无更早的快照。",
+  "The preceding revision is unavailable; no change comparison is claimed.":
+    "前一版本不可用，因此不显示变更比较。",
+  "Changed fields": "已更改的字段",
+  Before: "更改前",
+  After: "更改后",
+  "Field absent from snapshot": "快照中无此字段",
+  "No state, detail or evidence fields changed in this revision.":
+    "此版本未更改状态、详情或证据字段。",
+  "Full stored snapshot": "完整的已保存快照",
+  "No revisions before this cursor.": "此位置之前没有版本记录。",
+  "Audit history pages": "审核历史分页",
+  "Latest revisions": "最新版本",
+  "Older revisions": "更早版本",
+  "View revision history": "查看版本历史",
   "SOURCE COLLECTION": "来源采集",
   "Evidence before extraction.": "先核实证据，再提取信息。",
   "Enable collection only after checking source ownership and permitted access. Collection runs in a separate worker. No source instructions are executed.":

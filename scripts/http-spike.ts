@@ -8,7 +8,12 @@ import { tmpdir } from "node:os";
 import { preferencesSchema } from "../src/domain/profile";
 import { localConfig } from "../src/config";
 import { openDatabase } from "../src/db";
-import { seedLocalCatalogue } from "../src/catalogue/fixtures";
+import {
+  seedLocalCatalogue,
+  fixtureDetails,
+  fixtureEvidence,
+} from "../src/catalogue/fixtures";
+import { createDraft, reviewOpportunity } from "../src/catalogue/service";
 localConfig();
 const dir = await mkdtemp(join(tmpdir(), "smartmanu-http-"));
 const seed = await openDatabase(dir);
@@ -36,6 +41,41 @@ await seed.sql.query(
   "INSERT INTO research_jobs(id,source_id,state,attempts) VALUES('http-admin-job',$1,'done',1)",
   [adminSourceId],
 );
+await createDraft(
+  seed.sql,
+  "local-fixture-reviewer",
+  {
+    sourceId: adminSourceId,
+    details: {
+      ...fixtureDetails,
+      title: "Private audit fixture",
+      applicationFee: "CNY 400",
+    },
+    evidence: fixtureEvidence,
+    note: "Initial private audit fixture.",
+  },
+  "http-audit-fixture",
+);
+for (let revision = 2; revision <= 27; revision++)
+  await reviewOpportunity(
+    seed.sql,
+    "local-fixture-reviewer",
+    "http-audit-fixture",
+    {
+      action: "revise",
+      expectedRevision: revision - 1,
+      details: {
+        ...fixtureDetails,
+        title: "Private audit fixture",
+        applicationFee: revision === 27 ? "CNY 0" : "CNY 400",
+      },
+      evidence: fixtureEvidence,
+      note:
+        revision === 27
+          ? "Unverified private correction <script>window.auditExecuted=true</script>"
+          : "Original audit reason " + revision,
+    },
+  );
 await seed.close();
 const log = await open(join(dir, "server.log"), "w");
 const server = spawn(
@@ -247,8 +287,6 @@ try {
     200,
   );
 
-  const { fixtureDetails, fixtureEvidence } =
-    await import("../src/catalogue/fixtures");
   const created = await post("/api/admin/opportunities", {
     sourceId: source.id,
     details: { ...fixtureDetails, title: "HTTP reviewed factory course" },
@@ -1408,6 +1446,101 @@ try {
   assert.match(invalidFiltersHTML, /部分筛选条件无效/);
   assert.ok(!invalidFiltersHTML.includes("<article"));
   assert.match(invalidFiltersHTML, /清除筛选/);
+  const auditPath = "/api/admin/opportunities/http-audit-fixture/history";
+  const anonymousAudit = await fetch(base + auditPath);
+  assert.equal(anonymousAudit.status, 401);
+  assert.equal(anonymousAudit.headers.get("cache-control"), "no-store");
+  assert.equal(
+    (await fetch(base + auditPath, { headers: { Cookie: languageUser } }))
+      .status,
+    403,
+  );
+  assert.equal(
+    (
+      await fetch(base + auditPath + "?before=0", {
+        headers: { Cookie: adminZHCookie },
+      })
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await fetch(base + auditPath + "?before=2&before=3", {
+        headers: { Cookie: adminZHCookie },
+      })
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/opportunities/missing/history", {
+        headers: { Cookie: adminZHCookie },
+      })
+    ).status,
+    404,
+  );
+  const auditResponse = await fetch(base + auditPath, {
+    headers: { Cookie: adminZHCookie },
+  });
+  assert.equal(auditResponse.status, 200);
+  assert.equal(auditResponse.headers.get("cache-control"), "no-store");
+  const auditPage = await auditResponse.json();
+  assert.equal(auditPage.items.length, 20);
+  assert.equal(auditPage.nextBefore, 8);
+  const feeAudit = auditPage.items[0].changes.find(
+    (change: { field: string }) => change.field === "details.applicationFee",
+  );
+  assert.equal(feeAudit.before.value, "CNY 400");
+  assert.equal(feeAudit.after.value, "CNY 0");
+  assert.ok(auditPage.items[0].note.includes("<script>"));
+  const auditHTMLResponse = await fetch(
+    base + "/admin/review/http-audit-fixture/history",
+    { headers: { Cookie: adminZHCookie } },
+  );
+  assert.equal(auditHTMLResponse.status, 200);
+  const auditHTML = await auditHTMLResponse.text();
+  assert.match(auditHTML, /版本审核历史/);
+  assert.match(auditHTML, /更改前/);
+  assert.match(auditHTML, /更改后/);
+  assert.match(auditHTML, /CNY 400/);
+  assert.match(auditHTML, /CNY 0/);
+  assert.match(
+    auditHTML,
+    /&lt;script&gt;window.auditExecuted=true&lt;\/script&gt;/,
+  );
+  assert.ok(!auditHTML.includes("<script>window.auditExecuted=true</script>"));
+  assert.match(auditHTML, /before=8/);
+  const olderAudit = await (
+    await fetch(base + auditPath + "?before=8", {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).json();
+  assert.equal(olderAudit.items.length, 7);
+  assert.equal(olderAudit.items.at(-1).comparison, "initial");
+  assert.equal(
+    new Set(
+      [...auditPage.items, ...olderAudit.items].map(
+        (item: { revision: number }) => item.revision,
+      ),
+    ).size,
+    27,
+  );
+  const deniedAuditHTML = await fetch(
+    base + "/admin/review/http-audit-fixture/history",
+    { headers: { Cookie: languageUser + "; " + localeCookie } },
+  );
+  assert.equal(deniedAuditHTML.status, 404);
+  assert.ok(
+    !(await deniedAuditHTML.text()).includes("Unverified private correction"),
+  );
+  assert.equal(
+    (await fetch(base + "/api/opportunities/http-audit-fixture")).status,
+    404,
+  );
+  const reviewWithHistory = await (
+    await fetch(base + "/admin/review", { headers: { Cookie: adminZHCookie } })
+  ).text();
+  assert.match(reviewWithHistory, /查看版本历史/);
   const privacyCookie = await login("http-privacy@example.test");
   const exportPath = "/api/me/privacy/export";
   assert.equal((await fetch(base + exportPath)).status, 401);
@@ -1495,7 +1628,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, stable form values and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, stable form values and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

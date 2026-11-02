@@ -48,6 +48,7 @@ Implemented locally:
 - [x] Reviewed catalogue, filters, detail pages and saved opportunities
 - [x] Combined topic, level, mode, China/unstated location and date-only deadline filters
 - [x] Admin source registration, evidence review and revision history
+- [x] Private admin audit screen with stable pagination and field-level change comparisons
 - [x] Conservative funding, date and stale-listing checks
 - [x] SQL migrations, notification sink and bounded eve fixture runtime
 - [x] Durable source-collection jobs, bounded retrieval and snapshot deduplication
