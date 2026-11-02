@@ -1,8 +1,14 @@
+import { localConfig } from "@/src/config";
 import { getDatabase } from "@/src/db";
 import { deletionStatus } from "@/src/privacy/account";
 import { apiError } from "@/src/http/access";
 export async function GET(request: Request) {
   try {
+    if (localConfig().mode === "staging")
+      return Response.json(
+        { error: "Account actions are unavailable in this staging preview." },
+        { status: 503, headers: { "Cache-Control": "no-store" } },
+      );
     return Response.json(
       await deletionStatus(
         (await getDatabase()).sql,

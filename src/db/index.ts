@@ -35,7 +35,13 @@ export async function migrate(sql: SQL) {
     });
   }
 }
-export async function openDatabase(dataDir: string, databaseURL?: string) {
+export async function openDatabase(
+  dataDir: string,
+  databaseURL?: string,
+  options: { schema?: string; migrate?: boolean; ssl?: boolean } = {},
+) {
+  if (options.schema && !/^[a-z][a-z0-9_]{0,62}$/.test(options.schema))
+    throw new Error("Invalid database schema.");
   if (!databaseURL) {
     await mkdir(dataDir, { recursive: true, mode: 0o700 });
     const engine = new PGlite(resolve(dataDir, "postgres"));
@@ -48,7 +54,14 @@ export async function openDatabase(dataDir: string, databaseURL?: string) {
       kind: "pglite" as const,
     };
   }
-  const pool = new Pool({ connectionString: databaseURL, max: 4 });
+  const pool = new Pool({
+    connectionString: databaseURL,
+    max: options.schema ? 2 : 4,
+    idleTimeoutMillis: 5000,
+    connectionTimeoutMillis: 10000,
+    allowExitOnIdle: true,
+    ...(options.ssl ? { ssl: { rejectUnauthorized: true } } : {}),
+  });
   const makeSQL = (client: Pick<Pool, "query">): SQL => ({
     query: async (query, params) => client.query(query, params),
     exec: async (query) => client.query(query),
@@ -67,8 +80,33 @@ export async function openDatabase(dataDir: string, databaseURL?: string) {
       }
     },
   });
-  const sql = makeSQL(pool);
-  await migrate(sql);
+  const raw = makeSQL(pool);
+  const sql: SQL = options.schema
+    ? {
+        query: async (query, params) =>
+          raw.transaction(async (tx) => {
+            await tx.exec(
+              'SET LOCAL search_path="' + options.schema + '",pg_catalog',
+            );
+            return tx.query(query, params);
+          }),
+        exec: async (query) =>
+          raw.transaction(async (tx) => {
+            await tx.exec(
+              'SET LOCAL search_path="' + options.schema + '",pg_catalog',
+            );
+            return tx.exec(query);
+          }),
+        transaction: async (fn) =>
+          raw.transaction(async (tx) => {
+            await tx.exec(
+              'SET LOCAL search_path="' + options.schema + '",pg_catalog',
+            );
+            return fn(tx);
+          }),
+      }
+    : raw;
+  if (options.migrate !== false) await migrate(sql);
   return {
     sql,
     orm: postgresDrizzle(pool, { schema }),
@@ -85,5 +123,10 @@ export function getDatabase() {
   return (globalDatabase.smartmanuDatabase ??= openDatabase(
     config.dataDir,
     config.databaseURL,
+    {
+      schema: config.databaseSchema,
+      migrate: config.mode === "local",
+      ssl: config.mode === "staging",
+    },
   ));
 }

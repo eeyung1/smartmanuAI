@@ -1,4 +1,13 @@
 export const errorChinese: Record<string, string> = {
+  "Account actions are unavailable in this staging preview.":
+    "此暂存预览暂不提供账户操作。",
+  "Sign-in is unavailable in this staging preview.": "此暂存预览暂不提供登录。",
+  "Staging preview": "暂存预览",
+  "The catalogue is connected to the staging database. Account email and notifications are not enabled.":
+    "目录已连接暂存数据库。账户邮件及通知尚未启用。",
+  "Staging preview: read-only catalogue. Sign-in and notifications are not enabled.":
+    "暂存预览：只读目录。登录及通知尚未启用。",
+
   "Email control testing is unavailable.": "邮件控制测试当前不可用。",
   "Invalid unsubscribe link.": "退订链接无效。",
   "Unsubscribe link expired.": "退订链接已过期。",
