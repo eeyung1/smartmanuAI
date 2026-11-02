@@ -1,4 +1,4 @@
-import { createHmac, createHash } from "node:crypto";
+import { createHmac, createHash, randomUUID } from "node:crypto";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
@@ -13,7 +13,11 @@ import {
   fixtureDetails,
   fixtureEvidence,
 } from "../src/catalogue/fixtures";
-import { createDraft, reviewOpportunity } from "../src/catalogue/service";
+import {
+  createSource,
+  createDraft,
+  reviewOpportunity,
+} from "../src/catalogue/service";
 localConfig();
 const dir = await mkdtemp(join(tmpdir(), "smartmanu-http-"));
 const seed = await openDatabase(dir);
@@ -76,6 +80,55 @@ for (let revision = 2; revision <= 27; revision++)
           : "Original audit reason " + revision,
     },
   );
+const olderRegistrySource = await createSource(
+  seed.sql,
+  "local-fixture-reviewer",
+  {
+    name: "Older original registry source",
+    url: "https://example.test/older-registry-source",
+    synthetic: true,
+  },
+);
+await createDraft(
+  seed.sql,
+  "local-fixture-reviewer",
+  {
+    sourceId: olderRegistrySource.id,
+    details: { ...fixtureDetails, title: "Older original private record" },
+    evidence: fixtureEvidence,
+    note: "Original older record note.",
+  },
+  "older-admin-record",
+);
+await seed.sql.query(
+  "UPDATE sources SET created_at='2000-01-01T00:00:00Z' WHERE id=$1",
+  [olderRegistrySource.id],
+);
+await seed.sql.query(
+  "UPDATE opportunities SET updated_at='2000-01-01T00:00:00Z' WHERE id='older-admin-record'",
+);
+const registrySources = Array.from({ length: 102 }, (_, index) => ({
+  id: randomUUID(),
+  name: "Registry pagination fixture " + index,
+  url: "https://example.test/registry-pagination-" + index,
+}));
+await seed.sql.query(
+  "INSERT INTO sources(id,name,url,synthetic,created_by) SELECT item.id,item.name,item.url,true,'local-fixture-reviewer' FROM jsonb_to_recordset($1::jsonb) AS item(id text,name text,url text)",
+  [JSON.stringify(registrySources)],
+);
+const registryRecords = registrySources.map((source, index) => ({
+  id: randomUUID(),
+  source_id: source.id,
+  details: { ...fixtureDetails, title: "Queue pagination fixture " + index },
+}));
+await seed.sql.query(
+  "INSERT INTO opportunities(id,source_id,revision,state,details,evidence) SELECT item.id,item.source_id,1,'draft',item.details,$2::jsonb FROM jsonb_to_recordset($1::jsonb) AS item(id text,source_id text,details jsonb)",
+  [JSON.stringify(registryRecords), JSON.stringify(fixtureEvidence)],
+);
+await seed.sql.query(
+  "INSERT INTO opportunity_revisions(opportunity_id,revision,state,details,evidence,actor_id,note) SELECT item.id,1,'draft',item.details,$2::jsonb,'local-fixture-reviewer','Seeded private registry fixture.' FROM jsonb_to_recordset($1::jsonb) AS item(id text,details jsonb)",
+  [JSON.stringify(registryRecords), JSON.stringify(fixtureEvidence)],
+);
 await seed.close();
 const log = await open(join(dir, "server.log"), "w");
 const server = spawn(
@@ -1541,6 +1594,173 @@ try {
     await fetch(base + "/admin/review", { headers: { Cookie: adminZHCookie } })
   ).text();
   assert.match(reviewWithHistory, /查看版本历史/);
+  assert.equal((await fetch(base + "/api/admin/catalogue")).status, 401);
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/catalogue", {
+        headers: { Cookie: languageUser },
+      })
+    ).status,
+    403,
+  );
+  assert.equal(
+    (
+      await fetch(base + "/admin/catalogue", {
+        headers: { Cookie: languageUser },
+      })
+    ).status,
+    404,
+  );
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/catalogue?kind=sources&state=draft", {
+        headers: { Cookie: adminZHCookie },
+      })
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/catalogue?q=one&q=two", {
+        headers: { Cookie: adminZHCookie },
+      })
+    ).status,
+    400,
+  );
+  const adminBrowseResponse = await fetch(
+    base + "/api/admin/catalogue?q=Queue+pagination+fixture&state=draft",
+    { headers: { Cookie: adminZHCookie } },
+  );
+  assert.equal(adminBrowseResponse.headers.get("cache-control"), "no-store");
+  const adminBrowsePage = await adminBrowseResponse.json();
+  assert.equal(adminBrowsePage.total, 102);
+  assert.equal(adminBrowsePage.items.length, 25);
+  const adminBrowseHTML = await (
+    await fetch(
+      base + "/admin/catalogue?q=Queue+pagination+fixture&state=draft",
+      { headers: { Cookie: adminZHCookie } },
+    )
+  ).text();
+  assert.match(adminBrowseHTML, /管理目录浏览器/);
+  assert.match(adminBrowseHTML, /打开记录编辑器/);
+  const adminNextHref = adminBrowseHTML.match(/href="([^"]*page=2[^"]*)"/);
+  assert.ok(adminNextHref);
+  const adminNextURL = new URL(adminNextHref[1].replaceAll("&amp;", "&"), base);
+  assert.equal(adminNextURL.searchParams.get("q"), "Queue pagination fixture");
+  assert.equal(adminNextURL.searchParams.get("state"), "draft");
+  const adminSecondPage = await (
+    await fetch(base + "/api/admin/catalogue?" + adminNextURL.searchParams, {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).json();
+  assert.equal(
+    new Set(
+      [...adminBrowsePage.items, ...adminSecondPage.items].map(
+        (item: { id: string }) => item.id,
+      ),
+    ).size,
+    50,
+  );
+  const oldEditorDefault = await (
+    await fetch(base + "/api/admin/opportunities", {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).json();
+  assert.ok(
+    !oldEditorDefault.opportunities.some(
+      (item: { id: string }) => item.id === "older-admin-record",
+    ),
+  );
+  assert.ok(
+    !oldEditorDefault.sources.some(
+      (item: { id: string }) => item.id === olderRegistrySource.id,
+    ),
+  );
+  const oldRecordResult = await (
+    await fetch(base + "/api/admin/catalogue?q=Older+original+private+record", {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).json();
+  assert.equal(oldRecordResult.items[0].id, "older-admin-record");
+  const selectedEditor = await (
+    await fetch(base + "/admin/review?edit=older-admin-record", {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).text();
+  assert.match(selectedEditor, /修订学习机会/);
+  assert.match(selectedEditor, /value="Older original private record"/);
+  assert.ok(selectedEditor.includes(olderRegistrySource.id));
+  const oldSourceHTML = await (
+    await fetch(
+      base + "/admin/catalogue?kind=sources&q=Older+original+registry+source",
+      { headers: { Cookie: adminZHCookie } },
+    )
+  ).text();
+  assert.match(oldSourceHTML, /使用此来源创建草稿/);
+  assert.ok(oldSourceHTML.includes("source=" + olderRegistrySource.id));
+  const selectedSourceHTML = await (
+    await fetch(base + "/admin/review?source=" + olderRegistrySource.id, {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).text();
+  assert.match(selectedSourceHTML, /创建草稿/);
+  assert.ok(
+    selectedSourceHTML.includes(
+      'value="' + olderRegistrySource.id + '" selected',
+    ),
+  );
+  assert.equal(
+    (
+      await fetch(
+        base +
+          "/api/admin/opportunities?edit=older-admin-record&source=" +
+          olderRegistrySource.id,
+        { headers: { Cookie: adminZHCookie } },
+      )
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/opportunities?edit=missing", {
+        headers: { Cookie: adminZHCookie },
+      })
+    ).status,
+    404,
+  );
+  const oldRevision = await post(
+    "/api/admin/opportunities/older-admin-record/review",
+    {
+      action: "revise",
+      expectedRevision: 1,
+      details: { ...fixtureDetails, title: "Older revised private record" },
+      evidence: fixtureEvidence,
+      note: "Original older record correction.",
+    },
+    adminZHCookie,
+  );
+  assert.equal(oldRevision.status, 200);
+  const oldRefreshed = await (
+    await fetch(
+      base + "/api/admin/opportunities?source=" + olderRegistrySource.id,
+      { headers: { Cookie: adminZHCookie } },
+    )
+  ).json();
+  assert.ok(
+    oldRefreshed.sources.some(
+      (item: { id: string }) => item.id === olderRegistrySource.id,
+    ),
+  );
+  assert.equal(
+    oldRefreshed.opportunities.find(
+      (item: { id: string }) => item.id === "older-admin-record",
+    ).state,
+    "draft",
+  );
+  assert.equal(
+    (await fetch(base + "/api/opportunities/older-admin-record")).status,
+    404,
+  );
   const privacyCookie = await login("http-privacy@example.test");
   const exportPath = "/api/me/privacy/export";
   assert.equal((await fetch(base + exportPath)).status, 401);
@@ -1628,7 +1848,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, stable form values and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, admin catalogue/older editor selection, stable form values and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

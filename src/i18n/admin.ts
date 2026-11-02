@@ -1,4 +1,21 @@
 export const adminChinese: Record<string, string> = {
+  "Admin catalogue browser": "管理目录浏览器",
+  "Catalogue sections": "目录分区",
+  "Opportunity records": "学习机会记录",
+  "Source registry": "来源登记表",
+  "Find older records or sources beyond the review queue's latest 100 entries. Search does not change publication or collection settings.":
+    "查找审核队列最近 100 条之外的旧记录或来源。搜索不会更改发布或采集设置。",
+  "Search catalogue records": "搜索目录记录",
+  "Record state": "记录状态",
+  "All record states": "所有记录状态",
+  "Create draft from this source": "使用此来源创建草稿",
+  "Open record editor": "打开记录编辑器",
+  "No admin catalogue records match these filters.":
+    "没有符合筛选条件的管理目录记录。",
+  "Admin catalogue pages": "管理目录分页",
+  "This is a live list; edits may change its ordering. Refresh or return to page one to see the latest records.":
+    "此列表实时更新，修改可能改变排序。请刷新或返回第一页查看最新记录。",
+  "Browse all records and sources": "浏览所有记录和来源",
   "Back to review queue": "返回审核队列",
   "Revision audit history": "版本审核历史",
   "Current revision: {revision}": "当前版本：{revision}",
