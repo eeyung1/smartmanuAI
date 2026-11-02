@@ -127,6 +127,20 @@ export default async function AdminCatalogue({
                 ? t("Create draft from this source")
                 : t("Open record editor")}
             </Link>
+            {sources ? (
+              <p>
+                <Link
+                  href={
+                    "/admin/research?source=" +
+                    encodeURIComponent(String(item.id)) +
+                    "#source-" +
+                    encodeURIComponent(String(item.id))
+                  }
+                >
+                  {t("Manage source policy")}
+                </Link>
+              </p>
+            ) : null}
             {!sources ? (
               <p>
                 <Link

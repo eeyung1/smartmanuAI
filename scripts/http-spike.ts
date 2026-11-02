@@ -129,6 +129,29 @@ await seed.sql.query(
   "INSERT INTO opportunity_revisions(opportunity_id,revision,state,details,evidence,actor_id,note) SELECT item.id,1,'draft',item.details,$2::jsonb,'local-fixture-reviewer','Seeded private registry fixture.' FROM jsonb_to_recordset($1::jsonb) AS item(id text,details jsonb)",
   [JSON.stringify(registryRecords), JSON.stringify(fixtureEvidence)],
 );
+const oldResearchCandidate = randomUUID();
+const researchFixtures = [
+  { id: oldResearchCandidate, source_id: olderRegistrySource.id },
+  ...registrySources.map((source) => ({
+    id: randomUUID(),
+    source_id: source.id,
+  })),
+];
+await seed.sql.query(
+  "INSERT INTO source_snapshots(id,source_id,content_hash,content) SELECT x.id,x.source_id,x.id,$2 FROM jsonb_to_recordset($1::jsonb) AS x(id text,source_id text)",
+  [
+    JSON.stringify(researchFixtures),
+    "Original older research excerpt <script>window.oldResearch=true</script>",
+  ],
+);
+await seed.sql.query(
+  "INSERT INTO research_candidates(id,snapshot_id,created_at) SELECT x.id,x.id,CASE WHEN x.id=$2 THEN '2000-01-01'::timestamptz ELSE '2001-01-01'::timestamptz END FROM jsonb_to_recordset($1::jsonb) AS x(id text)",
+  [JSON.stringify(researchFixtures), oldResearchCandidate],
+);
+await seed.sql.query(
+  "INSERT INTO research_jobs(id,source_id,state,attempts,created_at) SELECT x.id,x.source_id,'done',1,'2001-01-01'::timestamptz FROM jsonb_to_recordset($1::jsonb) AS x(id text,source_id text)",
+  [JSON.stringify(researchFixtures)],
+);
 await seed.close();
 const log = await open(join(dir, "server.log"), "w");
 const server = spawn(
@@ -1759,6 +1782,173 @@ try {
   );
   assert.equal(
     (await fetch(base + "/api/opportunities/older-admin-record")).status,
+    404,
+  );
+  // Browse beyond each recent dashboard window, then retain exact selections.
+  assert.equal((await fetch(base + "/api/admin/research/browse")).status, 401);
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/research/browse", {
+        headers: { Cookie: a },
+      })
+    ).status,
+    403,
+  );
+  for (const kind of ["sources", "jobs", "candidates"]) {
+    const url =
+      "/api/admin/research/browse?kind=" +
+      kind +
+      "&q=Registry+pagination+fixture";
+    const firstResponse = await fetch(base + url, {
+      headers: { Cookie: admin },
+    });
+    assert.equal(firstResponse.headers.get("cache-control"), "no-store");
+    assert.equal(firstResponse.headers.get("referrer-policy"), "no-referrer");
+    const first = await firstResponse.json(),
+      second = await (
+        await fetch(base + url + "&page=2", { headers: { Cookie: admin } })
+      ).json();
+    assert.equal(first.total, 102);
+    assert.equal(first.items.length, 25);
+    assert.equal(second.items.length, 25);
+    assert.equal(
+      new Set(
+        [...first.items, ...second.items].map(
+          (item: { id: string }) => item.id,
+        ),
+      ).size,
+      50,
+    );
+  }
+  for (const query of ["kind=jobs&state=pending", "q=a&q=b", "userId=other"])
+    assert.equal(
+      (
+        await fetch(base + "/api/admin/research/browse?" + query, {
+          headers: { Cookie: admin },
+        })
+      ).status,
+      400,
+    );
+  const researchBrowserZH = await (
+    await fetch(
+      base +
+        "/admin/research/browse?kind=candidates&state=pending&q=Registry+pagination+fixture",
+      { headers: { Cookie: adminZHCookie } },
+    )
+  ).text();
+  assert.match(researchBrowserZH, /研究记录浏览器/);
+  assert.match(researchBrowserZH, /查看候选记录/);
+  assert.match(researchBrowserZH, /page=2/);
+  assert.match(researchBrowserZH, /state=pending/);
+  assert.equal(
+    (await fetch(base + "/admin/research/browse", { headers: { Cookie: a } }))
+      .status,
+    404,
+  );
+  const recentResearch = await (
+    await fetch(base + "/api/admin/research", { headers: { Cookie: admin } })
+  ).json();
+  assert.ok(
+    !recentResearch.sources.some(
+      (item: { id: string }) => item.id === olderRegistrySource.id,
+    ),
+  );
+  assert.ok(
+    !recentResearch.candidates.some(
+      (item: { id: string }) => item.id === oldResearchCandidate,
+    ),
+  );
+  const selectionURL = "/api/admin/research?candidate=" + oldResearchCandidate;
+  const selectedResearch = await (
+    await fetch(base + selectionURL, { headers: { Cookie: admin } })
+  ).json();
+  assert.equal(selectedResearch.candidates[0].id, oldResearchCandidate);
+  assert.equal(selectedResearch.sources[0].id, olderRegistrySource.id);
+  const oldResearchHTML = await (
+    await fetch(base + "/admin/research?candidate=" + oldResearchCandidate, {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).text();
+  assert.ok(
+    oldResearchHTML.includes('id="candidate-' + oldResearchCandidate + '"'),
+  );
+  assert.match(
+    oldResearchHTML,
+    /&lt;script&gt;window.oldResearch=true&lt;\/script&gt;/,
+  );
+  assert.ok(
+    !oldResearchHTML.includes("<script>window.oldResearch=true</script>"),
+  );
+  assert.equal(
+    (
+      await post(
+        "/api/admin/research",
+        {
+          action: "policy",
+          sourceId: olderRegistrySource.id,
+          enabled: false,
+          permissionNote: "Older original permission note retained.",
+        },
+        admin,
+      )
+    ).status,
+    200,
+  );
+  const savedPolicy = await (
+    await fetch(base + "/api/admin/research?source=" + olderRegistrySource.id, {
+      headers: { Cookie: admin },
+    })
+  ).json();
+  assert.equal(
+    savedPolicy.sources[0].permission_note,
+    "Older original permission note retained.",
+  );
+  assert.equal(
+    (
+      await post(
+        "/api/admin/research",
+        {
+          action: "extract",
+          candidateId: oldResearchCandidate,
+          extraction: {
+            relevant: false,
+            details: null,
+            evidence: Object.fromEntries(
+              ["title", "funding", "deadline", "eligibility"].map((key) => [
+                key,
+                { quote: null, reason: "Unsupported opportunity details." },
+              ]),
+            ),
+          },
+        },
+        admin,
+      )
+    ).status,
+    200,
+  );
+  const refreshedResearch = await (
+    await fetch(base + selectionURL, { headers: { Cookie: admin } })
+  ).json();
+  assert.equal(refreshedResearch.candidates[0].state, "rejected");
+  assert.equal(refreshedResearch.sources[0].id, olderRegistrySource.id);
+  for (const query of [
+    "candidate=" + oldResearchCandidate + "&source=" + olderRegistrySource.id,
+    "source=" + olderRegistrySource.id + "&source=" + olderRegistrySource.id,
+  ])
+    assert.equal(
+      (
+        await fetch(base + "/api/admin/research?" + query, {
+          headers: { Cookie: admin },
+        })
+      ).status,
+      400,
+    );
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/research?candidate=" + randomUUID(), {
+        headers: { Cookie: admin },
+      })
+    ).status,
     404,
   );
   const privacyCookie = await login("http-privacy@example.test");

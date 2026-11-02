@@ -25,7 +25,13 @@ type Dashboard = {
     opportunity_id: string | null;
   }[];
 };
-export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
+export default function ResearchWorkspace({
+  initial,
+  refreshQuery = "",
+}: {
+  initial: Dashboard;
+  refreshQuery?: string;
+}) {
   const { locale, t, research, message: translateMessage } = useScreenText();
   const [data, setData] = useState(initial),
     [busy, setBusy] = useState(false),
@@ -40,7 +46,9 @@ export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
       });
       const value = await r.json();
       if (!r.ok) throw Error(value.error ?? "Unable to save.");
-      const refreshed = await fetch("/api/admin/research");
+      const refreshed = await fetch(
+        "/api/admin/research" + (refreshQuery ? "?" + refreshQuery : ""),
+      );
       if (!refreshed.ok)
         throw Error("Saved, but refresh failed. Reload this page.");
       setData(await refreshed.json());
@@ -57,7 +65,7 @@ export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
         <h2>{t("Registered sources")}</h2>
         {data.sources.length ? (
           data.sources.map((source) => (
-            <article key={source.id}>
+            <article key={source.id} id={"source-" + source.id}>
               <h3 lang="">{source.name}</h3>
               <p>{source.url}</p>
               <p>
@@ -137,7 +145,7 @@ export default function ResearchWorkspace({ initial }: { initial: Dashboard }) {
         </p>
         {data.candidates.length ? (
           data.candidates.map((c) => (
-            <article key={c.id}>
+            <article key={c.id} id={"candidate-" + c.id}>
               <h3>
                 {t("Candidate")} {c.id}
               </h3>

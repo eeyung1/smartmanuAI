@@ -50,6 +50,7 @@ Implemented locally:
 - [x] Admin source registration, evidence review and revision history
 - [x] Private admin audit screen with stable pagination and field-level change comparisons
 - [x] Searchable admin catalogue with pagination and editor access beyond the latest 100 records/sources
+- [x] Paginated research browser for sources, collection jobs and candidates, with retained older policy/review selections
 - [x] Conservative funding, date and stale-listing checks
 - [x] SQL migrations, notification sink and bounded eve fixture runtime
 - [x] Durable source-collection jobs, bounded retrieval and snapshot deduplication
