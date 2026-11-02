@@ -1,3 +1,4 @@
+import { localConfig } from "@/src/config";
 import { interfaceLocale } from "@/src/i18n/server";
 import { screenText, screenLabel } from "@/src/i18n/screens";
 import Link from "next/link";
@@ -54,7 +55,9 @@ export default async function Opportunities({
       </p>
       <div className="notice">
         {t(
-          "Local prototype. Any synthetic records are clearly labelled and have no application link.",
+          localConfig().mode === "staging"
+            ? "Staging preview: read-only catalogue. Sign-in and notifications are not enabled."
+            : "Local prototype. Any synthetic records are clearly labelled and have no application link.",
         )}{" "}
       </div>
       {invalidFilters ? (

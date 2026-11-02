@@ -170,3 +170,8 @@ Source collection now supports persisted ETag/Last-Modified validators and fence
 ## 27 Retry-After checkpoint on 2 November 2026
 
 Collection now persists per-source Retry-After waits for 429/503 responses, retains them across restart and replacement jobs, and requires source-policy review for excessive waits. Failure completion is fenced by policy/current lease and admin screens expose delay/review state. See [source pipeline](source-pipeline.md) for accepted formats, limits, reset semantics and tests. Host-wide pacing, live-source interoperability, browser review, uncertain model-cost recovery and release gates remain open.
+
+
+## 28 Read-only hosted staging checkpoint on 2 November 2026
+
+Vercel/Supabase staging preparation introduces an explicit read-only mode, no-request-time migrations, schema-pinned SQL, health checks and an isolated Supabase bootstrap with RLS. Authentication and channels remain disabled in hosted previews, while local fixture flows remain intact. See [staging guide](vercel-supabase-staging.md) for setup and verification. Hosted account access, live collection/alerts, backups/retention and public release remain separate gates.

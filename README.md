@@ -4,7 +4,7 @@ A multi-user platform for finding smart manufacturing scholarships to study in C
 
 The product uses one shared research pipeline and reviewed catalogue for all users. Private profiles drive deterministic matching; source collection and AI extraction are shared so research costs do not grow as one agent per subscriber.
 
-**Current stage: local implementation and automated validation. Public release is not complete.** Sign-in currently accepts synthetic `.test` addresses, configuration is restricted to local origins/databases, and notification delivery uses local sinks or injected simulations. No live sending domain, Telegram bot, scheduled cloud worker or public deployment is connected.
+**Current stage: local implementation plus read-only Vercel staging preparation. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
 Feature audit: **2 November 2026**, through [implementation PR #24](https://github.com/eeyung1/smartmanuAI/pull/24).
 
@@ -303,7 +303,10 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] PostgreSQL 16 integration matrix in CI, using isolated schemas and concurrent-claim/restart fixtures.
 - [x] Local-only configuration guards, generated private development settings and labelled synthetic seeds.
 - [x] Pinned dependencies, lockfile, format/type/build checks and GitHub Actions validation.
-- [ ] Production/managed database validation, least-privilege database roles or RLS, and environment separation.
+- [x] Read-only Vercel staging configuration, health endpoint and explicit disabled-account/channel UI.
+- [x] Additive private-schema bootstrap with RLS and a least-privilege catalogue reader, tested locally and in the PostgreSQL CI case.
+- [ ] Verify the deployed Vercel-to-Supabase connection and hosted route behavior.
+- [ ] Full production/managed database validation, private-account database roles and development/staging/production separation.
 - [ ] Approve exact current hosting/search/model/email/backup prices and capacity before provisioning.
 - [ ] Monthly research budget periods, actual-cost/invoice reconciliation and operator spend overview.
 - [ ] Budget alerts at 70%, optional-work reduction at 90%, and production hard-cap/reserved essential capacity behavior.
@@ -367,7 +370,7 @@ npm run dev
 
 Open `http://127.0.0.1:3000`. Sign in with a synthetic `.test` email and open its link from the private `.local/mail.jsonl` sink. Local setup creates missing private settings without printing secrets or replacing existing values. Retain local encryption keys if keeping existing encrypted test data.
 
-PGlite permits **one owning process**. Stop the development server before migrations, seeds, admin grants or worker commands. Optional local PostgreSQL supports separate processes; current application configuration rejects remote/managed database URLs. This is not a production deployment recipe.
+PGlite permits **one owning process**. Stop the development server before migrations, seeds, admin grants or worker commands. Optional local PostgreSQL supports separate processes; local-mode configuration rejects remote/managed database URLs. The separate read-only staging mode is documented in the staging guide; it is not a production account/worker deployment recipe.
 
 ### Administrator access
 
@@ -450,24 +453,25 @@ Exact installed versions are recorded in the package manifest and lockfile. A li
 | `.github/workflows/`                          | Pull-request and main-branch CI                                                       |
 | `docs/`                                       | Requirements, proposals, implementation checkpoints, limits and decisions             |
 
-| Document                                                                                          | What it covers                                                              |
-| ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [Product requirements](docs/smartmanuAI_PRD_v0_1.md)                                              | FR01–FR09, product scope and public-MVP acceptance                          |
-| [Screen flows](docs/screen-flows.md)                                                              | Proposed journeys and screen acceptance                                     |
-| [Technical architecture](docs/technical-architecture.md)                                          | Proposed components, data and trust boundaries                              |
-| [Delivery workflow](docs/delivery-workflow.md)                                                    | Required workflow, decisions and dated implementation checkpoints           |
-| [Provider feasibility](docs/provider-feasibility.md) / [budget worksheet](docs/pilot-budget.json) | Historical provider research and unapproved cost assumptions                |
-| [Source feasibility](docs/source-feasibility.md)                                                  | Official-page sample and source-access limitations                          |
-| [Local scaffold](docs/local-spike.md)                                                             | Local setup, fixture runtime and recovery limits                            |
-| [Catalogue](docs/catalogue-implementation.md)                                                     | Publication, public/admin browse and audit-history behavior                 |
-| [Source pipeline](docs/source-pipeline.md)                                                        | Collection, extraction, job recovery, conditional retrieval and Retry-After |
-| [Matching and tracker](docs/matching-tracker.md)                                                  | Rule policy, material changes, persistence and bounds                       |
-| [Local digests](docs/notification-digests.md)                                                     | Consent, timezone slots, caps and sink semantics                            |
-| [Telegram](docs/telegram-linking.md)                                                              | Local link ownership, encrypted bindings and revocation                     |
-| [Email controls](docs/email-controls.md)                                                          | Signed opt-out, verified callbacks and suppression                          |
-| [Outbound simulation](docs/outbound-simulation.md)                                                | Request adapters, quota/retry/uncertainty semantics                         |
-| [Account privacy](docs/account-privacy.md)                                                        | Local export, deletion receipts, purge and remaining policy work            |
-| [Language support](docs/language-support.md)                                                      | English/Chinese controls, original wording, fallback and validation limits  |
+| Document                                                                                          | What it covers                                                                |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [Product requirements](docs/smartmanuAI_PRD_v0_1.md)                                              | FR01–FR09, product scope and public-MVP acceptance                            |
+| [Screen flows](docs/screen-flows.md)                                                              | Proposed journeys and screen acceptance                                       |
+| [Technical architecture](docs/technical-architecture.md)                                          | Proposed components, data and trust boundaries                                |
+| [Delivery workflow](docs/delivery-workflow.md)                                                    | Required workflow, decisions and dated implementation checkpoints             |
+| [Provider feasibility](docs/provider-feasibility.md) / [budget worksheet](docs/pilot-budget.json) | Historical provider research and unapproved cost assumptions                  |
+| [Source feasibility](docs/source-feasibility.md)                                                  | Official-page sample and source-access limitations                            |
+| [Local scaffold](docs/local-spike.md)                                                             | Local setup, fixture runtime and recovery limits                              |
+| [Catalogue](docs/catalogue-implementation.md)                                                     | Publication, public/admin browse and audit-history behavior                   |
+| [Source pipeline](docs/source-pipeline.md)                                                        | Collection, extraction, job recovery, conditional retrieval and Retry-After   |
+| [Matching and tracker](docs/matching-tracker.md)                                                  | Rule policy, material changes, persistence and bounds                         |
+| [Local digests](docs/notification-digests.md)                                                     | Consent, timezone slots, caps and sink semantics                              |
+| [Telegram](docs/telegram-linking.md)                                                              | Local link ownership, encrypted bindings and revocation                       |
+| [Email controls](docs/email-controls.md)                                                          | Signed opt-out, verified callbacks and suppression                            |
+| [Outbound simulation](docs/outbound-simulation.md)                                                | Request adapters, quota/retry/uncertainty semantics                           |
+| [Account privacy](docs/account-privacy.md)                                                        | Local export, deletion receipts, purge and remaining policy work              |
+| [Vercel/Supabase staging](docs/vercel-supabase-staging.md)                                        | Read-only hosting, private schema, roles, secrets and deployment verification |
+| [Language support](docs/language-support.md)                                                      | English/Chinese controls, original wording, fallback and validation limits    |
 
 ## Delivery workflow
 

@@ -96,6 +96,15 @@ export async function createLocalAuth(
 }
 let auth: ReturnType<typeof createLocalAuth> | undefined;
 export function getAuth() {
+  if (localConfig().mode === "staging")
+    return Promise.resolve({
+      handler: async (_request: Request) =>
+        Response.json(
+          { error: "Sign-in is unavailable in this staging preview." },
+          { status: 503, headers: { "Cache-Control": "no-store" } },
+        ),
+      api: { getSession: async (_input: { headers: Headers }) => null },
+    });
   return (auth ??= (async () =>
     createLocalAuth(await getDatabase(), localConfig().dataDir))());
 }
