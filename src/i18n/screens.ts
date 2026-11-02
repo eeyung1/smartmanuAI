@@ -1,9 +1,11 @@
 import { adminChinese, researchStateLabels } from "./admin";
+import { errorChinese } from "./errors";
 import { controlChinese } from "./controls";
 import type { Locale } from "./locale";
 export const screenChinese: Record<string, string> = {
   ...controlChinese,
   ...adminChinese,
+  ...errorChinese,
   "SMART MANUFACTURING OPPORTUNITIES": "智能制造学习机会",
   "Find your next": "寻找您的下一个",
   "step forward.": "进步机会。",

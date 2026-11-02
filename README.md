@@ -59,7 +59,8 @@ Implemented locally:
 - [x] English/Simplified Chinese catalogue, detail pages, preferences, match explanations and tracker controls
 - [x] English/Simplified Chinese alert settings, Telegram tests, privacy and unsubscribe screens
 - [x] English/Simplified Chinese admin review, source policies and manual extraction controls
-- [ ] Complete service-error coverage and linguistic/browser review
+- [x] Fixed application-error translations and localized not-found/failure recovery screens
+- [ ] Linguistic/browser review and third-party error interoperability
 - [x] Notification consent, channel selection, timezone digests and local opt-out
 - [x] Local digest cap, overflow, deduplication and send-time eligibility checks
 - [x] Local Telegram linking, encrypted binding, webhook validation and revocation

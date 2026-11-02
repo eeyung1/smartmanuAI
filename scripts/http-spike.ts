@@ -127,6 +127,23 @@ try {
     })
   ).text();
   assert.match(invalidCookie, /<html lang="en"/);
+  const missingEnglish = await fetch(base + "/missing-page-for-error-check");
+  assert.equal(missingEnglish.status, 404);
+  assert.match(await missingEnglish.text(), /Page not found/);
+  const missingChinese = await fetch(base + "/missing-page-for-error-check", {
+    headers: { Cookie: localeCookie },
+  });
+  assert.equal(missingChinese.status, 404);
+  const missingChineseHTML = await missingChinese.text();
+  assert.match(missingChineseHTML, /未找到页面/);
+  assert.match(missingChineseHTML, /href="\/opportunities"/);
+  assert.ok(!missingChineseHTML.includes("BETTER_AUTH_SECRET"));
+  const missingOpportunityChinese = await fetch(
+    base + "/opportunities/no-such-opportunity",
+    { headers: { Cookie: localeCookie } },
+  );
+  assert.equal(missingOpportunityChinese.status, 404);
+  assert.match(await missingOpportunityChinese.text(), /未找到页面/);
   const a = await login("http-alice@example.test");
   const b = await login("http-bob@example.test");
   const admin = await login("reviewer@example.test");
@@ -1082,6 +1099,9 @@ try {
     headers: { Cookie: languageUser + "; " + localeCookie },
   });
   assert.equal(deniedAdminPage.status, 404);
+  const deniedAdminHTML = await deniedAdminPage.text();
+  assert.match(deniedAdminHTML, /未找到页面/);
+  assert.ok(!deniedAdminHTML.includes("Captured candidates"));
   assert.equal(
     (
       await fetch(base + "/api/admin/research", {
@@ -1380,7 +1400,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, stable form values and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, stable form values and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

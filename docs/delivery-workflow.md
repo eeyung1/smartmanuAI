@@ -135,3 +135,7 @@ Local user screens now include translated digest consent/schedules, Telegram bin
 ## 19 Admin translation checkpoint on 31 October 2026
 
 The local English/Simplified Chinese interface now covers admin catalogue review and source-collection/manual-extraction controls. Review/permission semantics, source evidence, JSON contracts, tri-state costs and audit notes remain unchanged. See [language support](language-support.md) for the seeded extraction-to-review HTTP checks. Remaining service/framework errors, linguistic/browser review, live-source/model validation and all public-release gates remain open.
+
+## 20 Error recovery checkpoint on 2 November 2026
+
+The local application now translates fixed service/API error messages and provides custom English/Simplified Chinese production not-found, page-failure and root-layout fallback screens. Error details remain private and retry is explicit. A static error-message audit and rendered/HTTP checks cover translation gaps, secret-bearing exceptions and missing/restricted records. See [language support](language-support.md) for root-fallback locale behavior and validation boundaries. Third-party interoperability, browser/linguistic review, source/provider pilots and public-release gates remain open.
