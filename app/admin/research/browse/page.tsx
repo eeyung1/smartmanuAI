@@ -166,15 +166,27 @@ export default async function ResearchBrowser({
                 </p>
               </>
             ) : kind === "jobs" ? (
-              <p>
-                {t("Attempts: {count}", { count: Number(item.attempts) })}
-                {item.error_code
-                  ? " · " +
-                    t("Diagnostic code: {code}", {
-                      code: String(item.error_code),
-                    })
-                  : ""}
-              </p>
+              <div>
+                <p>
+                  <Link
+                    href={
+                      "/admin/research/jobs/" +
+                      encodeURIComponent(String(item.id))
+                    }
+                  >
+                    {t("Inspect collection job")}
+                  </Link>
+                </p>
+                <p>
+                  {t("Attempts: {count}", { count: Number(item.attempts) })}
+                  {item.error_code
+                    ? " · " +
+                      t("Diagnostic code: {code}", {
+                        code: String(item.error_code),
+                      })
+                    : ""}
+                </p>
+              </div>
             ) : (
               <>
                 <p lang="" style={{ overflowWrap: "anywhere" }}>

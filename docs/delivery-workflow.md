@@ -155,3 +155,8 @@ A searchable, paginated administrator catalogue now reaches records and sources 
 ## 24 Research navigation checkpoint on 2 November 2026
 
 Administrators can browse source policies, jobs and candidates in searchable pages of 25 and open exact older policy/review targets beyond the recent workspace limits. Selected records survive policy saves and manual candidate review, preserving original source text and private-draft publication boundaries. See [source pipeline](source-pipeline.md) for query validation, live-list ordering and verification. Browser/linguistic review, job/uncertain-cost recovery controls, retention, live provider/source pilots and public-release gates remain open.
+
+
+## 25 Collection-job recovery checkpoint on 2 November 2026
+
+Administrators now have a bilingual collection-job detail screen with audited cancellation and one queued replacement per failed/cancelled attempt. Expected state/attempts, ordered locks, active-job checks and lease fencing preserve worker and source-policy behavior. See [source pipeline](source-pipeline.md) for queue semantics, privacy handling and tests. Uncertain model usage, browser/linguistic review, live collection/provider pilots, retention and public-release gates remain open.

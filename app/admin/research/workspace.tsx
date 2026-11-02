@@ -1,6 +1,7 @@
 "use client";
 import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
+import Link from "next/link";
 type Dashboard = {
   sources: {
     id: string;
@@ -126,6 +127,10 @@ export default function ResearchWorkspace({
                   j.source_id}
                 : {research("job", j.state)}
                 {t("· Attempt")} {j.attempts}
+                {" · "}
+                <Link href={"/admin/research/jobs/" + encodeURIComponent(j.id)}>
+                  {t("Inspect collection job")}
+                </Link>
                 {j.error_code
                   ? " · " + t("Diagnostic code: {code}", { code: j.error_code })
                   : ""}

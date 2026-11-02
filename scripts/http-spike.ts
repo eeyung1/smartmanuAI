@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { preferencesSchema } from "../src/domain/profile";
 import { localConfig } from "../src/config";
+import { collectionPolicy } from "../src/research/collection";
 import { openDatabase } from "../src/db";
 import {
   seedLocalCatalogue,
@@ -151,6 +152,25 @@ await seed.sql.query(
 await seed.sql.query(
   "INSERT INTO research_jobs(id,source_id,state,attempts,created_at) SELECT x.id,x.source_id,'done',1,'2001-01-01'::timestamptz FROM jsonb_to_recordset($1::jsonb) AS x(id text,source_id text)",
   [JSON.stringify(researchFixtures)],
+);
+const recoverySource = await createSource(seed.sql, "local-fixture-reviewer", {
+  name: "Recovery HTTP source fixture",
+  url: "https://university.example.edu/recovery-fixture",
+});
+await collectionPolicy(seed.sql, "local-fixture-reviewer", {
+  sourceId: recoverySource.id,
+  enabled: true,
+  permissionNote: "HTTP fixture permission; no worker or real collection.",
+});
+const recoveryRunningID = randomUUID(),
+  recoveryFailedID = randomUUID();
+await seed.sql.query(
+  "INSERT INTO research_jobs(id,source_id,state,attempts,lease_token,lease_until) VALUES($1,$2,'running',1,'PRIVATE_HTTP_LEASE',NOW()+INTERVAL '1 hour')",
+  [recoveryRunningID, recoverySource.id],
+);
+await seed.sql.query(
+  "INSERT INTO research_jobs(id,source_id,state,attempts,error_code) VALUES($1,$2,'failed',3,'source_timeout')",
+  [recoveryFailedID, recoverySource.id],
 );
 await seed.close();
 const log = await open(join(dir, "server.log"), "w");
@@ -1951,6 +1971,144 @@ try {
     ).status,
     404,
   );
+  const recoveryPath = "/api/admin/research/jobs/" + recoveryRunningID;
+  assert.equal((await fetch(base + recoveryPath)).status, 401);
+  assert.equal(
+    (await fetch(base + recoveryPath, { headers: { Cookie: a } })).status,
+    403,
+  );
+  const recoveryGET = await fetch(base + recoveryPath, {
+    headers: { Cookie: admin },
+  });
+  assert.equal(recoveryGET.headers.get("cache-control"), "no-store");
+  assert.equal(recoveryGET.headers.get("referrer-policy"), "no-referrer");
+  const recoveryInitial = await recoveryGET.json();
+  assert.equal(recoveryInitial.job.state, "running");
+  assert.ok(!JSON.stringify(recoveryInitial).includes("PRIVATE_HTTP_LEASE"));
+  const recoveryCancel = {
+    action: "cancel",
+    expectedState: "running",
+    expectedAttempts: 1,
+    note: "Original recovery reason <script>window.recovery=true</script>",
+  };
+  const recoveryRetry = {
+    action: "retry",
+    expectedState: "failed",
+    expectedAttempts: 3,
+    note: "Fixture retry after reviewing source policy.",
+  };
+  assert.equal((await post(recoveryPath, recoveryCancel, a)).status, 403);
+  assert.equal(
+    (
+      await fetch(base + recoveryPath, {
+        method: "POST",
+        headers: {
+          Cookie: admin,
+          Origin: "https://attacker.example.test",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(recoveryCancel),
+      })
+    ).status,
+    403,
+  );
+  assert.equal(
+    (await post(recoveryPath, { ...recoveryCancel, note: "bad" }, admin))
+      .status,
+    400,
+  );
+  assert.equal(
+    (await post(recoveryPath, { ...recoveryCancel, force: true }, admin))
+      .status,
+    400,
+  );
+  assert.equal(
+    (
+      await post(
+        recoveryPath,
+        { ...recoveryCancel, expectedAttempts: 0 },
+        admin,
+      )
+    ).status,
+    409,
+  );
+  const failedPath = "/api/admin/research/jobs/" + recoveryFailedID;
+  assert.equal((await post(failedPath, recoveryRetry, admin)).status, 409);
+  const recoveryScreen = await (
+    await fetch(base + "/admin/research/jobs/" + recoveryRunningID, {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).text();
+  assert.match(recoveryScreen, /取消采集任务/);
+  assert.match(recoveryScreen, /name="note"/);
+  assert.ok(!recoveryScreen.includes("PRIVATE_HTTP_LEASE"));
+  assert.equal(
+    (
+      await fetch(base + "/admin/research/jobs/" + recoveryRunningID, {
+        headers: { Cookie: a },
+      })
+    ).status,
+    404,
+  );
+  assert.equal((await post(recoveryPath, recoveryCancel, admin)).status, 200);
+  assert.equal((await post(recoveryPath, recoveryCancel, admin)).status, 409);
+  const recoveryHistory = await (
+    await fetch(base + "/admin/research/jobs/" + recoveryRunningID, {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).text();
+  assert.match(recoveryHistory, /任务操作历史/);
+  assert.match(
+    recoveryHistory,
+    /&lt;script&gt;window.recovery=true&lt;\/script&gt;/,
+  );
+  assert.ok(!recoveryHistory.includes("<script>window.recovery=true</script>"));
+  const retriedResponse = await post(failedPath, recoveryRetry, admin);
+  assert.equal(retriedResponse.status, 200);
+  const retriedJob = await retriedResponse.json();
+  assert.ok(retriedJob.replacementJobId);
+  assert.equal((await post(failedPath, recoveryRetry, admin)).status, 409);
+  const retainedFailed = await (
+    await fetch(base + failedPath, { headers: { Cookie: admin } })
+  ).json();
+  assert.equal(retainedFailed.job.state, "failed");
+  assert.equal(retainedFailed.job.attempts, 3);
+  assert.equal(
+    retainedFailed.actions[0].replacement_job_id,
+    retriedJob.replacementJobId,
+  );
+  const retryHTML = await (
+    await fetch(base + "/admin/research/jobs/" + recoveryFailedID, {
+      headers: { Cookie: adminZHCookie },
+    })
+  ).text();
+  assert.match(retryHTML, /打开替代任务/);
+  assert.ok(!retryHTML.includes('name="note"'));
+  const replacementData = await (
+    await fetch(
+      base + "/api/admin/research/jobs/" + retriedJob.replacementJobId,
+      { headers: { Cookie: admin } },
+    )
+  ).json();
+  assert.equal(replacementData.job.state, "queued");
+  assert.equal(replacementData.job.attempts, 0);
+  assert.equal(replacementData.predecessor, recoveryFailedID);
+  const jobsBrowser = await (
+    await fetch(
+      base + "/admin/research/browse?kind=jobs&source=" + recoverySource.id,
+      { headers: { Cookie: adminZHCookie } },
+    )
+  ).text();
+  assert.match(jobsBrowser, /查看采集任务/);
+  assert.ok(jobsBrowser.includes("/admin/research/jobs/" + recoveryFailedID));
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/research/jobs/" + randomUUID(), {
+        headers: { Cookie: admin },
+      })
+    ).status,
+    404,
+  );
   const privacyCookie = await login("http-privacy@example.test");
   const exportPath = "/api/me/privacy/export";
   assert.equal((await fetch(base + exportPath)).status, 401);
@@ -2038,7 +2196,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, admin catalogue/older editor selection, stable form values and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, admin catalogue/older editor selection, research navigation and audited job recovery, stable form values and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

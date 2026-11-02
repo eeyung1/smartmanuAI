@@ -6,7 +6,7 @@ Implemented locally on 31 October 2026. No production privacy or legal-complianc
 
 Visit `/privacy` after signing in. Export and deletion require a session created within ten minutes; older sessions must sign in again. The JSON download contains the account, preferences, tracker, notification settings, Telegram connection summary, digest/delivery metadata and session dates. Credentials, raw mail, encrypted requests, link tokens and shared catalogue records are excluded. This is a profile/activity export, not a complete subject-access response.
 
-Type DELETE to request deletion. The transaction disables alerts, suppresses pending digests and queued simulation jobs, marks in-flight sends uncertain, revokes Telegram connections and all sessions, then queues a durable deletion request. An already-started request cannot be recalled. Accounts attributed to shared source/review history receive a conflict with no deletion queued; an operator-assisted anonymization policy is required before launch.
+Type DELETE to request deletion. The transaction disables alerts, suppresses pending digests and queued simulation jobs, marks in-flight sends uncertain, revokes Telegram connections and all sessions, then queues a durable deletion request. An already-started request cannot be recalled. Accounts attributed to shared source/review history or manual collection-job audits receive a conflict with no deletion queued; an operator-assisted anonymization policy is required before launch.
 
 Save the opaque private receipt displayed once. `/privacy/status` checks completion without signing in; only its hash is stored. Receipt responses expose state and dates, with no account identity. Receipts are bearer capabilities and should not be shared.
 
