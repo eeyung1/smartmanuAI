@@ -27,7 +27,7 @@ The HTTP test exercises administrator access, draft privacy, publication, stale 
 
 ## Remaining work
 
-Source permissions and automated source validation, discovery and extraction, duplicate reconciliation, precise deadline timezones, multilingual UI, matching, complete saved status tracking, consent/channel setup and live provider delivery remain future slices. Admin lists are limited to the latest 100 sources and opportunities and need pagination before growth. The revision API is available; a full audit-history screen remains pending. Arbitrary in-flight agent crash recovery remains a deployment blocker.
+Source permissions and automated source validation, discovery and extraction, duplicate reconciliation, precise deadline timezones, multilingual UI, matching, complete saved status tracking, consent/channel setup and live provider delivery remain future slices. Admin lists are limited to the latest 100 sources and opportunities and need pagination before growth. The original revision API remains available; a bounded admin audit-history screen is described below. Arbitrary in-flight agent crash recovery remains a deployment blocker.
 
 ## Expanded discovery filters — 2 November 2026
 
@@ -40,3 +40,15 @@ Deadline choices are any, explicitly dated, unstated or the next 30 UTC calendar
 The same validated schema serves UI/API and domain queries. Duplicate URL fields and invalid values are rejected by the API. Invalid web filters show a localized message and no result records, with a clear-filters link; they no longer silently broaden to the default catalogue. GET form submission starts at page one, and pagination links preserve every valid selected filter. These public browse filters do not alter a private profile or its language preferences.
 
 Validation covers combined filters and two pages with no duplicate items, repeated matching topics without inflated counts, literal wildcard/injection-like input, date-window boundaries, unknown facts and publication/freshness exclusions on PGlite and PostgreSQL 16 in CI. Production HTTP checks cover bilingual labels, selected option values, preserved pagination URLs, API duplicate/invalid-field rejection and explicit invalid-web-filter handling. Browser/mobile visual review and full FR02/release acceptance remain pending.
+
+## Administrator audit history — 2 November 2026
+
+Each review-queue record now links to `/admin/review/[id]/history`. The read-only screen shows the record's current registry source, stored revision state, actor identifier, original reason, UTC audit time, field changes and expandable full detail/evidence snapshots. Source wording and reviewer notes remain original and React-escaped; JSON field paths stay unchanged for operators. No author email, credentials or private notification data are added.
+
+The new `/api/admin/opportunities/[id]/history` endpoint returns 20 revisions at a time, with an optional exclusive `before` revision cursor. It loads one older row to compare the last displayed item across a page boundary. Cursors remain stable when new revisions are inserted and queries are anchored to the record revision read at request time. Unknown/duplicate cursor fields are rejected. Administrators are checked at both the route and service layer; non-admin pages return generic not-found and APIs deny access. Responses, including authorization/validation failures, are no-store and no-referrer. The legacy revision-array endpoint is unchanged for existing consumers.
+
+Comparisons include state, details and evidence. Object key ordering is ignored, array ordering is preserved, and missing fields, nulls, false, numeric/string zero and object/array types remain distinct. Initial snapshots are labelled as such. If the immediately preceding revision is missing, the screen explicitly withholds a comparison rather than asserting that nothing changed. Audit timestamps are UTC representations of stored database times at JavaScript millisecond precision, not source deadline times.
+
+The history reader performs SELECTs only. It does not publish, restore, delete or rewrite revisions. Stored reasons and actor identifiers follow the existing shared-audit retention policy; this does not implement operator-assisted anonymization or immutable-database enforcement against a privileged SQL operator.
+
+Tests cover authorization, 27 revisions across two pages, a new revision between page reads, a cross-page fee comparison, timestamp precision, missing predecessor handling and unchanged record counts on PGlite/PostgreSQL 16. Production HTTP checks cover English/Chinese controls, positive-to-zero fee history, escaped hostile notes, private draft exclusion and denied access for ordinary users. Browser/keyboard/visual review and admin queue pagination remain pending.
