@@ -28,3 +28,15 @@ The HTTP test exercises administrator access, draft privacy, publication, stale 
 ## Remaining work
 
 Source permissions and automated source validation, discovery and extraction, duplicate reconciliation, precise deadline timezones, multilingual UI, matching, complete saved status tracking, consent/channel setup and live provider delivery remain future slices. Admin lists are limited to the latest 100 sources and opportunities and need pagination before growth. The revision API is available; a full audit-history screen remains pending. Arbitrary in-flight agent crash recovery remains a deployment blocker.
+
+## Expanded discovery filters — 2 November 2026
+
+The public catalogue now combines free text, type, funding, teaching language, topic substring, scholarship study level, participation mode, location and deadline state. Free text searches titles, organizers and summaries; topic search checks each original topic string using a case-insensitive literal substring. Percent/underscore/backslash characters do not become search wildcards. This is not semantic or translated search; no model calls are made.
+
+Study level supports bachelor/master/doctorate and explicitly unstated. Mode supports online/in-person. This prototype's location choices are China (CN), unstated or all; it does not expand the existing publication geography policy. Unstated country/level/deadline filters select null or absent source facts and do not infer eligibility or an online location. Other location facets and precise deadline timestamps remain future scope.
+
+Deadline choices are any, explicitly dated, unstated or the next 30 UTC calendar dates. The window excludes today and includes day 30 under the existing conservative date-only rule; it is not a source-local closing-time calculation. Closed, draft, rejected, stale and expired/closing-today records remain excluded regardless of filters. Default funding exclusions remain unchanged.
+
+The same validated schema serves UI/API and domain queries. Duplicate URL fields and invalid values are rejected by the API. Invalid web filters show a localized message and no result records, with a clear-filters link; they no longer silently broaden to the default catalogue. GET form submission starts at page one, and pagination links preserve every valid selected filter. These public browse filters do not alter a private profile or its language preferences.
+
+Validation covers combined filters and two pages with no duplicate items, repeated matching topics without inflated counts, literal wildcard/injection-like input, date-window boundaries, unknown facts and publication/freshness exclusions on PGlite and PostgreSQL 16 in CI. Production HTTP checks cover bilingual labels, selected option values, preserved pagination URLs, API duplicate/invalid-field rejection and explicit invalid-web-filter handling. Browser/mobile visual review and full FR02/release acceptance remain pending.

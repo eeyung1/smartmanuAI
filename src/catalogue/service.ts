@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import type { SQL } from "../db";
 import {
   sourceSchema,
+  filtersSchema,
+  type PublicFilters,
   draftSchema,
   detailsSchema,
   evidenceSchema,
@@ -192,14 +194,9 @@ export async function publicOpportunity(sql: SQL, id: string) {
   ).rows[0];
   return row ? publicRecord(row) : null;
 }
-export type Filters = {
-  q?: string;
-  category?: string;
-  language?: string;
-  funding?: string;
-  page?: number;
-};
-export async function listPublic(sql: SQL, filters: Filters = {}) {
+export type Filters = Partial<PublicFilters>;
+export async function listPublic(sql: SQL, input: Filters = {}) {
+  const filters = filtersSchema.parse(input);
   const params: unknown[] = [];
   const where = [
     "o.state='published'",
@@ -210,12 +207,37 @@ export async function listPublic(sql: SQL, filters: Filters = {}) {
     ["category", filters.category],
     ["teachingLanguage", filters.language],
     ["funding", filters.funding],
+    ["mode", filters.mode],
   ] as const) {
     if (value) {
       params.push(value);
       where.push(`o.details->>'${key}'=$${params.length}`);
     }
   }
+  for (const [key, value] of [
+    ["studyLevel", filters.studyLevel],
+    ["country", filters.country],
+  ] as const) {
+    if (value === "not_stated") where.push(`o.details->>'${key}' IS NULL`);
+    else if (value) {
+      params.push(value);
+      where.push(`o.details->>'${key}'=$${params.length}`);
+    }
+  }
+  if (filters.topic) {
+    params.push("%" + filters.topic.replace(/[\\%_]/g, "\\$&") + "%");
+    where.push(
+      `EXISTS (SELECT 1 FROM jsonb_array_elements_text(o.details->'topics') AS topic(value) WHERE topic.value ILIKE $${params.length})`,
+    );
+  }
+  if (filters.deadline === "not_stated")
+    where.push("o.details->>'deadline' IS NULL");
+  else if (filters.deadline === "dated")
+    where.push("o.details->>'deadline' IS NOT NULL");
+  else if (filters.deadline === "next_30_days")
+    where.push(
+      "o.details->>'deadline' <= TO_CHAR((CURRENT_TIMESTAMP AT TIME ZONE 'UTC')+INTERVAL '30 days','YYYY-MM-DD')",
+    );
   if (filters.q) {
     params.push("%" + filters.q.replace(/[\\%_]/g, "\\$&") + "%");
     where.push(

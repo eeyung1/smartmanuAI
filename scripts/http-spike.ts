@@ -1313,6 +1313,101 @@ try {
         "Original revision note: preserve facts and require review again.",
     ),
   );
+  const filterDeadline = new Date(Date.now() + 7 * 86400000)
+    .toISOString()
+    .slice(0, 10);
+  for (let index = 0; index < 13; index++) {
+    const pagedDraft = await post("/api/admin/opportunities", {
+      sourceId: source.id,
+      details: {
+        ...fixtureDetails,
+        title: "Paged topic fixture " + index,
+        topics: ["catalogue-only-topic", "advanced catalogue-only-topic"],
+        studyLevel: "master",
+        mode: "in_person",
+        country: "CN",
+        deadline: filterDeadline,
+        deadlineText: "Date-only synthetic source deadline.",
+      },
+      evidence: fixtureEvidence,
+      note: "Create synthetic combined filter fixture.",
+    });
+    assert.equal(pagedDraft.status, 201);
+    const { id } = await pagedDraft.json();
+    assert.equal(
+      (
+        await post("/api/admin/opportunities/" + id + "/review", {
+          action: "publish",
+          expectedRevision: 1,
+          verified: true,
+          note: "Review synthetic combined filter fixture.",
+        })
+      ).status,
+      200,
+    );
+  }
+  const combinedFilter = new URLSearchParams({
+    topic: "catalogue-only-topic",
+    category: "course",
+    studyLevel: "master",
+    mode: "in_person",
+    country: "CN",
+    deadline: "next_30_days",
+    funding: "free_participation",
+    language: "en",
+  });
+  const combinedResponse = await fetch(
+    base + "/api/opportunities?" + combinedFilter,
+  );
+  assert.equal(combinedResponse.status, 200);
+  const combinedResults = await combinedResponse.json();
+  assert.equal(combinedResults.total, 13);
+  assert.equal(combinedResults.items.length, 12);
+  const combinedHTML = await (
+    await fetch(base + "/opportunities?" + combinedFilter, {
+      headers: { Cookie: localeCookie },
+    })
+  ).text();
+  assert.match(combinedHTML, /主题包含/);
+  assert.match(combinedHTML, /未来 30 个日历日（UTC）/);
+  assert.match(combinedHTML, /来源截止时间的时区仍未知/);
+  assert.match(combinedHTML, /name="topic"[^>]*value="catalogue-only-topic"/);
+  assert.match(
+    combinedHTML,
+    /<option value="master"[^>]*selected[^>]*>硕士<\/option>/,
+  );
+  const nextHref = combinedHTML.match(/href="([^"]*page=2[^"]*)"/);
+  assert.ok(nextHref);
+  const nextURL = new URL(nextHref[1].replaceAll("&amp;", "&"), base);
+  for (const [key, value] of combinedFilter)
+    assert.equal(nextURL.searchParams.get(key), value);
+  const nextResults = await (
+    await fetch(base + "/api/opportunities?" + nextURL.searchParams)
+  ).json();
+  assert.equal(nextResults.total, 13);
+  assert.equal(nextResults.items.length, 1);
+  assert.ok(
+    !combinedResults.items.some(
+      (item: { id: string }) => item.id === nextResults.items[0].id,
+    ),
+  );
+  assert.equal(
+    (await fetch(base + "/api/opportunities?mode=online&mode=in_person"))
+      .status,
+    400,
+  );
+  assert.equal(
+    (await fetch(base + "/api/opportunities?studyLevel=postdoc")).status,
+    400,
+  );
+  const invalidFiltersPage = await fetch(
+    base + "/opportunities?mode=sideways&topic=catalogue-only-topic",
+    { headers: { Cookie: localeCookie } },
+  );
+  const invalidFiltersHTML = await invalidFiltersPage.text();
+  assert.match(invalidFiltersHTML, /部分筛选条件无效/);
+  assert.ok(!invalidFiltersHTML.includes("<article"));
+  assert.match(invalidFiltersHTML, /清除筛选/);
   const privacyCookie = await login("http-privacy@example.test");
   const exportPath = "/api/me/privacy/export";
   assert.equal((await fetch(base + exportPath)).status, 401);
@@ -1400,7 +1495,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, stable form values and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, stable form values and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

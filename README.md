@@ -46,6 +46,7 @@ Implemented locally:
 
 - [x] Email-link sign-in and private user preferences
 - [x] Reviewed catalogue, filters, detail pages and saved opportunities
+- [x] Combined topic, level, mode, China/unstated location and date-only deadline filters
 - [x] Admin source registration, evidence review and revision history
 - [x] Conservative funding, date and stale-listing checks
 - [x] SQL migrations, notification sink and bounded eve fixture runtime

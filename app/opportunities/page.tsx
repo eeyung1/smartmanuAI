@@ -22,16 +22,17 @@ export default async function Opportunities({
     screenText(locale, key, values);
   const label = (value: string) => screenLabel(locale, value);
   const raw = await searchParams;
+  let invalidFilters = false;
   let filters: import("../../src/catalogue/service").Filters;
   try {
     filters = parseFilters(raw);
   } catch {
+    invalidFilters = true;
     filters = parseFilters({});
   }
-  const { items, total, page, pageSize } = await listPublic(
-    (await getDatabase()).sql,
-    filters,
-  );
+  const { items, total, page, pageSize } = invalidFilters
+    ? { items: [], total: 0, page: 1, pageSize: 12 }
+    : await listPublic((await getDatabase()).sql, filters);
   function pageLink(next: number) {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters))
@@ -56,13 +57,20 @@ export default async function Opportunities({
           "Local prototype. Any synthetic records are clearly labelled and have no application link.",
         )}{" "}
       </div>
+      {invalidFilters ? (
+        <p role="alert">
+          {t(
+            "Some filters are invalid. Clear them or choose valid options before searching.",
+          )}
+        </p>
+      ) : null}
       <form className="filters" action="/opportunities">
         <label>
           {t("Search")}{" "}
           <input
             name="q"
             defaultValue={filters.q}
-            placeholder={t("Topic, title or organizer")}
+            placeholder={t("Title, organizer or summary")}
             maxLength={120}
           />
         </label>
@@ -96,8 +104,63 @@ export default async function Opportunities({
             ))}
           </select>
         </label>
+        <label>
+          {t("Topic contains")}
+          <input
+            name="topic"
+            minLength={2}
+            maxLength={70}
+            defaultValue={filters.topic}
+            placeholder={t("For example: digital twins")}
+          />
+        </label>
+        <label>
+          {t("Study level")}
+          <select name="studyLevel" defaultValue={filters.studyLevel ?? ""}>
+            <option value="">{t("All study levels")}</option>
+            {(["bachelor", "master", "doctorate"] as const).map((value) => (
+              <option key={value} value={value}>
+                {label(value)}
+              </option>
+            ))}
+            <option value="not_stated">{t("Not stated")}</option>
+          </select>
+        </label>
+        <label>
+          {t("Participation mode")}
+          <select name="mode" defaultValue={filters.mode ?? ""}>
+            <option value="">{t("All modes")}</option>
+            <option value="online">{t("Online")}</option>
+            <option value="in_person">{t("In person")}</option>
+          </select>
+        </label>
+        <label>
+          {t("Location")}
+          <select name="country" defaultValue={filters.country ?? ""}>
+            <option value="">{t("All locations")}</option>
+            <option value="CN">{t("China (CN)")}</option>
+            <option value="not_stated">{t("Location not stated")}</option>
+          </select>
+        </label>
+        <label>
+          {t("Deadline filter")}
+          <select name="deadline" defaultValue={filters.deadline ?? ""}>
+            <option value="">{t("All deadline states")}</option>
+            <option value="next_30_days">
+              {t("Next 30 calendar days (UTC)")}
+            </option>
+            <option value="dated">{t("Dated deadlines only")}</option>
+            <option value="not_stated">{t("Deadline not stated")}</option>
+          </select>
+        </label>
         <button>{t("Find opportunities")}</button>
+        <Link href="/opportunities">{t("Clear filters")}</Link>
       </form>
+      <p className="muted">
+        {t(
+          "Date-only filters use UTC calendar dates; the source deadline timezone remains unknown. Unstated values do not confirm eligibility.",
+        )}
+      </p>
       <section>
         <div className="section-title">
           <h2>{t("Explore opportunities")}</h2>
