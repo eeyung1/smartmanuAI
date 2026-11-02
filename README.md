@@ -55,6 +55,7 @@ Implemented locally:
 - [x] SQL migrations, notification sink and bounded eve fixture runtime
 - [x] Durable source-collection jobs, bounded retrieval and snapshot deduplication
 - [x] Persisted ETag/Last-Modified conditional retrieval with fenced not-modified handling
+- [x] Durable per-source Retry-After delays and operator review for excessive waits
 - [x] Evidence-checked extraction into private drafts and admin collection controls
 - [x] Audited admin collection-job cancellation and one replacement per failed/cancelled attempt
 - [ ] Live-source/model pilot and open-web discovery

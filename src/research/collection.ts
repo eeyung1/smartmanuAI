@@ -43,6 +43,10 @@ export async function collectionPolicy(
       "INSERT INTO source_collection_policies(source_id,enabled,permission_note,actor_id) VALUES($1,$2,$3,$4) ON CONFLICT(source_id) DO UPDATE SET enabled=$2,permission_note=$3,actor_id=$4,updated_at=NOW()",
       [v.sourceId, v.enabled, v.permissionNote, actor],
     );
+    if (v.enabled)
+      await tx.query("DELETE FROM source_retry_after WHERE source_id=$1", [
+        v.sourceId,
+      ]);
     if (!v.enabled)
       await tx.query(
         "UPDATE research_jobs SET state='cancelled',lease_token=NULL,lease_until=NULL WHERE source_id=$1 AND state IN ('queued','running')",
@@ -55,7 +59,7 @@ export async function scheduleSources(sql: SQL) {
   return sql.transaction(async (tx) => {
     const due = (
       await tx.query(
-        "SELECT source_id FROM source_collection_policies WHERE enabled AND next_due_at<=NOW() ORDER BY next_due_at LIMIT 25 FOR UPDATE SKIP LOCKED",
+        "SELECT p.source_id FROM source_collection_policies p LEFT JOIN source_retry_after r ON r.source_id=p.source_id WHERE p.enabled AND p.next_due_at<=NOW() AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) ORDER BY p.next_due_at LIMIT 25 FOR UPDATE OF p SKIP LOCKED",
       )
     ).rows;
     for (const row of due) {
@@ -78,7 +82,7 @@ export async function claimCollection(sql: SQL) {
     );
     const row = (
       await tx.query(
-        "SELECT j.id,j.source_id,s.url FROM research_jobs j JOIN sources s ON s.id=j.source_id JOIN source_collection_policies p ON p.source_id=s.id WHERE p.enabled AND j.attempts<3 AND ((j.state='queued' AND j.available_at<=NOW()) OR (j.state='running' AND j.lease_until<NOW())) ORDER BY j.created_at LIMIT 1 FOR UPDATE OF j SKIP LOCKED",
+        "SELECT j.id,j.source_id,s.url FROM research_jobs j JOIN sources s ON s.id=j.source_id JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id WHERE p.enabled AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) AND j.attempts<3 AND ((j.state='queued' AND j.available_at<=NOW()) OR (j.state='running' AND j.lease_until<NOW())) ORDER BY j.created_at LIMIT 1 FOR UPDATE OF j SKIP LOCKED",
       )
     ).rows[0];
     if (!row) return null;
@@ -219,6 +223,40 @@ export async function finishNotModified(
     return "not_modified";
   });
 }
+export async function failCollection(
+  sql: SQL,
+  job: CollectionClaim,
+  error: unknown,
+) {
+  return sql.transaction(async (tx) => {
+    const policy = (
+      await tx.query(
+        "SELECT enabled FROM source_collection_policies WHERE source_id=$1 FOR UPDATE",
+        [job.sourceId],
+      )
+    ).rows[0];
+    const current = (
+      await tx.query(
+        "SELECT attempts FROM research_jobs WHERE id=$1 AND state='running' AND lease_token=$2 AND lease_until>NOW() FOR UPDATE",
+        [job.id, job.token],
+      )
+    ).rows[0];
+    if (!current || !policy?.enabled) return "discarded";
+    const retry = error instanceof RetrievalError ? error.retryAfter : null;
+    const code =
+      error instanceof RetrievalError ? error.code : "collection_failed";
+    if (retry)
+      await tx.query(
+        "INSERT INTO source_retry_after(source_id,retry_after_at,requires_review) VALUES($1,$2,$3) ON CONFLICT(source_id) DO UPDATE SET retry_after_at=GREATEST(source_retry_after.retry_after_at,EXCLUDED.retry_after_at),requires_review=source_retry_after.requires_review OR EXCLUDED.requires_review,updated_at=NOW()",
+        [job.sourceId, retry.until, retry.requiresReview],
+      );
+    await tx.query(
+      "UPDATE research_jobs SET state=CASE WHEN attempts>=3 OR $3 THEN 'failed' ELSE 'queued' END,available_at=GREATEST(NOW()+INTERVAL '5 minutes',COALESCE($4::timestamptz,NOW())),lease_token=NULL,lease_until=NULL,error_code=$2 WHERE id=$1",
+      [job.id, code, retry?.requiresReview ?? false, retry?.until ?? null],
+    );
+    return "retry_or_failed";
+  });
+}
 export async function collectOne(
   sql: SQL,
   retrieve: (
@@ -237,13 +275,7 @@ export async function collectOne(
       return await finishNotModified(sql, job, cache, result.validators);
     return await finishCollection(sql, job, result.content, result.validators);
   } catch (error) {
-    const code =
-      error instanceof RetrievalError ? error.code : "collection_failed";
-    await sql.query(
-      "UPDATE research_jobs SET state=CASE WHEN attempts>=3 THEN 'failed' ELSE 'queued' END,available_at=NOW()+INTERVAL '5 minutes',lease_token=NULL,lease_until=NULL,error_code=$3 WHERE id=$1 AND lease_token=$2 AND state='running'",
-      [job.id, job.token, code],
-    );
-    return "retry_or_failed";
+    return failCollection(sql, job, error);
   }
 }
 export async function researchDashboard(sql: SQL, actor: string) {

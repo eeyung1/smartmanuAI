@@ -1,4 +1,11 @@
 export const adminChinese: Record<string, string> = {
+  "Retry-After pause requires source-policy review.":
+    "Retry-After 暂停需要审核来源策略。",
+  "Source retry not before (UTC)": "来源重试不得早于（UTC）",
+  "Job available at (UTC)": "任务可执行时间（UTC）",
+  "Saving an enabled source policy clears Retry-After pauses after operator review.":
+    "操作人员审核后，保存已启用的来源策略将清除 Retry-After 暂停。",
+
   "Account deletion is pending.": "账户删除正在等待处理。",
   "Collection job not found.": "未找到采集任务。",
   "Collection job changed. Reload before acting.":

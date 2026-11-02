@@ -16,7 +16,7 @@ export async function collectionJob(sql: SQL, actor: string, id: string) {
   jobIdSchema.parse(id);
   const job = (
     await sql.query(
-      "SELECT j.id,j.source_id,j.state,j.attempts,j.error_code,j.created_at,j.available_at,j.lease_until,s.name AS source_name,s.url,s.synthetic,COALESCE(p.enabled,false) AS enabled FROM research_jobs j JOIN sources s ON s.id=j.source_id LEFT JOIN source_collection_policies p ON p.source_id=s.id WHERE j.id=$1",
+      "SELECT j.id,j.source_id,j.state,j.attempts,j.error_code,j.created_at,j.available_at,j.lease_until,r.retry_after_at,COALESCE(r.requires_review,false) AS requires_review,s.name AS source_name,s.url,s.synthetic,COALESCE(p.enabled,false) AS enabled FROM research_jobs j JOIN sources s ON s.id=j.source_id LEFT JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id WHERE j.id=$1",
       [id],
     )
   ).rows[0];
@@ -77,7 +77,7 @@ export async function actOnCollectionJob(
     ).rows[0];
     const job = (
       await tx.query(
-        "SELECT state,attempts FROM research_jobs WHERE id=$1 FOR UPDATE",
+        "SELECT state,attempts,available_at FROM research_jobs WHERE id=$1 FOR UPDATE",
         [id],
       )
     ).rows[0];
@@ -139,11 +139,27 @@ export async function actOnCollectionJob(
           409,
           "This source already has an active collection job.",
         );
+      const cooldown = (
+        await tx.query(
+          "SELECT retry_after_at,requires_review FROM source_retry_after WHERE source_id=$1",
+          [target.source_id],
+        )
+      ).rows[0];
+      if (cooldown?.requires_review)
+        throw new CatalogueError(
+          409,
+          "Retry-After pause requires source-policy review.",
+        );
       replacement = randomUUID();
-      await tx.query("INSERT INTO research_jobs(id,source_id) VALUES($1,$2)", [
-        replacement,
-        target.source_id,
-      ]);
+      await tx.query(
+        "INSERT INTO research_jobs(id,source_id,available_at) VALUES($1,$2,GREATEST(NOW(),$3::timestamptz,COALESCE($4::timestamptz,NOW())))",
+        [
+          replacement,
+          target.source_id,
+          job.available_at,
+          cooldown?.retry_after_at ?? null,
+        ],
+      );
       // A scheduled run should not immediately enqueue a second job after this replacement finishes.
       await tx.query(
         "UPDATE source_collection_policies SET next_due_at=GREATEST(next_due_at,NOW()+INTERVAL '1 day') WHERE source_id=$1",

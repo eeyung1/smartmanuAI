@@ -64,6 +64,11 @@ export default function ResearchWorkspace({
     <div lang={locale}>
       <section>
         <h2>{t("Registered sources")}</h2>
+        <p>
+          {t(
+            "Saving an enabled source policy clears Retry-After pauses after operator review.",
+          )}
+        </p>
         {data.sources.length ? (
           data.sources.map((source) => (
             <article key={source.id} id={"source-" + source.id}>
