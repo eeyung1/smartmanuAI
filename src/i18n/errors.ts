@@ -36,6 +36,8 @@ export const errorChinese: Record<string, string> = {
   "Enable local email digests before creating a test link.":
     "创建测试链接前请先启用本地邮件摘要。",
   invalid_opportunity: "学习机会无效或当前无法收藏。",
+  invalid_onboarding_step: "引导步骤无效或数据不完整。",
+  incomplete_onboarding: "请先完成所有引导步骤再提交。",
   "Use a form-encoded unsubscribe request.": "请使用表单编码的退订请求。",
   "Confirm the unsubscribe action.": "请确认退订操作。",
   "Not found.": "未找到。",
