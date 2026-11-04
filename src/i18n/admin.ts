@@ -240,6 +240,13 @@ export const adminChinese: Record<string, string> = {
     "仅可关闭已发布记录。未发布草稿请使用不通过操作。",
   "Only closed or rejected records can be archived.":
     "仅可归档已关闭或不通过的记录。",
+  "Choose a different surviving opportunity.": "请选择不同的保留记录。",
+  "The duplicate is already archived and was not merged into this opportunity.":
+    "该重复记录已归档，且未合并至此机会。",
+  "An archived opportunity cannot survive a merge.":
+    "已归档的机会不能作为合并保留记录。",
+  "An opportunity changed. Reload both records before merging.":
+    "机会记录已更改。合并前请重新加载两条记录。",
   "Verify the official source and field evidence before publishing.":
     "发布前请核实官方来源及字段证据。",
   "Past or closing-today dates cannot be newly published under the conservative date-only policy.":
