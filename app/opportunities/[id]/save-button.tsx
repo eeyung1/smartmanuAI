@@ -18,7 +18,10 @@ export default function SaveButton({ id }: { id: string }) {
               body: JSON.stringify({ opportunityId: id }),
             });
             if (r.status === 401) {
-              window.location.assign("/sign-in");
+              const returnTo = `/opportunities/${encodeURIComponent(id)}`;
+              window.location.assign(
+                `/sign-in?${new URLSearchParams({ returnTo }).toString()}`,
+              );
               return;
             }
             setMessage(
