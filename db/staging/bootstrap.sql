@@ -133,6 +133,15 @@ CREATE TABLE source_retry_after (
 );
 
 INSERT INTO schema_migrations(name) VALUES('012_source_retry_after.sql');
+CREATE TABLE onboarding_progress (
+  user_id text PRIMARY KEY REFERENCES auth_user(id) ON DELETE CASCADE,
+  step smallint NOT NULL DEFAULT 1 CHECK (step BETWEEN 1 AND 3),
+  progress jsonb NOT NULL DEFAULT '{}'::jsonb,
+  completed_at timestamptz,
+  updated_at timestamptz NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO schema_migrations(name) VALUES('013_onboarding_progress.sql');
 DO $guard$ DECLARE item record; BEGIN FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='smartmanuai' LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY','smartmanuai',item.tablename); END LOOP; FOR item IN SELECT p.oid::regprocedure AS signature FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='smartmanuai' LOOP EXECUTE format('ALTER FUNCTION %s SET search_path=smartmanuai,pg_catalog',item.signature); END LOOP; END $guard$;
 REVOKE ALL ON SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "smartmanuai" FROM PUBLIC;
