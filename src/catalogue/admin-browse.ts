@@ -16,7 +16,9 @@ export const adminBrowseSchema = z
   .object({
     kind: z.enum(["opportunities", "sources"]).default("opportunities"),
     q: z.string().trim().max(120).optional(),
-    state: z.enum(["draft", "published", "closed", "rejected"]).optional(),
+    state: z
+      .enum(["draft", "published", "closed", "rejected", "archived"])
+      .optional(),
     page: z.coerce.number().int().min(1).max(10000).default(1),
   })
   .strict()

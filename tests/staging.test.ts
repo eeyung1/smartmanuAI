@@ -108,7 +108,7 @@ for (const kind of ["pglite", "postgres"])
             "INSERT INTO sources(id,name,url,synthetic,created_by) VALUES('source','Public source','https://example.test/source',true,'reviewer'),('private-source','Private source','https://example.test/private',true,'reviewer')",
           );
           await tx.query(
-            "INSERT INTO opportunities(id,source_id,revision,state,details,evidence,verified_at) VALUES('published','source',1,'published','{}','{}',NOW()),('private-draft','private-source',1,'draft','{}','{}',NULL)",
+            "INSERT INTO opportunities(id,source_id,revision,state,details,evidence,verified_at) VALUES('published','source',1,'published','{}','{}',NOW()),('private-draft','private-source',1,'draft','{}','{}',NULL),('archived','private-source',2,'archived','{}','{}',NULL)",
           );
         });
         await db.sql.transaction(async (tx) => {
@@ -120,7 +120,7 @@ for (const kind of ["pglite", "postgres"])
               (await tx.query("SELECT COUNT(*) AS n FROM schema_migrations"))
                 .rows[0].n,
             ),
-            14,
+            15,
           );
           assert.deepEqual(
             (await tx.query("SELECT id FROM opportunities")).rows.map(
@@ -161,7 +161,7 @@ for (const kind of ["pglite", "postgres"])
                   )
                 ).rows[0].n,
               ),
-              14,
+              15,
             );
             assert.equal(
               (await scoped.sql.query("SELECT current_schema() AS name"))

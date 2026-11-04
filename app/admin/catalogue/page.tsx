@@ -76,11 +76,16 @@ export default async function AdminCatalogue({
             {t("Record state")}
             <select name="state" defaultValue={data.filters.state ?? ""}>
               <option value="">{t("All record states")}</option>
-              {["draft", "published", "closed", "rejected"].map((state) => (
-                <option key={state} value={state}>
-                  {screenLabel(locale, state)}
-                </option>
-              ))}
+              {["draft", "published", "closed", "rejected", "archived"].map(
+                (state) => (
+                  <option key={state} value={state}>
+                    {screenLabel(
+                      locale,
+                      state === "archived" ? "Archived" : state,
+                    )}
+                  </option>
+                ),
+              )}
             </select>
           </label>
         ) : null}
