@@ -34,15 +34,20 @@ test("deadline reminders target interested/applying saves and deduplicate concur
         "SELECT source_id FROM opportunities WHERE id='synthetic-course'",
       )
     ).rows[0].source_id;
-    const users = ["interested-user", "applying-user", "applied-user"];
+    const users = [
+      "interested-user",
+      "applying-user",
+      "applied-user",
+      "reminders-opted-out-user",
+    ];
     for (const user of users) {
       await db.sql.query(
         "INSERT INTO auth_user(id,name,email,created_at,updated_at) VALUES($1,$1,$2,NOW(),NOW())",
         [user, `${user}@example.test`],
       );
       await db.sql.query(
-        "INSERT INTO notification_preferences(user_id,enabled,channel,consent_version) VALUES($1,true,'telegram','local-sink-v1')",
-        [user],
+        "INSERT INTO notification_preferences(user_id,enabled,deadline_reminders_enabled,channel,consent_version) VALUES($1,true,$2,'telegram','local-sink-v1')",
+        [user, user !== "reminders-opted-out-user"],
       );
     }
     await db.sql.query(
@@ -71,7 +76,7 @@ test("deadline reminders target interested/applying saves and deduplicate concur
       );
     }
     await db.sql.query(
-      "INSERT INTO saved_items(user_id,opportunity_id,status,saved) VALUES('interested-user','deadline-seven','interested',true),('applying-user','deadline-two','applying',true),('applied-user','deadline-seven','applied',true)",
+      "INSERT INTO saved_items(user_id,opportunity_id,status,saved) VALUES('interested-user','deadline-seven','interested',true),('applying-user','deadline-two','applying',true),('applied-user','deadline-seven','applied',true),('reminders-opted-out-user','deadline-seven','interested',true)",
     );
 
     const concurrent = await Promise.all([
