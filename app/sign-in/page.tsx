@@ -2,7 +2,12 @@ import { interfaceLocale } from "@/src/i18n/server";
 import SignIn from "./form";
 import { localConfig } from "@/src/config";
 import { screenText } from "@/src/i18n/screens";
-export default async function SignInPage() {
+import { safeAuthDestination } from "@/src/auth/destination";
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const locale = await interfaceLocale();
   if (localConfig().mode === "staging")
     return (
@@ -22,5 +27,9 @@ export default async function SignInPage() {
         </p>
       </section>
     );
-  return <SignIn key={locale} locale={locale} />;
+  const rawReturnTo = (await searchParams).returnTo;
+  const returnTo = safeAuthDestination(
+    typeof rawReturnTo === "string" ? rawReturnTo : undefined,
+  );
+  return <SignIn key={locale} locale={locale} returnTo={returnTo} />;
 }
