@@ -1,5 +1,6 @@
 "use client";
 import { useScreenText } from "@/src/i18n/context";
+import OpportunityPreview from "./preview";
 import Link from "next/link";
 import { useState } from "react";
 import type { Details } from "@/src/catalogue/schema";
@@ -55,6 +56,9 @@ export default function ReviewWorkspace({
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
     [editing, setEditing] = useState<Row | null>(initialEditing),
+    [sourceId, setSourceId] = useState(
+      initialEditing?.source_id ?? initialSourceId ?? "",
+    ),
     [details, setDetails] = useState<Details>(
       initialEditing?.details ?? initialDetails,
     ),
@@ -197,6 +201,7 @@ export default function ReviewWorkspace({
                 });
               draftForm.reset();
               setEditing(null);
+              setSourceId(initialSourceId ?? "");
               setDetails(initialDetails);
               setEvidence({
                 title: "",
@@ -212,8 +217,8 @@ export default function ReviewWorkspace({
             {t("Source")}{" "}
             <select
               name="sourceId"
-              defaultValue={editing?.source_id ?? initialSourceId ?? ""}
-              key={editing?.id ?? "new"}
+              value={sourceId}
+              onChange={(e) => setSourceId(e.target.value)}
               disabled={!!editing}
               required
             >
@@ -477,6 +482,7 @@ export default function ReviewWorkspace({
               className="secondary"
               onClick={() => {
                 setEditing(null);
+                setSourceId(initialSourceId ?? "");
                 setDetails(initialDetails);
                 setEvidence({
                   title: "",
@@ -491,6 +497,12 @@ export default function ReviewWorkspace({
           ) : null}
         </form>
       </section>
+      <OpportunityPreview
+        details={details}
+        source={data.sources.find((source) => source.id === sourceId) ?? null}
+        evidence={evidence}
+        verificationKey={JSON.stringify({ sourceId, details, evidence })}
+      />
       <section>
         <h2>{t("Review queue")}</h2>
         {data.opportunities.length === 0 ? (
@@ -566,6 +578,7 @@ export default function ReviewWorkspace({
                 className="secondary"
                 onClick={() => {
                   setEditing(row);
+                  setSourceId(row.source_id);
                   setDetails(row.details);
                   setEvidence(row.evidence);
                   window.scrollTo({ top: 0, behavior: "smooth" });
