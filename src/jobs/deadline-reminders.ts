@@ -58,7 +58,8 @@ export async function dispatchDeadlineReminders(
          LEFT JOIN profiles pr ON pr.user_id=t.user_id
         WHERE t.saved=true AND t.status IN ('interested','applying')
           AND o.state='published' AND o.verified_at >= $1
-          AND p.enabled=true AND p.consent_version=$2
+          AND p.enabled=true AND p.deadline_reminders_enabled=true
+          AND p.consent_version=$2
         ORDER BY t.user_id,t.opportunity_id`,
       [freshnessBoundary, LOCAL_CONSENT_VERSION],
     )
@@ -95,7 +96,8 @@ export async function dispatchDeadlineReminders(
             WHERE t.user_id=$1 AND t.opportunity_id=$2 AND t.saved=true
               AND t.status IN ('interested','applying')
               AND o.state='published' AND o.verified_at >= $3
-              AND p.enabled=true AND p.consent_version=$4
+              AND p.enabled=true AND p.deadline_reminders_enabled=true
+              AND p.consent_version=$4
             FOR UPDATE OF t,o,p`,
           [
             candidate.user_id,

@@ -2,6 +2,7 @@
 import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 import type { readNotificationSettings } from "@/src/jobs/digests";
+import NotificationPreview from "./preview";
 type Settings = Awaited<ReturnType<typeof readNotificationSettings>>;
 type History = { id: string; channel: string; slot: string; state: string }[];
 export default function NotificationSettings({
@@ -15,6 +16,9 @@ export default function NotificationSettings({
   const [settings, setSettings] = useState(initial),
     [history, setHistory] = useState(initialHistory),
     [enabled, setEnabled] = useState(initial.enabled),
+    [deadlineRemindersEnabled, setDeadlineRemindersEnabled] = useState(
+      initial.deadlineRemindersEnabled,
+    ),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
   const [testLink, setTestLink] = useState("");
@@ -32,6 +36,7 @@ export default function NotificationSettings({
         throw Error(value.error ?? "Unable to save notification settings.");
       setSettings(value);
       setEnabled(value.enabled);
+      setDeadlineRemindersEnabled(value.deadlineRemindersEnabled);
       const refreshed = await fetch("/api/me/notifications");
       if (!refreshed.ok)
         throw Error(
@@ -67,6 +72,7 @@ export default function NotificationSettings({
             void save({
               expectedVersion: settings.version,
               enabled,
+              deadlineRemindersEnabled,
               channel: f.get("channel"),
               frequency: f.get("frequency"),
               timezone: f.get("timezone"),
@@ -82,6 +88,15 @@ export default function NotificationSettings({
               onChange={(e) => setEnabled(e.target.checked)}
             />
             {t("Enable local digest simulation")}{" "}
+          </label>
+          <label className="inline">
+            <input
+              type="checkbox"
+              name="deadlineRemindersEnabled"
+              checked={deadlineRemindersEnabled}
+              onChange={(e) => setDeadlineRemindersEnabled(e.target.checked)}
+            />
+            {t("Send separate 7-day and 2-day deadline reminders")}{" "}
           </label>
           <label>
             {t("Channel")}{" "}
@@ -179,6 +194,7 @@ export default function NotificationSettings({
             void save({
               expectedVersion: settings.version,
               enabled: false,
+              deadlineRemindersEnabled,
               channel: settings.channel,
               frequency: settings.frequency,
               timezone: settings.timezone,
@@ -215,6 +231,7 @@ export default function NotificationSettings({
           )}{" "}
         </p>
       </section>
+      <NotificationPreview />
       <p role="status" aria-live="polite">
         {translateMessage(message)}
       </p>

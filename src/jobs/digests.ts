@@ -20,6 +20,7 @@ export const notificationSettingsSchema = z
   .object({
     expectedVersion: z.number().int().min(0),
     enabled: z.boolean(),
+    deadlineRemindersEnabled: z.boolean().optional(),
     channel: z.enum(["email", "telegram"]),
     frequency: z.enum(["daily", "weekly"]),
     timezone: timezoneSchema,
@@ -33,7 +34,7 @@ export const notificationSettingsSchema = z
 export async function readNotificationSettings(sql: SQL, userId: string) {
   const row = (
     await sql.query(
-      "SELECT enabled,channel,version,consent_version,timezone,frequency,next_due_at FROM notification_preferences WHERE user_id=$1",
+      "SELECT enabled,deadline_reminders_enabled,channel,version,consent_version,timezone,frequency,next_due_at FROM notification_preferences WHERE user_id=$1",
       [userId],
     )
   ).rows[0];
@@ -46,6 +47,7 @@ export async function readNotificationSettings(sql: SQL, userId: string) {
     : null;
   return {
     enabled: row?.enabled === true,
+    deadlineRemindersEnabled: row?.deadline_reminders_enabled === true,
     emailSuppressionReason,
     channel: (row?.channel ?? "email") as "email" | "telegram",
     version: Number(row?.version ?? 0),
@@ -98,14 +100,18 @@ export async function saveNotificationSettings(
         row?.consent_version !== LOCAL_CONSENT_VERSION)
         ? 1
         : 0);
+    const deadlineRemindersEnabled =
+      value.deadlineRemindersEnabled ??
+      row?.deadline_reminders_enabled === true;
     const next = value.enabled
       ? nextDigestSlot(now, value.timezone, value.frequency).toISOString()
       : null;
     await tx.query(
-      "INSERT INTO notification_preferences(user_id,enabled,channel,version,consent_version,timezone,frequency,next_due_at,email_consent_epoch) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(user_id) DO UPDATE SET enabled=$2,channel=$3,version=$4,consent_version=$5,timezone=$6,frequency=$7,next_due_at=$8,email_consent_epoch=$9",
+      "INSERT INTO notification_preferences(user_id,enabled,deadline_reminders_enabled,channel,version,consent_version,timezone,frequency,next_due_at,email_consent_epoch) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(user_id) DO UPDATE SET enabled=$2,deadline_reminders_enabled=$3,channel=$4,version=$5,consent_version=$6,timezone=$7,frequency=$8,next_due_at=$9,email_consent_epoch=$10",
       [
         userId,
         value.enabled,
+        deadlineRemindersEnabled,
         value.channel,
         value.expectedVersion + 1,
         value.enabled ? LOCAL_CONSENT_VERSION : null,

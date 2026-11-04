@@ -112,7 +112,7 @@ for (const kind of ["pglite", "postgres"])
         await saveItem(db.sql, a.id, "synthetic-course");
         await saveItem(db.sql, b.id, "synthetic-course");
         await db.sql.query(
-          "INSERT INTO notification_preferences(user_id,enabled,channel) VALUES($1,true,'email'),($2,true,'email')",
+          "INSERT INTO notification_preferences(user_id,enabled,deadline_reminders_enabled,channel) VALUES($1,true,true,'email'),($2,true,false,'email')",
           [a.id, b.id],
         );
         await queueNotification(db.sql, a.id, "private-a");
@@ -137,6 +137,7 @@ for (const kind of ["pglite", "postgres"])
         assert.ok(!json.includes("private-access-token"));
         assert.ok(!json.includes("private-cipher"));
         assert.equal(exported.tracker.length, 1);
+        assert.equal(exported.notifications.deadline_reminders_enabled, true);
         await assert.rejects(() =>
           requestAccountDeletion(db.sql, a.id, {
             confirmation: "DELETE",

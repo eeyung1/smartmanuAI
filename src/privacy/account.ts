@@ -49,7 +49,7 @@ export async function accountExport(sql: SQL, userId: string) {
       notifications:
         (
           await tx.query(
-            "SELECT enabled,channel,version,consent_version,timezone,frequency,next_due_at FROM notification_preferences WHERE user_id=$1",
+            "SELECT enabled,deadline_reminders_enabled,channel,version,consent_version,timezone,frequency,next_due_at FROM notification_preferences WHERE user_id=$1",
             [userId],
           )
         ).rows[0] ?? null,
