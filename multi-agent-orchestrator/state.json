@@ -1,0 +1,828 @@
+{
+  "authority": {
+    "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
+    "protocol": "orchestrator/v1",
+    "schema": 4,
+    "generation": 45,
+    "enrollment": "NATIVE",
+    "provenance": "Human operator initialized project coordination",
+    "enrolled_utc": "2026-11-04T09:54:21Z"
+  },
+  "sessions": {
+    "codex-gpt6-20261104-20261104-57bdf9bc": {
+      "id": "codex-gpt6-20261104-20261104-57bdf9bc",
+      "role": "worker",
+      "state": "COMPLETE",
+      "generation": 13
+    },
+    "codex-gpt6-20261104-20261104-d3aa10e8": {
+      "id": "codex-gpt6-20261104-20261104-d3aa10e8",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 17
+    },
+    "codex-gpt6-20261104-next-97c13e-20261104-954c27d4": {
+      "id": "codex-gpt6-20261104-next-97c13e-20261104-954c27d4",
+      "role": "worker",
+      "state": "COMPLETE",
+      "generation": 21
+    },
+    "codex-gpt6-20261104-next2-b7560a-20261104-802c783b": {
+      "id": "codex-gpt6-20261104-next2-b7560a-20261104-802c783b",
+      "role": "worker",
+      "state": "COMPLETE",
+      "generation": 31
+    },
+    "codex-gpt6-20261104-next3-5de7c2-20261104-e7cdc80f": {
+      "id": "codex-gpt6-20261104-next3-5de7c2-20261104-e7cdc80f",
+      "role": "worker",
+      "state": "COMPLETE",
+      "generation": 37
+    },
+    "codex-gpt6-20261104-next4-9c1fa3-20261104-4247c1e0": {
+      "id": "codex-gpt6-20261104-next4-9c1fa3-20261104-4247c1e0",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 39
+    },
+    "codex-gpt6-20261104-next5-2bced9-20261104-1125768c": {
+      "id": "codex-gpt6-20261104-next5-2bced9-20261104-1125768c",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 43
+    },
+    "opencode-gpt56sol-20261104-a7f31c-20261104-9d771583": {
+      "id": "opencode-gpt56sol-20261104-a7f31c-20261104-9d771583",
+      "role": "worker",
+      "state": "COMPLETE",
+      "generation": 8
+    },
+    "opencode-gpt56sol-20261104-b84e2d-20261104-51548fe4": {
+      "id": "opencode-gpt56sol-20261104-b84e2d-20261104-51548fe4",
+      "role": "worker",
+      "state": "COMPLETE",
+      "generation": 9
+    },
+    "planner-antigravity-20261104-b9e2894a": {
+      "id": "planner-antigravity-20261104-b9e2894a",
+      "role": "planner",
+      "state": "ACTIVE",
+      "generation": 3
+    }
+  },
+  "claims": {},
+  "objectives": {
+    "milestone-1-application-flow": {
+      "id": "milestone-1-application-flow",
+      "description": "Milestone 1: Application Flow and Usability",
+      "status": "COMPLETE"
+    },
+    "milestone-2-proactive-notifications": {
+      "id": "milestone-2-proactive-notifications",
+      "description": "Milestone 2: Proactive Notifications and Lifecycle Alerts",
+      "status": "COMPLETE"
+    },
+    "milestone-3-admin-moderation": {
+      "id": "milestone-3-admin-moderation",
+      "description": "Milestone 3: Administrative Review and Opportunity Moderation",
+      "status": "APPROVED"
+    }
+  },
+  "tasks": {
+    "milestone-1-application-flow::feature-auth-destination-preservation": {
+      "id": "feature-auth-destination-preservation",
+      "objective_id": "milestone-1-application-flow",
+      "feature": "feature-auth-destination-preservation",
+      "scope": "app/sign-in/,app/opportunities/[id]/save-button.tsx,src/auth/,tests/auth-destination.test.ts",
+      "priority": 10,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 8,
+      "token": "auth-destination-20261104-a7f31c-9d2e",
+      "session_id": "opencode-gpt56sol-20261104-a7f31c-20261104-9d771583",
+      "result_id": "result-pr-27",
+      "description": "Safe relative returnTo preservation through magic-link sign-in and post-auth redirect",
+      "acceptance_criteria": [
+        "Safe relative returnTo preservation through magic-link sign-in and post-auth redirect"
+      ],
+      "validation": [
+        "node --import tsx --test tests/auth-destination.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-auth-destination-preservation",
+      "base_sha": "main",
+      "validated_head": "cbe8995bcab4b2ddcc52f970a50bc88e3370005b",
+      "validation_evidence": "PR #27 merged to main (merge commit 6623e3418d2a7abd06b736b8719141745032a195; CI green)"
+    },
+    "milestone-1-application-flow::feature-multistep-onboarding": {
+      "id": "feature-multistep-onboarding",
+      "objective_id": "milestone-1-application-flow",
+      "feature": "feature-multistep-onboarding",
+      "scope": "app/onboarding/,src/domain/profile.ts,app/api/me/onboarding/,tests/onboarding.test.ts,db/migrations/",
+      "priority": 8,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 11,
+      "session_id": "codex-gpt6-20261104-20261104-57bdf9bc",
+      "result_id": "result-pr-29",
+      "description": "Dedicated 3-step onboarding wizard (/onboarding) with persisted progress, bilingual UI, and preference saving",
+      "acceptance_criteria": [
+        "Dedicated 3-step onboarding wizard (/onboarding) with persisted progress, bilingual UI, and preference saving"
+      ],
+      "validation": [
+        "node --import tsx --test tests/onboarding.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-multistep-onboarding-5532d854",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-multistep-onboarding-5532d854",
+      "base_sha": "main",
+      "validated_head": "296b4e860a6d68a6569520ad44c287fd413b1539",
+      "validation_evidence": "PR #29 merged to main (merge commit 12640e9c1cb91ff7d286c37321face87265510ba; CI green 72/72 tests)"
+    },
+    "milestone-1-application-flow::feature-tracker-pagination-filtering": {
+      "id": "feature-tracker-pagination-filtering",
+      "objective_id": "milestone-1-application-flow",
+      "feature": "feature-tracker-pagination-filtering",
+      "scope": "src/domain/tracker.ts,app/api/me/tracker/,app/matches/workspace.tsx,tests/tracker-pagination.test.ts",
+      "priority": 9,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 9,
+      "token": "tracker-pagination-20261104-b84e2d-61a7",
+      "session_id": "opencode-gpt56sol-20261104-b84e2d-20261104-51548fe4",
+      "result_id": "result-pr-28",
+      "description": "Server-side tracker pagination (12/page), status filters (interested/applying/applied/dismissed), search, beyond 100-item cap",
+      "acceptance_criteria": [
+        "Server-side tracker pagination (12/page), status filters (interested/applying/applied/dismissed), search, beyond 100-item cap"
+      ],
+      "validation": [
+        "node --import tsx --test tests/tracker-pagination.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-tracker-pagination-filtering",
+      "base_sha": "main",
+      "validated_head": "b4da58ccc28cd3e5b9d1f55cbb595578a95721f3",
+      "validation_evidence": "PR #28 merged to main (merge commit 2869e47b50420b14b1675ca98a87035f9fe75164; CI green)"
+    },
+    "milestone-2-proactive-notifications::feature-deadline-reminders": {
+      "id": "feature-deadline-reminders",
+      "objective_id": "milestone-2-proactive-notifications",
+      "feature": "feature-deadline-reminders",
+      "scope": "src/jobs/deadline-reminders.ts,src/domain/reminders.ts,tests/deadline-reminders.test.ts",
+      "priority": 10,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 16,
+      "session_id": "codex-gpt6-20261104-20261104-d3aa10e8",
+      "result_id": "result-pr-30",
+      "description": "Automated calculation and dispatch of 7-day and 2-day urgent deadline reminders for active saved opportunities in the user tracker (interested or applying), with idempotency and deduplication guards",
+      "acceptance_criteria": [
+        "Automated calculation and dispatch of 7-day and 2-day urgent deadline reminders for active saved opportunities in the user tracker (interested or applying), with idempotency and deduplication guards"
+      ],
+      "validation": [
+        "node --import tsx --test tests/deadline-reminders.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-deadline-reminders-a4a059d6",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-deadline-reminders-a4a059d6",
+      "base_sha": "main",
+      "validated_head": "9a11a276509c99b66cbd8334a5e1c14463162e8b",
+      "validation_evidence": "PR #30 merged to main (merge commit 169426fe6607246c6bdb6adb45b1f44ed120667e; CI green 73/73 tests)"
+    },
+    "milestone-2-proactive-notifications::feature-notification-settings-preview": {
+      "id": "feature-notification-settings-preview",
+      "objective_id": "milestone-2-proactive-notifications",
+      "feature": "feature-notification-settings-preview",
+      "scope": "app/notifications/settings.tsx,app/api/me/notifications/preview/route.ts,app/notifications/preview.tsx,tests/notification-settings-preview.test.ts,app/api/me/notifications/route.ts,src/jobs/digests.ts,src/jobs/deadline-reminders.ts,db/migrations/,db/staging/bootstrap.sql,tests/staging.test.ts,tests/deadline-reminders.test.ts,src/privacy/account.ts,tests/privacy.test.ts",
+      "priority": 8,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 25,
+      "token": "claim-1ed0d82d22af1be62364432183596a9c",
+      "session_id": "codex-gpt6-20261104-next2-b7560a-20261104-802c783b",
+      "result_id": "result-pr-32",
+      "description": "Granular preference checkboxes in /notifications to toggle deadline reminders separately from general digests, plus an in-browser preview component rendering the upcoming digest before delivery",
+      "acceptance_criteria": [
+        "Granular preference checkboxes in /notifications to toggle deadline reminders separately from general digests, plus an in-browser preview component rendering the upcoming digest before delivery"
+      ],
+      "validation": [
+        "node --import tsx --test tests/notification-settings-preview.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-notification-settings-preview-83596a9c",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-notification-settings-preview-83596a9c",
+      "base_sha": "main",
+      "validated_head": "da7fd69f7140ea44da88f7ad168387c2f44e9b80",
+      "validation_evidence": "PR #32 merged to main (merge commit 73d16b16e37308b1f3a6dbb52cc11e4acbd59b26; CI green)"
+    },
+    "milestone-2-proactive-notifications::feature-opportunity-withdrawal-alerts": {
+      "id": "feature-opportunity-withdrawal-alerts",
+      "objective_id": "milestone-2-proactive-notifications",
+      "feature": "feature-opportunity-withdrawal-alerts",
+      "scope": "src/jobs/material-changes.ts,src/domain/material-changes.ts,tests/material-changes.test.ts",
+      "priority": 9,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 20,
+      "session_id": "codex-gpt6-20261104-next-97c13e-20261104-954c27d4",
+      "result_id": "result-pr-31",
+      "description": "Detection of material changes on saved opportunities (funding cancellation, deadline reduction/extension, program closure) and queueing immediate high-priority outbox notifications",
+      "acceptance_criteria": [
+        "Detection of material changes on saved opportunities (funding cancellation, deadline reduction/extension, program closure) and queueing immediate high-priority outbox notifications"
+      ],
+      "validation": [
+        "node --import tsx --test tests/material-changes.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-opportunity-withdrawal-alerts-59333149",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-opportunity-withdrawal-alerts-59333149",
+      "base_sha": "main",
+      "validated_head": "85aa84dc6d1abc8bd1c9d756a5021c3d2140a995",
+      "validation_evidence": "PR #31 merged to main (merge commit b4f3da9b71937e6cdcd7f1e476caf29fe618dc3f; CI green)"
+    },
+    "milestone-3-admin-moderation::feature-admin-publication-preview": {
+      "id": "feature-admin-publication-preview",
+      "objective_id": "milestone-3-admin-moderation",
+      "feature": "feature-admin-publication-preview",
+      "scope": "app/admin/review/workspace.tsx,app/admin/review/preview.tsx,tests/admin-preview.test.ts",
+      "priority": 10,
+      "status": "COMPLETE",
+      "attempt": 2,
+      "assignment_generation": 42,
+      "session_id": "codex-gpt6-20261104-next5-2bced9-20261104-1125768c",
+      "result_id": "result-pr-35",
+      "description": "Add live user-facing opportunity card and detail preview with policy validation warnings directly inside the admin review workspace (/admin/review)",
+      "acceptance_criteria": [
+        "Live rendered opportunity card and detail view preview in /admin/review matching public visitor view",
+        "Interactive validation warnings for conservative date-only policy, funding prerequisites, and source verification",
+        "Bilingual labels in English and Simplified Chinese"
+      ],
+      "validation": [
+        "node --import tsx --test tests/admin-preview.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-admin-publication-preview-639c3d72",
+      "base_sha": "main",
+      "validated_head": "8bf9b13ee82a8a6cd57970d9daf83a2e131e01ad",
+      "validation_evidence": "PR #35 merged to main (merge commit 3eda3983e10be006b06965ddcede5690fa9254e7; CI green 76/76 tests)"
+    },
+    "milestone-3-admin-moderation::feature-opportunity-duplicate-merge": {
+      "id": "feature-opportunity-duplicate-merge",
+      "objective_id": "milestone-3-admin-moderation",
+      "feature": "feature-opportunity-duplicate-merge",
+      "scope": "src/domain/catalogue-merge.ts,app/api/admin/opportunities/[id]/merge/route.ts,tests/catalogue-merge.test.ts",
+      "priority": 8,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 38,
+      "token": "claim-aa9b56d489329aa6a99f2a48a9b799c7",
+      "session_id": "codex-gpt6-20261104-next4-9c1fa3-20261104-4247c1e0",
+      "result_id": "result-pr-34",
+      "description": "Implement administrative duplicate opportunity merge service and API endpoint to consolidate duplicate candidate opportunities into a single surviving record, preserving source URL provenance and mapping user saved tracker items without losing progression status",
+      "acceptance_criteria": [
+        "Admin endpoint POST /api/admin/opportunities/[id]/merge requiring admin authentication and CSRF check",
+        "Repoints saved_items from duplicate opportunity to surviving target opportunity, preserving highest status progression (applied \u003e applying \u003e interested \u003e dismissed) on collision",
+        "Transitions duplicate opportunity state to archived with merge explanation in opportunity_revisions",
+        "Records an audited revision on target opportunity linking to the merged duplicate ID",
+        "Idempotent and transactionally safe against concurrent saves"
+      ],
+      "validation": [
+        "node --import tsx --test tests/catalogue-merge.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-opportunity-duplicate-merge-a9b799c7",
+      "base_sha": "main",
+      "validated_head": "933ee6a55a2270aad062d670a10243e44d3a9b3c",
+      "validation_evidence": "PR #34 merged to main (merge commit e0d4401a0949d206ba9d156fc2381075b1cb6c10; CI green 75/75 tests)"
+    },
+    "milestone-3-admin-moderation::feature-opportunity-lifecycle-archive": {
+      "id": "feature-opportunity-lifecycle-archive",
+      "objective_id": "milestone-3-admin-moderation",
+      "feature": "feature-opportunity-lifecycle-archive",
+      "scope": "src/catalogue/schema.ts,src/catalogue/service.ts,src/catalogue/admin-browse.ts,src/i18n/admin.ts,app/admin/catalogue/page.tsx,db/migrations/,db/staging/bootstrap.sql,tests/staging.test.ts,tests/lifecycle-archive.test.ts",
+      "priority": 9,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 36,
+      "token": "claim-3d5d79ebb2501d7941709babe04945af",
+      "session_id": "codex-gpt6-20261104-next3-5de7c2-20261104-e7cdc80f",
+      "result_id": "result-pr-33",
+      "description": "Extend opportunity lifecycle with explicit archived state, review action archive for closed/rejected records with audited revision history, and admin catalogue filtering",
+      "acceptance_criteria": [
+        "opportunities.state check constraint expanded to include archived",
+        "reviewSchema action enum accepts archive for closed or rejected records",
+        "reviewOpportunity transitions state to archived and records audit note in opportunity_revisions",
+        "/admin/catalogue includes archived state filter",
+        "Migration 015 with updated staging schema bootstrap and staging test assertion (15 migrations)"
+      ],
+      "validation": [
+        "node --import tsx --test tests/lifecycle-archive.test.ts tests/staging.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-opportunity-lifecycle-archive-e04945af",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-opportunity-lifecycle-archive-e04945af",
+      "base_sha": "main",
+      "validated_head": "6607fd77103b262b21a60122dbc808ac79d962c5",
+      "validation_evidence": "PR #33 merged to main (merge commit c0b4a2205ad307d259c6427e157dcb3d3cab0f7e; CI green)"
+    }
+  },
+  "results": {
+    "milestone-1-application-flow::feature-multistep-onboarding::11": {
+      "id": "milestone-1-application-flow::feature-multistep-onboarding::11",
+      "objective_id": "milestone-1-application-flow",
+      "task_id": "feature-multistep-onboarding",
+      "session_id": "codex-gpt6-20261104-20261104-57bdf9bc",
+      "assignment_generation": 11,
+      "branch": "agent/feature-multistep-onboarding-5532d854",
+      "head_sha": "823fa99afc3ee989e14f70118900bf7061b7d55e",
+      "validation": "node --import tsx --test tests/onboarding.test.ts: pass; npm run typecheck: pass; npm run format:check: pass; git diff --check: pass",
+      "artifacts": [
+        "823fa99"
+      ],
+      "recorded_utc": "2026-11-04T12:25:02Z"
+    },
+    "milestone-2-proactive-notifications::feature-deadline-reminders::16": {
+      "id": "milestone-2-proactive-notifications::feature-deadline-reminders::16",
+      "objective_id": "milestone-2-proactive-notifications",
+      "task_id": "feature-deadline-reminders",
+      "session_id": "codex-gpt6-20261104-20261104-d3aa10e8",
+      "assignment_generation": 16,
+      "branch": "agent/feature-deadline-reminders-a4a059d6",
+      "head_sha": "9a11a276509c99b66cbd8334a5e1c14463162e8b",
+      "validation": "node --import tsx --test tests/deadline-reminders.test.ts: pass; npm run typecheck: pass; npm run format:check: pass; git diff --check: pass",
+      "artifacts": [
+        "9a11a276509c99b66cbd8334a5e1c14463162e8b"
+      ],
+      "recorded_utc": "2026-11-04T13:12:30Z"
+    },
+    "milestone-2-proactive-notifications::feature-opportunity-withdrawal-alerts::20": {
+      "id": "milestone-2-proactive-notifications::feature-opportunity-withdrawal-alerts::20",
+      "objective_id": "milestone-2-proactive-notifications",
+      "task_id": "feature-opportunity-withdrawal-alerts",
+      "session_id": "codex-gpt6-20261104-next-97c13e-20261104-954c27d4",
+      "assignment_generation": 20,
+      "branch": "agent/feature-opportunity-withdrawal-alerts-59333149",
+      "head_sha": "85aa84dc6d1abc8bd1c9d756a5021c3d2140a995",
+      "validation": "node --import tsx --test tests/material-changes.test.ts: pass; npm run typecheck: pass; scoped Prettier check: pass; git diff --check: pass",
+      "artifacts": [
+        "85aa84dc6d1abc8bd1c9d756a5021c3d2140a995"
+      ],
+      "recorded_utc": "2026-11-04T13:25:49Z"
+    },
+    "milestone-3-admin-moderation::feature-admin-publication-preview::42": {
+      "id": "milestone-3-admin-moderation::feature-admin-publication-preview::42",
+      "objective_id": "milestone-3-admin-moderation",
+      "task_id": "feature-admin-publication-preview",
+      "session_id": "codex-gpt6-20261104-next5-2bced9-20261104-1125768c",
+      "assignment_generation": 42,
+      "branch": "agent/feature-admin-publication-preview-639c3d72",
+      "head_sha": "8bf9b13ee82a8a6cd57970d9daf83a2e131e01ad",
+      "validation": "node --import tsx --test tests/admin-preview.test.ts: pass; npm run typecheck: pass; npm run format:check: pass; git diff --cached --check: pass",
+      "artifacts": [
+        "8bf9b13ee82a8a6cd57970d9daf83a2e131e01ad"
+      ],
+      "recorded_utc": "2026-11-04T15:37:14Z"
+    },
+    "result-pr-27": {
+      "id": "result-pr-27",
+      "objective_id": "milestone-1-application-flow",
+      "task_id": "feature-auth-destination-preservation",
+      "session_id": "opencode-gpt56sol-20261104-a7f31c-20261104-9d771583",
+      "assignment_generation": 8,
+      "branch": "agent/feature-auth-destination-preservation",
+      "head_sha": "cbe8995bcab4b2ddcc52f970a50bc88e3370005b",
+      "validation": "node --import tsx --test tests/auth-destination.test.ts \u0026\u0026 npm run typecheck (3 pass, 0 fail; CI green)",
+      "recorded_utc": "2026-11-04T10:41:00Z"
+    },
+    "result-pr-28": {
+      "id": "result-pr-28",
+      "objective_id": "milestone-1-application-flow",
+      "task_id": "feature-tracker-pagination-filtering",
+      "session_id": "opencode-gpt56sol-20261104-b84e2d-20261104-51548fe4",
+      "assignment_generation": 9,
+      "branch": "agent/feature-tracker-pagination-filtering",
+      "head_sha": "b4da58ccc28cd3e5b9d1f55cbb595578a95721f3",
+      "validation": "node --import tsx --test tests/tracker-pagination.test.ts \u0026\u0026 npm run typecheck (1 pass, 0 fail; CI green)",
+      "recorded_utc": "2026-11-04T10:55:45Z"
+    },
+    "result-pr-29": {
+      "id": "result-pr-29",
+      "objective_id": "milestone-1-application-flow",
+      "task_id": "feature-multistep-onboarding",
+      "session_id": "codex-gpt6-20261104-20261104-57bdf9bc",
+      "assignment_generation": 11,
+      "branch": "agent/feature-multistep-onboarding-5532d854",
+      "head_sha": "296b4e860a6d68a6569520ad44c287fd413b1539",
+      "validation": "node --import tsx --test tests/onboarding.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run check (72 pass, 0 fail; CI green)",
+      "recorded_utc": "2026-11-04T12:49:10Z"
+    },
+    "result-pr-30": {
+      "id": "result-pr-30",
+      "objective_id": "milestone-2-proactive-notifications",
+      "task_id": "feature-deadline-reminders",
+      "session_id": "codex-gpt6-20261104-20261104-d3aa10e8",
+      "assignment_generation": 16,
+      "branch": "agent/feature-deadline-reminders-a4a059d6",
+      "head_sha": "9a11a276509c99b66cbd8334a5e1c14463162e8b",
+      "validation": "node --import tsx --test tests/deadline-reminders.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run check (73 pass, 0 fail; CI green)",
+      "recorded_utc": "2026-11-04T13:18:20Z"
+    },
+    "result-pr-31": {
+      "id": "result-pr-31",
+      "objective_id": "milestone-2-proactive-notifications",
+      "task_id": "feature-opportunity-withdrawal-alerts",
+      "session_id": "codex-gpt6-20261104-next-97c13e-20261104-954c27d4",
+      "assignment_generation": 20,
+      "branch": "agent/feature-opportunity-withdrawal-alerts-59333149",
+      "head_sha": "85aa84dc6d1abc8bd1c9d756a5021c3d2140a995",
+      "validation": "node --import tsx --test tests/material-changes.test.ts \u0026\u0026 npm run typecheck (pass; CI local-spike green)",
+      "recorded_utc": "2026-11-04T13:33:34Z"
+    },
+    "result-pr-32": {
+      "id": "result-pr-32",
+      "objective_id": "milestone-2-proactive-notifications",
+      "task_id": "feature-notification-settings-preview",
+      "session_id": "codex-gpt6-20261104-next2-b7560a-20261104-802c783b",
+      "assignment_generation": 25,
+      "branch": "agent/feature-notification-settings-preview-83596a9c",
+      "head_sha": "da7fd69f7140ea44da88f7ad168387c2f44e9b80",
+      "validation": "node --import tsx --test tests/notification-settings-preview.test.ts tests/privacy.test.ts tests/deadline-reminders.test.ts tests/staging.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "recorded_utc": "2026-11-04T14:17:02Z"
+    },
+    "result-pr-33": {
+      "id": "result-pr-33",
+      "objective_id": "milestone-3-admin-moderation",
+      "task_id": "feature-opportunity-lifecycle-archive",
+      "session_id": "codex-gpt6-20261104-next3-5de7c2-20261104-e7cdc80f",
+      "assignment_generation": 36,
+      "branch": "agent/feature-opportunity-lifecycle-archive-e04945af",
+      "head_sha": "6607fd77103b262b21a60122dbc808ac79d962c5",
+      "validation": "node --import tsx --test tests/lifecycle-archive.test.ts tests/staging.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "recorded_utc": "2026-11-04T14:51:40Z"
+    },
+    "result-pr-34": {
+      "id": "result-pr-34",
+      "objective_id": "milestone-3-admin-moderation",
+      "task_id": "feature-opportunity-duplicate-merge",
+      "session_id": "codex-gpt6-20261104-next4-9c1fa3-20261104-4247c1e0",
+      "assignment_generation": 38,
+      "branch": "agent/feature-opportunity-duplicate-merge-a9b799c7",
+      "head_sha": "933ee6a55a2270aad062d670a10243e44d3a9b3c",
+      "validation": "node --import tsx --test tests/catalogue-merge.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 75/75 tests)",
+      "recorded_utc": "2026-11-04T15:22:38Z"
+    },
+    "result-pr-35": {
+      "id": "result-pr-35",
+      "objective_id": "milestone-3-admin-moderation",
+      "task_id": "feature-admin-publication-preview",
+      "session_id": "codex-gpt6-20261104-next5-2bced9-20261104-1125768c",
+      "assignment_generation": 42,
+      "branch": "agent/feature-admin-publication-preview-639c3d72",
+      "head_sha": "8bf9b13ee82a8a6cd57970d9daf83a2e131e01ad",
+      "validation": "node --import tsx --test tests/admin-preview.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 76/76 tests)",
+      "recorded_utc": "2026-11-04T15:44:27Z"
+    }
+  },
+  "reviews": {
+    "milestone-1-application-flow": {
+      "objective_id": "milestone-1-application-flow",
+      "status": "APPROVED",
+      "result_ids": [
+        "milestone-1-application-flow::feature-multistep-onboarding::11",
+        "result-pr-27",
+        "result-pr-28"
+      ]
+    },
+    "milestone-2-proactive-notifications": {
+      "objective_id": "milestone-2-proactive-notifications",
+      "status": "APPROVED",
+      "result_ids": [
+        "result-pr-30",
+        "result-pr-31",
+        "result-pr-32"
+      ]
+    },
+    "milestone-3-admin-moderation": {
+      "objective_id": "milestone-3-admin-moderation",
+      "status": "APPROVED",
+      "result_ids": [
+        "milestone-3-admin-moderation::feature-admin-publication-preview::42",
+        "result-pr-33",
+        "result-pr-34"
+      ],
+      "decision": "APPROVED",
+      "decided_by": "planner-antigravity-20261104-b9e2894a",
+      "decided_utc": "2026-11-04T15:47:50Z"
+    }
+  },
+  "events": [
+    {
+      "id": "2-authority-enrollment",
+      "actor": "ORCHESTRATOR",
+      "operation": "authority-enrollment",
+      "generation": 2,
+      "utc": "2026-11-04T09:54:21Z"
+    },
+    {
+      "id": "3-register-session",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "register-session",
+      "generation": 3,
+      "utc": "2026-11-04T09:58:16Z"
+    },
+    {
+      "id": "4-register-session",
+      "actor": "opencode-gpt56sol-20261104-a7f31c-20261104-9d771583",
+      "operation": "register-session",
+      "generation": 4,
+      "utc": "2026-11-04T10:14:41Z"
+    },
+    {
+      "id": "8-reconcile-claim",
+      "actor": "ORCHESTRATOR",
+      "operation": "reconcile-claim",
+      "generation": 8,
+      "utc": "2026-11-04T10:22:00Z"
+    },
+    {
+      "id": "9-merge-and-reconcile",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-and-reconcile",
+      "generation": 9,
+      "utc": "2026-11-04T10:41:00Z"
+    },
+    {
+      "id": "10-merge-and-reconcile",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-and-reconcile",
+      "generation": 10,
+      "utc": "2026-11-04T10:55:45Z"
+    },
+    {
+      "id": "12-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 12,
+      "utc": "2026-11-04T12:25:02Z"
+    },
+    {
+      "id": "13-merge-and-reconcile",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-and-reconcile",
+      "generation": 13,
+      "utc": "2026-11-04T12:49:10Z"
+    },
+    {
+      "id": "14-adopt-objective",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "adopt-objective",
+      "generation": 14,
+      "utc": "2026-11-04T12:53:00Z"
+    },
+    {
+      "id": "15-reconcile-task-status",
+      "actor": "ORCHESTRATOR",
+      "operation": "reconcile-tasks",
+      "generation": 15,
+      "utc": "2026-11-04T12:58:00Z"
+    },
+    {
+      "id": "16-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 16,
+      "utc": "2026-11-04T13:00:26Z"
+    },
+    {
+      "id": "17-register-session",
+      "actor": "codex-gpt6-20261104-20261104-d3aa10e8",
+      "operation": "register-session",
+      "generation": 17,
+      "utc": "2026-11-04T13:00:26Z"
+    },
+    {
+      "id": "18-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 18,
+      "utc": "2026-11-04T13:00:26Z"
+    },
+    {
+      "id": "19-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 19,
+      "utc": "2026-11-04T13:12:30Z"
+    },
+    {
+      "id": "20-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 20,
+      "utc": "2026-11-04T13:17:21Z"
+    },
+    {
+      "id": "21-register-session",
+      "actor": "codex-gpt6-20261104-next-97c13e-20261104-954c27d4",
+      "operation": "register-session",
+      "generation": 21,
+      "utc": "2026-11-04T13:17:21Z"
+    },
+    {
+      "id": "22-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 22,
+      "utc": "2026-11-04T13:17:21Z"
+    },
+    {
+      "id": "23-merge-and-reconcile",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-and-reconcile",
+      "generation": 23,
+      "utc": "2026-11-04T13:18:20Z"
+    },
+    {
+      "id": "24-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 24,
+      "utc": "2026-11-04T13:25:49Z"
+    },
+    {
+      "id": "25-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 25,
+      "utc": "2026-11-04T13:26:11Z"
+    },
+    {
+      "id": "26-register-session",
+      "actor": "codex-gpt6-20261104-next2-b7560a-20261104-802c783b",
+      "operation": "register-session",
+      "generation": 26,
+      "utc": "2026-11-04T13:26:11Z"
+    },
+    {
+      "id": "27-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 27,
+      "utc": "2026-11-04T13:26:11Z"
+    },
+    {
+      "id": "28-merge-and-reconcile",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-and-reconcile",
+      "generation": 28,
+      "utc": "2026-11-04T13:33:34Z"
+    },
+    {
+      "id": "29-expand-task-scope",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "expand-scope",
+      "generation": 29,
+      "utc": "2026-11-04T13:35:50Z"
+    },
+    {
+      "id": "30-expand-task-scope",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "expand-scope",
+      "generation": 30,
+      "utc": "2026-11-04T13:56:00Z"
+    },
+    {
+      "id": "31-merge-and-reconcile",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-and-reconcile",
+      "generation": 31,
+      "utc": "2026-11-04T14:17:02Z"
+    },
+    {
+      "id": "32-complete-objective",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "complete-objective",
+      "generation": 32,
+      "utc": "2026-11-04T14:17:30Z"
+    },
+    {
+      "id": "33-adopt-objective",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "adopt-objective",
+      "generation": 33,
+      "utc": "2026-11-04T14:25:00Z"
+    },
+    {
+      "id": "34-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 34,
+      "utc": "2026-11-04T14:26:52Z"
+    },
+    {
+      "id": "35-acquire-rollback",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-rollback",
+      "generation": 35,
+      "utc": "2026-11-04T14:26:52Z"
+    },
+    {
+      "id": "36-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 36,
+      "utc": "2026-11-04T14:29:32Z"
+    },
+    {
+      "id": "37-register-session",
+      "actor": "codex-gpt6-20261104-next3-5de7c2-20261104-e7cdc80f",
+      "operation": "register-session",
+      "generation": 37,
+      "utc": "2026-11-04T14:29:32Z"
+    },
+    {
+      "id": "38-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 38,
+      "utc": "2026-11-04T14:29:32Z"
+    },
+    {
+      "id": "37-merge-and-reconcile",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-and-reconcile",
+      "generation": 37,
+      "utc": "2026-11-04T14:51:40Z"
+    },
+    {
+      "id": "38-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 38,
+      "utc": "2026-11-04T14:59:54Z"
+    },
+    {
+      "id": "39-register-session",
+      "actor": "codex-gpt6-20261104-next4-9c1fa3-20261104-4247c1e0",
+      "operation": "register-session",
+      "generation": 39,
+      "utc": "2026-11-04T14:59:54Z"
+    },
+    {
+      "id": "40-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 40,
+      "utc": "2026-11-04T14:59:54Z"
+    },
+    {
+      "id": "41-reconcile-pr-34",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-reconcile",
+      "generation": 41,
+      "utc": "2026-11-04T15:22:38Z"
+    },
+    {
+      "id": "42-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 42,
+      "utc": "2026-11-04T15:28:15Z"
+    },
+    {
+      "id": "43-register-session",
+      "actor": "codex-gpt6-20261104-next5-2bced9-20261104-1125768c",
+      "operation": "register-session",
+      "generation": 43,
+      "utc": "2026-11-04T15:28:15Z"
+    },
+    {
+      "id": "44-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 44,
+      "utc": "2026-11-04T15:28:16Z"
+    },
+    {
+      "id": "45-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 45,
+      "utc": "2026-11-04T15:37:14Z"
+    },
+    {
+      "id": "44-reconcile-pr-35",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "merge-reconcile",
+      "generation": 44,
+      "utc": "2026-11-04T15:44:27Z"
+    },
+    {
+      "id": "45-review-decision",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "review-decision",
+      "generation": 45,
+      "utc": "2026-11-04T15:47:50Z"
+    }
+  ]
+}

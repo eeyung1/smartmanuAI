@@ -1,0 +1,67 @@
+{
+  "id": "milestone-3-admin-moderation",
+  "objective": "Milestone 3: Administrative Review and Opportunity Moderation",
+  "tasks": [
+    {
+      "id": "feature-admin-publication-preview",
+      "objective_id": "milestone-3-admin-moderation",
+      "feature": "feature-admin-publication-preview",
+      "scope": "app/admin/review/workspace.tsx,app/admin/review/preview.tsx,tests/admin-preview.test.ts",
+      "priority": 10,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Add live user-facing opportunity card and detail preview with policy validation warnings directly inside the admin review workspace (/admin/review)",
+      "acceptance_criteria": [
+        "Live rendered opportunity card and detail view preview in /admin/review matching public visitor view",
+        "Interactive validation warnings for conservative date-only policy, funding prerequisites, and source verification",
+        "Bilingual labels in English and Simplified Chinese"
+      ],
+      "validation": [
+        "node --import tsx --test tests/admin-preview.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    {
+      "id": "feature-opportunity-lifecycle-archive",
+      "objective_id": "milestone-3-admin-moderation",
+      "feature": "feature-opportunity-lifecycle-archive",
+      "scope": "src/catalogue/schema.ts,src/catalogue/service.ts,src/catalogue/admin-browse.ts,src/i18n/admin.ts,app/admin/catalogue/page.tsx,db/migrations/,db/staging/bootstrap.sql,tests/staging.test.ts,tests/lifecycle-archive.test.ts",
+      "priority": 9,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Extend opportunity lifecycle with explicit archived state, review action archive for closed/rejected records with audited revision history, and admin catalogue filtering",
+      "acceptance_criteria": [
+        "opportunities.state check constraint expanded to include archived",
+        "reviewSchema action enum accepts archive for closed or rejected records",
+        "reviewOpportunity transitions state to archived and records audit note in opportunity_revisions",
+        "/admin/catalogue includes archived state filter",
+        "Migration 015 with updated staging schema bootstrap and staging test assertion (15 migrations)"
+      ],
+      "validation": [
+        "node --import tsx --test tests/lifecycle-archive.test.ts tests/staging.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    {
+      "id": "feature-opportunity-duplicate-merge",
+      "objective_id": "milestone-3-admin-moderation",
+      "feature": "feature-opportunity-duplicate-merge",
+      "scope": "src/domain/catalogue-merge.ts,app/api/admin/opportunities/[id]/merge/route.ts,tests/catalogue-merge.test.ts",
+      "priority": 8,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement administrative duplicate opportunity merge service and API endpoint to consolidate duplicate candidate opportunities into a single surviving record, preserving source URL provenance and mapping user saved tracker items without losing progression status",
+      "acceptance_criteria": [
+        "Admin endpoint POST /api/admin/opportunities/[id]/merge requiring admin authentication and CSRF check",
+        "Repoints saved_items from duplicate opportunity to surviving target opportunity, preserving highest status progression (applied > applying > interested > dismissed) on collision",
+        "Transitions duplicate opportunity state to archived with merge explanation in opportunity_revisions",
+        "Records an audited revision on target opportunity linking to the merged duplicate ID",
+        "Idempotent and transactionally safe against concurrent saves"
+      ],
+      "validation": [
+        "node --import tsx --test tests/catalogue-merge.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    }
+  ]
+}

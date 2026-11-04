@@ -10,3 +10,5 @@ coverage/
 .output/
 
 .vercel/
+
+.agent-worktrees/
