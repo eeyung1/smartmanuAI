@@ -100,7 +100,7 @@ export const draftSchema = z
 export const reviewSchema = z
   .object({
     expectedRevision: z.number().int().positive(),
-    action: z.enum(["publish", "close", "reject", "revise"]),
+    action: z.enum(["publish", "close", "reject", "revise", "archive"]),
     note: z.string().trim().min(5).max(1000),
     verified: z.boolean().default(false),
     details: detailsSchema.optional(),

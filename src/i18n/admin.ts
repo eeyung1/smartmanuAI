@@ -68,6 +68,7 @@ export const adminChinese: Record<string, string> = {
   "Search catalogue records": "搜索目录记录",
   "Record state": "记录状态",
   "All record states": "所有记录状态",
+  Archived: "已归档",
   "Create draft from this source": "使用此来源创建草稿",
   "Open record editor": "打开记录编辑器",
   "No admin catalogue records match these filters.":

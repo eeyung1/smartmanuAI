@@ -100,6 +100,14 @@ export async function reviewOpportunity(
         400,
         "Only published records can be closed. Reject an unpublished draft instead.",
       );
+    if (
+      v.action === "archive" &&
+      !["closed", "rejected"].includes(String(record.state))
+    )
+      throw new CatalogueError(
+        400,
+        "Only closed or rejected records can be archived.",
+      );
     const details = detailsSchema.parse(v.details ?? record.details),
       evidence = evidenceSchema.parse(v.evidence ?? record.evidence);
     const state =
@@ -109,7 +117,9 @@ export async function reviewOpportunity(
           ? "closed"
           : v.action === "reject"
             ? "rejected"
-            : "draft";
+            : v.action === "archive"
+              ? "archived"
+              : "draft";
     if (v.action === "publish") {
       if (!v.verified)
         throw new CatalogueError(
