@@ -2,11 +2,12 @@
 import { useScreenText } from "@/src/i18n/context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Preferences } from "@/src/domain/profile";
-import type { listTracker } from "@/src/domain/tracker";
+import type { listTracker, listTrackerPage } from "@/src/domain/tracker";
 import type { matchesForUser } from "@/src/domain/matching";
 type Matches = Awaited<ReturnType<typeof matchesForUser>>;
+type TrackerPage = Awaited<ReturnType<typeof listTrackerPage>>;
 const defaults: Preferences = {
   interfaceLanguage: "en",
   alertLanguage: "en",
@@ -39,20 +40,41 @@ export default function Workspace({
   } = useScreenText();
   const router = useRouter();
   const [matches, setMatches] = useState(initialMatches),
-    [tracker, setTracker] = useState(initialTracker),
+    [tracker, setTracker] = useState<TrackerPage>({
+      items: initialTracker.slice(0, 12),
+      total: initialTracker.length,
+      page: 1,
+      pageSize: 12,
+      status: "all",
+      search: "",
+    }),
     [busy, setBusy] = useState(false),
     [notice, setNotice] = useState("");
   const p = profile ?? defaults;
-  async function reload(page = matches.page) {
-    const [m, t] = await Promise.all([
-      fetch("/api/me/matches?page=" + page),
-      fetch("/api/me/tracker"),
-    ]);
-    if (!m.ok || !t.ok)
-      throw Error("Unable to refresh. Please reload the page.");
-    setMatches(await m.json());
-    setTracker(await t.json());
+  async function loadTracker(
+    page = tracker.page,
+    status = tracker.status,
+    search = tracker.search,
+  ) {
+    const query = new URLSearchParams({ page: String(page), status });
+    if (search) query.set("search", search);
+    const response = await fetch("/api/me/tracker?" + query);
+    if (!response.ok) throw Error("Unable to refresh. Please reload the page.");
+    setTracker(await response.json());
   }
+  async function reload(page = matches.page) {
+    const [m] = await Promise.all([
+      fetch("/api/me/matches?page=" + page),
+      loadTracker(),
+    ]);
+    if (!m.ok) throw Error("Unable to refresh. Please reload the page.");
+    setMatches(await m.json());
+  }
+  useEffect(() => {
+    void loadTracker(1, "all", "").catch(() =>
+      setNotice("Unable to refresh. Please reload the page."),
+    );
+  }, []);
   async function perform(fn: () => Promise<void>) {
     setBusy(true);
     setNotice("");
@@ -344,8 +366,49 @@ export default function Workspace({
             "Application status is self-reported. Closed or unavailable records remain in your tracker.",
           )}{" "}
         </p>
-        {tracker.length ? (
-          tracker.map((item) => (
+        <form
+          className="form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const values = new FormData(event.currentTarget);
+            void perform(() =>
+              loadTracker(
+                1,
+                String(values.get("trackerStatus") ?? "all") as
+                  "all" | "interested" | "applying" | "applied" | "dismissed",
+                String(values.get("trackerSearch") ?? "").trim(),
+              ),
+            );
+          }}
+        >
+          <label>
+            {t("Search saved opportunities")}{" "}
+            <input
+              name="trackerSearch"
+              type="search"
+              maxLength={200}
+              defaultValue={tracker.search}
+            />
+          </label>
+          <label>
+            {t("Tracker status")}{" "}
+            <select name="trackerStatus" defaultValue={tracker.status}>
+              {["all", "interested", "applying", "applied", "dismissed"].map(
+                (value) => (
+                  <option key={value} value={value}>
+                    {label(value)}
+                  </option>
+                ),
+              )}
+            </select>
+          </label>
+          <button disabled={busy}>{t("Filter tracker")}</button>
+        </form>
+        <p>
+          {tracker.total} {t("tracker items")}
+        </p>
+        {tracker.items.length ? (
+          tracker.items.map((item) => (
             <article key={item.opportunity_id}>
               <h3>
                 {item.available ? (
@@ -429,6 +492,24 @@ export default function Workspace({
         ) : (
           <p>{t("No saved or dismissed opportunities yet.")}</p>
         )}
+        <nav aria-label={t("Tracker pages")} className="pagination">
+          {tracker.page > 1 ? (
+            <button
+              disabled={busy}
+              onClick={() => void perform(() => loadTracker(tracker.page - 1))}
+            >
+              {t("Previous")}
+            </button>
+          ) : null}
+          {tracker.page * tracker.pageSize < tracker.total ? (
+            <button
+              disabled={busy}
+              onClick={() => void perform(() => loadTracker(tracker.page + 1))}
+            >
+              {t("Next")}
+            </button>
+          ) : null}
+        </nav>
         <Link href="/opportunities">{t("Explore all opportunities")}</Link>
       </section>
       <button

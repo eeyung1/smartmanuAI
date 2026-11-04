@@ -1,6 +1,10 @@
 import { getAuth } from "@/src/auth";
 import { getDatabase } from "@/src/db";
-import { listTracker, updateTracker } from "@/src/domain/tracker";
+import {
+  listTracker,
+  listTrackerPage,
+  updateTracker,
+} from "@/src/domain/tracker";
 import { apiError, readJSON } from "@/src/http/access";
 import { localConfig } from "@/src/config";
 export async function GET(request: Request) {
@@ -9,9 +13,22 @@ export async function GET(request: Request) {
   ).api.getSession({ headers: request.headers });
   if (!session)
     return Response.json({ error: "unauthorized" }, { status: 401 });
-  return Response.json(
-    await listTracker((await getDatabase()).sql, session.user.id),
-  );
+  try {
+    const params = new URL(request.url).searchParams;
+    if (!params.size)
+      return Response.json(
+        await listTracker((await getDatabase()).sql, session.user.id),
+      );
+    return Response.json(
+      await listTrackerPage(
+        (await getDatabase()).sql,
+        session.user.id,
+        Object.fromEntries(params),
+      ),
+    );
+  } catch (e) {
+    return apiError(e);
+  }
 }
 export async function PATCH(request: Request) {
   if (request.headers.get("origin") !== localConfig().baseURL)
