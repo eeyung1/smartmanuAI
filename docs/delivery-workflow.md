@@ -175,3 +175,7 @@ Collection now persists per-source Retry-After waits for 429/503 responses, reta
 ## 28 Read-only hosted staging checkpoint on 2 November 2026
 
 Vercel/Supabase staging preparation introduces an explicit read-only mode, no-request-time migrations, schema-pinned SQL, health checks and an isolated Supabase bootstrap with RLS. Authentication and channels remain disabled in hosted previews, while local fixture flows remain intact. See [staging guide](vercel-supabase-staging.md) for setup and verification. Hosted account access, live collection/alerts, backups/retention and public release remain separate gates.
+
+## 29 Notification commands and tracker merge checkpoint (5 November 2026)
+
+Local one-shot reminder and material-change commands now call the existing persisted jobs, refuse staging before database access and report their local-only outcome. They do not install a schedule or send to providers; change alerts remain queued. Duplicate reconciliation preserves the most recent exact database timestamp, including a later dismissal/removal or status regression, with survivor precedence on equal timestamps. Merge operations advance optimistic versions without manufacturing a new user-choice timestamp. The README separates these implemented portions from remaining source rechecks, hosted scheduling, independently configurable updates and real transport qualification.

@@ -18,17 +18,8 @@ type SavedItem = Record<string, unknown> & {
   saved: boolean;
   dismissed_fingerprint: string | null;
   version: number;
+  updated_at: string;
 };
-
-const progression: Record<SavedItem["status"], number> = {
-  interested: 1,
-  applying: 2,
-  applied: 3,
-};
-
-function trackerRank(item: SavedItem) {
-  return item.dismissed_fingerprint ? 0 : progression[item.status];
-}
 
 function mergeMarker(duplicateId: string, targetId: string) {
   return `[smartmanu-duplicate-merge:${encodeURIComponent(duplicateId)}:${encodeURIComponent(targetId)}]`;
@@ -112,8 +103,8 @@ export async function mergeDuplicateOpportunity(
 
     const rows = (
       await tx.query(
-        "SELECT user_id,opportunity_id,status,saved,dismissed_fingerprint,version FROM saved_items WHERE opportunity_id=ANY($1::text[]) ORDER BY user_id,opportunity_id FOR UPDATE",
-        [ids],
+        "SELECT user_id,opportunity_id,status,saved,dismissed_fingerprint,version,updated_at::text AS updated_at FROM saved_items WHERE opportunity_id=ANY($1::text[]) ORDER BY user_id,saved_items.updated_at DESC,(opportunity_id=$2) DESC,opportunity_id FOR UPDATE",
+        [ids, targetId],
       )
     ).rows as SavedItem[];
     const byUser = new Map<string, Map<string, SavedItem>>();
@@ -130,24 +121,22 @@ export async function mergeDuplicateOpportunity(
       const existing = items.get(targetId);
       if (!existing) {
         await tx.query(
-          "UPDATE saved_items SET opportunity_id=$2,version=version+1,updated_at=NOW() WHERE user_id=$1 AND opportunity_id=$3",
+          "UPDATE saved_items SET opportunity_id=$2,version=version+1 WHERE user_id=$1 AND opportunity_id=$3",
           [userId, targetId, duplicateId],
         );
       } else {
-        const winner =
-          trackerRank(from) > trackerRank(existing) ? from : existing;
-        const saved = from.saved || existing.saved;
+        // SQL orders exact database timestamps newest first; ties keep the survivor.
+        const winner = items.values().next().value!;
         await tx.query(
-          "UPDATE saved_items SET status=$3,saved=$4,dismissed_fingerprint=$5,version=$6,updated_at=NOW() WHERE user_id=$1 AND opportunity_id=$2",
+          "UPDATE saved_items SET status=$3,saved=$4,dismissed_fingerprint=$5,version=$6,updated_at=$7::timestamptz WHERE user_id=$1 AND opportunity_id=$2",
           [
             userId,
             targetId,
             winner.status,
-            saved,
-            saved
-              ? null
-              : (existing.dismissed_fingerprint ?? from.dismissed_fingerprint),
+            winner.saved,
+            winner.dismissed_fingerprint,
             Math.max(Number(from.version), Number(existing.version)) + 1,
+            winner.updated_at,
           ],
         );
         await tx.query(

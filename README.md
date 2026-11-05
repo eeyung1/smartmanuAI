@@ -60,8 +60,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Preferred in-person countries and acceptable English/Chinese teaching languages.
 - [x] Independent English/Simplified Chinese interface and alert preferences.
 - [x] User-facing settings/profile form in the private `/matches` workspace.
-- [ ] Dedicated multi-step onboarding with persisted progress, completion checks and contextual guidance.
-- [ ] Preserve the intended opportunity/save destination through sign-in and onboarding; current sign-in returns to `/matches`.
+- [x] Dedicated multi-step onboarding with persisted progress, completion checks and contextual guidance.
+- [x] Preserve validated internal opportunity/save destinations through sign-in and onboarding; reject external redirect destinations.
 - [ ] Residence-country profile field and residence-based eligibility rules.
 - [ ] Language-test details, detailed qualification equivalence and age/birth-year freshness handling.
 - [ ] User-facing session inventory, individual session revocation and verified account-email change flow.
@@ -110,11 +110,13 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Private read-only audit screen/API with bounded revision cursors and field-level comparisons.
 - [x] Explicit distinctions between missing values, nulls, zero costs, type changes and unavailable predecessors.
 - [x] English/Simplified Chinese review, browse, editor and audit controls; original evidence/notes stay unchanged.
-- [ ] Duplicate-merge workflow, surviving identities and source aliases across different URLs.
-- [ ] Preserve each user's latest tracker status when merging duplicate opportunities.
+- [x] Administrator duplicate merge with surviving opportunity identity, archived duplicate and source-URL audit notes.
+- [ ] Persistent source aliases and automatic reconciliation across different URLs/intakes.
+- [x] Preserve each user's latest tracker status, saved/dismissed choice and exact timestamp when merging duplicates; ties keep the survivor and versions still advance.
 - [ ] Explicit intake/event identity reconciliation so new intakes remain distinct.
-- [ ] Archive action and complete discovered/review/stale/archived lifecycle management.
-- [ ] Dedicated user-facing publication preview before approval.
+- [x] Audited archive action for closed/rejected opportunities, hidden from public discovery.
+- [ ] Complete discovered/review/stale lifecycle automation and restoration policy.
+- [x] Bilingual publication preview of the public card/details with evidence, deadline and policy warnings before approval.
 - [ ] Full source metadata management: source type/language, configurable cadence and consolidated success/failure counters.
 - [ ] Bulk moderation actions and a unified operations/cost dashboard.
 
@@ -184,7 +186,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Material-fact fingerprints prevent cosmetic title/summary edits from resurfacing unchanged dismissed items.
 - [x] Relevant material changes can resurface a dismissed record; closed/stale saved history remains available.
 - [x] Preserve the last public title when the current record is an unpublished revision.
-- [ ] Full tracker pagination/search/status filtering beyond the latest 100 active saved/dismissed rows.
+- [x] Tracker pagination, literal search and status filtering beyond the latest 100 rows.
 - [ ] Matching over the full catalogue beyond the 1,000-candidate bound and stronger cross-request snapshot consistency.
 - [ ] Residence, language-test and detailed qualification-equivalence rules.
 - [ ] Complete FR04–FR06 acceptance against representative real user/source cases.
@@ -220,12 +222,16 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Cancel queued local digests on settings changes or pause; drop invalid pending events before local acceptance.
 - [x] Commit sink insertion and event/digest acceptance together; show the last 20 local digest statuses.
 - [x] Localized digest text and preserved funding/fee uncertainty, match reasons, source time and synthetic notices.
-- [ ] Seven-day and two-day saved-opportunity deadline reminders, with source rechecks and deadline-revision deduplication.
-- [ ] Separate reminder opt-in, including an explicit choice for already-applied opportunities.
+- [x] Local seven-day/two-day saved-opportunity reminders with opt-in, 24-hour verification freshness and deadline/revision deduplication; runnable with `npm run reminders:once`.
+- [ ] Automatic official-source rechecks before reminders and live delivery qualification.
+- [x] Independent reminder opt-in; currently restricted to interested/applying saved items.
+- [ ] User choice to receive reminders for already-applied opportunities.
 - [ ] Separately configurable saved-item deadline-change/funding-withdrawal alerts outside the digest.
-- [ ] Withdrawal updates for affected saved items even when normal discovery eligibility/funding would exclude them.
+- [x] Queue local closure, funding reduction and deadline-change alerts for active saved items outside normal discovery funding filters, using `npm run changes:once`.
+- [ ] Dispatch queued change alerts with current consent, destination, suppression and privacy rechecks.
 - [ ] Production consent version, verified destination/binding integration and real email/Telegram dispatch.
-- [ ] User-facing digest preview and full notification-history pagination.
+- [x] User-facing preview of fresh, unseen digest content without scheduling or sending.
+- [ ] Full notification-history pagination.
 - [ ] Continuously scheduled hosted digest/reminder execution and live end-to-end acceptance.
 
 ### 9. Telegram connection and revocation
@@ -305,7 +311,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Pinned dependencies, lockfile, format/type/build checks and GitHub Actions validation.
 - [x] Read-only Vercel staging configuration, health endpoint and explicit disabled-account/channel UI.
 - [x] Additive private-schema bootstrap with RLS and a least-privilege catalogue reader, tested locally and in the PostgreSQL CI case.
-- [ ] Verify the deployed Vercel-to-Supabase connection and hosted route behavior.
+- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 5 November 2026; 39 RLS tables and 15 migrations in the shared l2e-studylink project.
 - [ ] Full production/managed database validation, private-account database roles and development/staging/production separation.
 - [ ] Approve exact current hosting/search/model/email/backup prices and capacity before provisioning.
 - [ ] Monthly research budget periods, actual-cost/invoice reconciliation and operator spend overview.
@@ -315,7 +321,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [ ] Measure the proposed 99% scheduled-run success target and feed p95 below two seconds under an agreed load.
 - [ ] Production backups, restore drill, migration/worker-upgrade procedure and rollback validation.
 - [ ] Durable hosted workflow storage, recurring workers, health/incident monitoring and operational support ownership.
-- [ ] Staging environment and authorized public pilot/production deployment.
+- [x] Protected read-only staging at https://smartmanuai.vercel.app with a dedicated reader and verified TLS.
+- [ ] Authorized public pilot/production release with account access, live research and notifications.
 
 ## PRD requirement coverage
 
@@ -323,14 +330,14 @@ A checked subfeature above does not mark an entire public-MVP requirement accept
 
 | Requirement           | Implemented foundation                                                        | Remaining acceptance/work                                                                    |
 | --------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| FR01 Private profiles | Local sign-in, isolated editable preferences, export and queued account purge | Full onboarding/profile fields, reviewer-deletion operations and production identity/privacy |
+| FR01 Private profiles | Local sign-in, persisted onboarding, isolated preferences, export and queued account purge | Additional profile fields, reviewer-deletion operations and production identity/privacy |
 | FR02 Discovery        | Combined public filters, URL state, counts and pagination                     | Live-source coverage, browser/navigation acceptance and any approved broader location scope  |
 | FR03 Details          | Evidence, funding breakdown, source links, conservative dates and freshness   | Live field-quality review and precise source deadline/timezone handling                      |
 | FR04 Personalization  | Known-failure exclusion, explicit unknowns and deterministic explanations     | Residence/language-test/equivalence rules and representative real-case acceptance            |
-| FR05 Tracking         | Persistent save/status/dismiss/restore with material-change behavior          | Full tracker pagination/status filters, duplicate-merge preservation and browser acceptance  |
+| FR05 Tracking         | Paginated/searchable save/status/dismiss/restore and latest-choice duplicate reconciliation          | Full browser acceptance and larger-catalogue matching consistency  |
 | FR06 Languages        | Independent preferences and English/Chinese controlled interface/alert text   | Reviewed source translations, final launch locales and linguistic/browser acceptance         |
-| FR07 Alerts           | Local consent, timezone daily/weekly digests, caps and deduplication          | Verified live channels, reminders, saved-item updates and hosted scheduling                  |
-| FR08 Administration   | Evidence review, audited corrections, source pause, job browse/recovery       | Duplicate merge, archive, full source metadata, operations/cost views and live operations    |
+| FR07 Alerts           | Local consent, digests/previews, runnable reminders and queued change alerts          | Source rechecks, update-alert controls/dispatch, verified live channels and hosted scheduling                  |
+| FR08 Administration   | Evidence/publication preview, duplicate merge/archive, audited corrections and job recovery       | Automatic identity reconciliation, full source metadata, operations/cost views and live operations    |
 | FR09 User control     | Local pause, Telegram revoke, signed email opt-out and queued deletion        | Live-provider interoperability, reviewer deletion and production retention/backup policy     |
 
 ## Current screens and APIs
@@ -342,6 +349,7 @@ These are implemented routes, not the separate routes proposed in the original s
 | `/`, `/opportunities`                       | Public catalogue and filters                                                      |
 | `/opportunities/[id]`                       | Public details and save action                                                    |
 | `/sign-in`                                  | Local magic-link sign-in                                                          |
+| `/onboarding` | Resumable profile/preferences wizard with validated return destination |
 | `/matches`                                  | Private preferences, matches and saved/dismissed tracker                          |
 | `/notifications`                            | Local digest settings, Telegram links, unsubscribe tests and delivery simulations |
 | `/privacy`, `/privacy/status`               | Export/deletion request and private receipt status                                |
@@ -352,7 +360,7 @@ These are implemented routes, not the separate routes proposed in the original s
 | `/admin/research`, `/admin/research/browse` | Collection policies, candidates and paginated research records                    |
 | `/admin/research/jobs/[id]`                 | Job detail, cancellation, replacement links and wait/review state                 |
 
-API groups: `/api/auth/*`; public `/api/opportunities*`; owner-only `/api/me/profile`, `/api/me/matches`, `/api/me/saved`, `/api/me/tracker`, `/api/me/notifications`, `/api/me/telegram`, `/api/me/email-unsubscribe`, `/api/me/delivery-tests` and `/api/me/privacy/*`; private-receipt `/api/privacy/status`; scoped `/api/notifications/unsubscribe`; authenticated `/api/webhooks/email` and `/api/webhooks/telegram`; and administrator `/api/admin/sources`, `/api/admin/opportunities*`, `/api/admin/catalogue` and `/api/admin/research*`. `/api/locale` updates the browser display choice. Method-specific contracts and authorization remain in the route handlers and linked implementation guides.
+API groups: `/api/auth/*`; public `/api/opportunities*`; owner-only `/api/me/onboarding`, `/api/me/notifications/preview`, `/api/me/profile`, `/api/me/matches`, `/api/me/saved`, `/api/me/tracker`, `/api/me/notifications`, `/api/me/telegram`, `/api/me/email-unsubscribe`, `/api/me/delivery-tests` and `/api/me/privacy/*`; private-receipt `/api/privacy/status`; scoped `/api/notifications/unsubscribe`; authenticated `/api/webhooks/email` and `/api/webhooks/telegram`; and administrator `/api/admin/sources`, `/api/admin/opportunities*`, `/api/admin/catalogue` and `/api/admin/research*`. `/api/locale` updates the browser display choice. Method-specific contracts and authorization remain in the route handlers and linked implementation guides.
 
 ## Local development
 
@@ -390,6 +398,8 @@ Restart and visit `/admin/review`, `/admin/catalogue` or `/admin/research`. Role
 | `npm run build` / `npm start`                               | Production-mode build/local server; does not deploy                                                               |
 | `npm run setup:local`                                       | Generate/add missing local-only configuration                                                                     |
 | `npm run db:migrate` / `npm run seed:local`                 | Apply migrations / seed optional synthetic catalogue                                                              |
+| `npm run reminders:once` | Run due saved-item reminders into the local sink; hosted mode is refused |
+| `npm run changes:once` | Queue deduplicated material-change alerts locally; no external dispatch |
 | `npm run digest:once`                                       | Plan one due user and dispatch one queued local-sink digest                                                       |
 | `npm run delivery:test:once`                                | Process a synthetic outbound simulation with injected transport                                                   |
 | `npm run privacy:once`                                      | Process at most one queued local account purge                                                                    |
@@ -398,7 +408,7 @@ Restart and visit `/admin/review`, `/admin/catalogue` or `/admin/research`. Role
 | `npm run agent:build` / `npm run spike`                     | Build/check the bounded fixture agent with its local network guard                                                |
 | `npm run check`                                             | Format, typecheck, tests, web build, HTTP checks, guarded agent build and restart spike                           |
 
-Consult [source pipeline](docs/source-pipeline.md) before enabling collection or optional model execution. Worker commands do not install recurring schedules. Do not use real subscriber destinations in local tests.
+Consult [source pipeline](docs/source-pipeline.md) before enabling collection or optional model execution. Reminder commands write the local sink and change-alert commands only queue outbox records; they refuse staging and do not send to providers. Worker commands do not install recurring schedules. Do not use real subscriber destinations in local tests.
 
 ## Validation and release gates
 
