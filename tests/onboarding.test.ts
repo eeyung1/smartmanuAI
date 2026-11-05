@@ -107,6 +107,7 @@ test("onboarding validates step order and keeps progress private per user", asyn
     await seedUser(db.sql, "second-user");
     await saveProfile(db.sql, "first-user", {
       nationality: "GH",
+      residenceCountry: "GH",
       topics: ["robotics"],
     });
     await assert.rejects(() =>
@@ -121,6 +122,11 @@ test("onboarding validates step order and keeps progress private per user", asyn
     });
     assert.equal(
       (await readOnboardingProgress(db.sql, "second-user")).values.nationality,
+      undefined,
+    );
+    assert.equal(
+      (await readOnboardingProgress(db.sql, "second-user")).values
+        .residenceCountry,
       undefined,
     );
     await assert.rejects(() =>
