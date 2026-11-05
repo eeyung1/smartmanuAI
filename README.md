@@ -4,9 +4,9 @@ A multi-user platform for finding smart manufacturing scholarships to study in C
 
 The product uses one shared research pipeline and reviewed catalogue for all users. Private profiles drive deterministic matching; source collection and AI extraction are shared so research costs do not grow as one agent per subscriber.
 
-**Current stage: local implementation plus read-only Vercel staging preparation. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
+**Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **2 November 2026**, through [implementation PR #24](https://github.com/eeyung1/smartmanuAI/pull/24).
+Feature audit: **5 November 2026**, through [implementation PR #37](https://github.com/eeyung1/smartmanuAI/pull/37). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
