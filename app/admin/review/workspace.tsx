@@ -163,6 +163,10 @@ export default function ReviewWorkspace({
               .split(",")
               .map((v) => v.trim().toUpperCase())
               .filter(Boolean);
+            const residences = String(f.get("residenceCountries") ?? "")
+              .split(",")
+              .map((v) => v.trim().toUpperCase())
+              .filter(Boolean);
             const minAge = String(f.get("minAge") ?? ""),
               maxAge = String(f.get("maxAge") ?? ""),
               minQualification = String(f.get("minQualification") ?? "");
@@ -170,9 +174,14 @@ export default function ReviewWorkspace({
               ...details,
               studyLevel: f.get("studyLevel") || null,
               eligibilityRules:
-                countries.length || minAge || maxAge || minQualification
+                countries.length ||
+                residences.length ||
+                minAge ||
+                maxAge ||
+                minQualification
                   ? {
                       nationalities: countries.length ? countries : null,
+                      residenceCountries: residences.length ? residences : null,
                       minAge: minAge ? Number(minAge) : null,
                       maxAge: maxAge ? Number(maxAge) : null,
                       minQualification: minQualification || null,
@@ -415,6 +424,20 @@ export default function ReviewWorkspace({
                 }
               />
             </label>
+            <label>
+              {t("Allowed residence country codes, separated by commas")}
+              <input
+                name="residenceCountries"
+                defaultValue={
+                  details.eligibilityRules?.residenceCountries?.join(", ") ?? ""
+                }
+              />
+            </label>
+            <p>
+              {t(
+                "Residence and nationality are separate. Record residence restrictions only when supported by the source; ALL means explicitly unrestricted residence.",
+              )}
+            </p>
             <label>
               {t("Minimum age")}{" "}
               <input

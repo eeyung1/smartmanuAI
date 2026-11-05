@@ -105,6 +105,7 @@ const defaults: Preferences = {
   alertLanguage: "en",
   teachingLanguages: ["en"],
   nationality: null,
+  residenceCountry: null,
   age: null,
   qualification: null,
   targetLevels: [],
@@ -151,6 +152,10 @@ export default function OnboardingWizard({
               "en" | "zh-Hans",
             nationality:
               String(form.get("nationality") ?? "")
+                .trim()
+                .toUpperCase() || null,
+            residenceCountry:
+              String(form.get("residenceCountry") ?? "")
                 .trim()
                 .toUpperCase() || null,
             age: form.get("age") ? Number(form.get("age")) : null,
@@ -287,6 +292,16 @@ export default function OnboardingWizard({
                 name="nationality"
                 maxLength={2}
                 defaultValue={p.nationality ?? ""}
+                placeholder="NG"
+              />
+            </label>
+            <label>
+              {t("Country of residence (optional two-letter code)")}
+              <input
+                name="residenceCountry"
+                defaultValue={p.residenceCountry ?? ""}
+                maxLength={2}
+                pattern="[A-Za-z]{2}"
                 placeholder="NG"
               />
             </label>

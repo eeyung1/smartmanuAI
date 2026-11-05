@@ -117,6 +117,14 @@ export const screenChinese: Record<string, string> = {
   "Interface language": "界面语言",
   "Alert language": "提醒语言",
   "Simplified Chinese": "简体中文",
+  "Country of residence (optional two-letter code)":
+    "居住国家（可选，两位国家代码）",
+  "Residence requirements are not stated.": "居住地要求未说明。",
+  "Add your country of residence to check this restriction.":
+    "请添加您的居住国家以核对此项限制。",
+  "Your country of residence does not meet the recorded restriction.":
+    "您的居住国家不符合已记录的限制。",
+  "Residence meets the recorded restriction.": "居住地符合已记录的限制。",
   "Nationality (two-letter country code)": "国籍（两位国家代码）",
   "Age (optional)": "年龄（选填）",
   "Highest qualification": "最高学历",
