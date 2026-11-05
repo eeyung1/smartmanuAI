@@ -47,3 +47,11 @@ After provisioning and deploying the tested commit, verify the deployment reache
 ## Remaining gates
 
 Real user sign-in needs a reviewed email provider/identity setup and a scoped server-side account role; do not grant the public reader access to private tables to bypass this. Full production consent, live channels, recurring jobs, durable agent hosting, secret rotation, backup/restore, retention, browser/mobile acceptance and public-release authorization remain separate work. The shared database's maintenance/upgrades require their own coordinated change because other projects use it.
+
+## Hosted connection repair (5 November 2026)
+
+The Vercel production target serves the read-only staging configuration. Set the five required configuration keys listed above plus `SMARTMANU_DATABASE_CA_CERT` to the complete PEM root CA downloaded from Supabase Database Settings. The PostgreSQL client validates the certificate chain and pooler hostname; never disable verification. The CA is a public trust anchor, not a private key. Supabase's current root has SHA-256 fingerprint `80:70:25:AD:50:D4:ED:21:9D:2C:9C:7D:29:9C:00:4F:82:4E:B0:0C:F7:F6:5A:FE:F6:07:D0:7B:72:E6:CA:FA`. Recheck the official certificate when rotating it.
+
+Migrations 013–015 were applied to `smartmanuai` in the existing `l2e-studylink` project, creating onboarding progress, reminder preferences and archive state support. There are 39 application tables with RLS and 15 application migration records. No source or opportunity fixtures were inserted. The reader has no account-reading or catalogue-writing privileges.
+
+After every configuration change, redeploy and require `/api/health` to return HTTP 200 with `database: connected`, then verify `/opportunities` renders. Deployment READY alone does not establish database health. Authentication, background research and live channels remain disabled in this mode.

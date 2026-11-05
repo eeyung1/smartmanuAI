@@ -8,7 +8,7 @@ export async function GET() {
     const row = (
       await sql.query("SELECT COUNT(*) AS count FROM schema_migrations")
     ).rows[0];
-    if (Number(row.count) < 12) throw Error("Database setup incomplete");
+    if (Number(row.count) < 15) throw Error("Database setup incomplete");
     await sql.query(
       "SELECT id FROM opportunities WHERE state='published' LIMIT 1",
     );

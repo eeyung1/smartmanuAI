@@ -10,7 +10,7 @@ import {
   readNotificationSettings,
   saveNotificationSettings,
 } from "../src/jobs/digests";
-import { buildUpcomingDigestPreview } from "../app/api/me/notifications/preview/route";
+import { buildUpcomingDigestPreview } from "../src/jobs/digest-preview";
 
 test("PGlite: previews fresh unseen digest content without scheduling or sending", async () => {
   const dir = await mkdtemp(join(tmpdir(), "smartmanu-digest-preview-"));

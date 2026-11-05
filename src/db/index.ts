@@ -38,7 +38,12 @@ export async function migrate(sql: SQL) {
 export async function openDatabase(
   dataDir: string,
   databaseURL?: string,
-  options: { schema?: string; migrate?: boolean; ssl?: boolean } = {},
+  options: {
+    schema?: string;
+    migrate?: boolean;
+    ssl?: boolean;
+    ca?: string;
+  } = {},
 ) {
   if (options.schema && !/^[a-z][a-z0-9_]{0,62}$/.test(options.schema))
     throw new Error("Invalid database schema.");
@@ -60,7 +65,14 @@ export async function openDatabase(
     idleTimeoutMillis: 5000,
     connectionTimeoutMillis: 10000,
     allowExitOnIdle: true,
-    ...(options.ssl ? { ssl: { rejectUnauthorized: true } } : {}),
+    ...(options.ssl
+      ? {
+          ssl: {
+            rejectUnauthorized: true,
+            ...(options.ca ? { ca: options.ca } : {}),
+          },
+        }
+      : {}),
   });
   const makeSQL = (client: Pick<Pool, "query">): SQL => ({
     query: async (query, params) => client.query(query, params),
@@ -127,6 +139,7 @@ export function getDatabase() {
       schema: config.databaseSchema,
       migrate: config.mode === "local",
       ssl: config.mode === "staging",
+      ca: config.databaseCA,
     },
   ));
 }

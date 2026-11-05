@@ -1,3 +1,4 @@
+import { X509Certificate } from "node:crypto";
 export function localConfig(
   env: Record<string, string | undefined> = process.env,
 ) {
@@ -14,6 +15,12 @@ export function localConfig(
       "Set a random BETTER_AUTH_SECRET of at least 32 characters.",
     );
   const databaseURL = env.DATABASE_URL;
+  const databaseCA =
+    mode === "staging" ? env.SMARTMANU_DATABASE_CA_CERT : undefined;
+  if (databaseCA && !new X509Certificate(databaseCA).ca)
+    throw new Error(
+      "Database TLS certificate must be a certificate authority.",
+    );
   if (mode === "staging") {
     if (
       url.protocol !== "https:" ||
@@ -82,6 +89,7 @@ export function localConfig(
     baseURL: url.origin,
     secret,
     databaseURL,
+    databaseCA,
     dataDir: env.SMARTMANU_DATA_DIR ?? ".local",
     databaseSchema: mode === "staging" ? "smartmanuai" : undefined,
   };

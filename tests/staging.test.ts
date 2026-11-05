@@ -19,6 +19,10 @@ const stage = {
 };
 test("hosted staging requires explicit isolated reader config and forbids live work", () => {
   assert.equal(localConfig(stage).databaseSchema, "smartmanuai");
+  assert.equal(localConfig(stage).databaseCA, undefined);
+  assert.throws(() =>
+    localConfig({ ...stage, SMARTMANU_DATABASE_CA_CERT: "invalid PEM" }),
+  );
   for (const override of [
     { BETTER_AUTH_URL: "http://smartmanuai-test.vercel.app" },
     { BETTER_AUTH_URL: "https://attacker.test" },
