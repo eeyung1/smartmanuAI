@@ -40,7 +40,7 @@ test("admin duplicate merge enforces origin protection", async () => {
 
 for (const kind of ["pglite", "postgres"])
   test(
-    `${kind}: duplicate merge preserves tracker progress, source audit and is idempotent`,
+    `${kind}: duplicate merge preserves latest tracker choices, source audit and is idempotent`,
     { skip: kind === "postgres" && !process.env.TEST_DATABASE_URL },
     async () => {
       const dir = await mkdtemp(join(tmpdir(), "smartmanu-catalogue-merge-")),
@@ -83,6 +83,18 @@ for (const kind of ["pglite", "postgres"])
           [duplicate.id, targetId],
         );
 
+        await db.sql.query(
+          "UPDATE saved_items SET updated_at=CASE WHEN opportunity_id=$1 THEN '2026-01-01T00:00:00.000001Z'::timestamptz ELSE '2026-01-01T00:00:00.000002Z'::timestamptz END",
+          [duplicate.id],
+        );
+        await db.sql.query(
+          "UPDATE saved_items SET updated_at='2026-01-01T00:00:00.000003Z' WHERE user_id='dismissed-user' AND opportunity_id=$1",
+          [duplicate.id],
+        );
+        await db.sql.query(
+          "INSERT INTO saved_items(user_id,opportunity_id,status,saved,version,updated_at) VALUES('moved-user',$1,'interested',true,1,'2026-01-01T00:00:00.000001Z')",
+          [targetId],
+        );
         const input = {
           targetOpportunityId: targetId,
           expectedDuplicateRevision: 2,
@@ -139,14 +151,27 @@ for (const kind of ["pglite", "postgres"])
           "a concurrent save must either be merged onto the survivor or rejected after archival",
         );
         const byUser = new Map(rows.map((row) => [row.user_id, row]));
-        assert.equal(byUser.get("dismissed-user")?.status, "interested");
-        assert.equal(byUser.get("dismissed-user")?.saved, true);
-        assert.equal(byUser.get("dismissed-user")?.dismissed_fingerprint, null);
-        assert.equal(byUser.get("moved-user")?.status, "applying");
+        assert.equal(byUser.get("dismissed-user")?.status, "applied");
+        assert.equal(byUser.get("dismissed-user")?.saved, false);
+        assert.equal(
+          byUser.get("dismissed-user")?.dismissed_fingerprint,
+          "old-dismissal",
+        );
+        assert.equal(byUser.get("moved-user")?.status, "interested");
         assert.equal(Number(byUser.get("moved-user")?.version), 8);
-        assert.equal(byUser.get("progress-user")?.status, "applied");
+        assert.equal(byUser.get("progress-user")?.status, "applying");
         assert.equal(Number(byUser.get("progress-user")?.version), 5);
         assert.ok(rows.length === 3 || rows.length === 4);
+        assert.equal(
+          (
+            await db.sql.query(
+              "SELECT updated_at='2026-01-01T00:00:00.000002Z'::timestamptz AS preserved FROM saved_items WHERE user_id='progress-user' AND opportunity_id=$1",
+              [targetId],
+            )
+          ).rows[0].preserved,
+          true,
+          "merge must preserve the exact latest user-choice timestamp",
+        );
         const duplicateRevision = (
           await db.sql.query(
             "SELECT state,note FROM opportunity_revisions WHERE opportunity_id=$1 ORDER BY revision DESC LIMIT 1",
