@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import type { SQL } from "../db";
 import { detailsSchema, type Details } from "../catalogue/schema";
 import { preferencesSchema, type Preferences } from "./profile";
-export const MATCH_RULES_VERSION = "1";
+export const MATCH_RULES_VERSION = "2";
 const groups = [
   ["smart manufacturing", "intelligent manufacturing", "智能制造", "智慧制造"],
   ["industrial automation", "automation", "工业自动化"],
@@ -27,6 +27,13 @@ export function materialFingerprint(details: Details) {
         eligibilityRules: details.eligibilityRules
           ? {
               ...details.eligibilityRules,
+              ...(details.eligibilityRules.residenceCountries
+                ? {
+                    residenceCountries: [
+                      ...new Set(details.eligibilityRules.residenceCountries),
+                    ].sort(),
+                  }
+                : {}),
               nationalities: details.eligibilityRules.nationalities
                 ? [...new Set(details.eligibilityRules.nationalities)].sort()
                 : null,
@@ -102,6 +109,17 @@ export function evaluateMatch(profile: Preferences, details: Details) {
       );
   }
   const rules = details.eligibilityRules;
+  if (!rules?.residenceCountries)
+    unknowns.push("Residence requirements are not stated.");
+  else if (!rules.residenceCountries.includes("ALL")) {
+    if (!profile.residenceCountry)
+      unknowns.push("Add your country of residence to check this restriction.");
+    else if (!rules.residenceCountries.includes(profile.residenceCountry))
+      failures.push(
+        "Your country of residence does not meet the recorded restriction.",
+      );
+    else reasons.push("Residence meets the recorded restriction.");
+  }
   if (!rules)
     unknowns.push(
       "Structured nationality, age and qualification requirements are unavailable.",

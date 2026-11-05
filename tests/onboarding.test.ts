@@ -33,6 +33,7 @@ test("onboarding saves each step, resumes after restart and completes preference
         interfaceLanguage: "zh-Hans",
         alertLanguage: "en",
         nationality: "NG",
+        residenceCountry: "GH",
         age: 24,
         qualification: "bachelor",
       },
@@ -42,6 +43,7 @@ test("onboarding saves each step, resumes after restart and completes preference
       interfaceLanguage: "zh-Hans",
       alertLanguage: "en",
       nationality: "NG",
+      residenceCountry: "GH",
       age: 24,
       qualification: "bachelor",
     });
@@ -52,6 +54,7 @@ test("onboarding saves each step, resumes after restart and completes preference
     const resumed = await readOnboardingProgress(db.sql, "onboarding-user");
     assert.equal(resumed.step, 2);
     assert.equal(resumed.values.nationality, "NG");
+    assert.equal(resumed.values.residenceCountry, "GH");
     await saveOnboardingStep(db.sql, "onboarding-user", {
       step: 2,
       values: {
@@ -76,6 +79,7 @@ test("onboarding saves each step, resumes after restart and completes preference
     );
     assert.equal(progress.completed, true);
     assert.equal(profile.nationality, "NG");
+    assert.equal(profile.residenceCountry, "GH");
     assert.deepEqual(profile.targetLevels, ["master"]);
     assert.deepEqual(profile.countries, ["CN"]);
     assert.deepEqual(await readProfile(db.sql, "onboarding-user"), profile);
@@ -103,6 +107,7 @@ test("onboarding validates step order and keeps progress private per user", asyn
     await seedUser(db.sql, "second-user");
     await saveProfile(db.sql, "first-user", {
       nationality: "GH",
+      residenceCountry: "GH",
       topics: ["robotics"],
     });
     await assert.rejects(() =>
@@ -117,6 +122,11 @@ test("onboarding validates step order and keeps progress private per user", asyn
     });
     assert.equal(
       (await readOnboardingProgress(db.sql, "second-user")).values.nationality,
+      undefined,
+    );
+    assert.equal(
+      (await readOnboardingProgress(db.sql, "second-user")).values
+        .residenceCountry,
       undefined,
     );
     await assert.rejects(() =>
@@ -136,6 +146,7 @@ test("onboarding validates step order and keeps progress private per user", asyn
     });
     const { profile } = await completeOnboarding(db.sql, "first-user");
     assert.equal(profile.nationality, "NG");
+    assert.equal(profile.residenceCountry, "GH");
     assert.deepEqual(profile.topics, ["robotics"]);
   } finally {
     await db.close();

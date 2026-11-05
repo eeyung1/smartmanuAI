@@ -9,6 +9,11 @@ export const preferencesSchema = z
       .array(z.enum(["en", "zh"]))
       .max(2)
       .default(["en"]),
+    residenceCountry: z
+      .string()
+      .regex(/^[A-Z]{2}$/)
+      .nullable()
+      .optional(),
     nationality: z
       .string()
       .regex(/^[A-Z]{2}$/)
@@ -51,6 +56,11 @@ const onboardingValuesSchema = z
     interfaceLanguage: z.enum(["en", "zh-Hans"]),
     alertLanguage: z.enum(["en", "zh-Hans"]),
     teachingLanguages: z.array(z.enum(["en", "zh"])).max(2),
+    residenceCountry: z
+      .string()
+      .regex(/^[A-Z]{2}$/)
+      .nullable()
+      .optional(),
     nationality: z
       .string()
       .regex(/^[A-Z]{2}$/)
@@ -83,6 +93,7 @@ const onboardingStepSchemas = {
       interfaceLanguage: true,
       alertLanguage: true,
       nationality: true,
+      residenceCountry: true,
       age: true,
       qualification: true,
     })

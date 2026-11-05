@@ -13,6 +13,7 @@ const defaults: Preferences = {
   alertLanguage: "en",
   teachingLanguages: ["en"],
   nationality: null,
+  residenceCountry: null,
   age: null,
   qualification: null,
   targetLevels: [],
@@ -162,6 +163,10 @@ export default function Workspace({
                   String(f.get("nationality") ?? "")
                     .trim()
                     .toUpperCase() || null,
+                residenceCountry:
+                  String(f.get("residenceCountry") ?? "")
+                    .trim()
+                    .toUpperCase() || null,
                 age: f.get("age") ? Number(f.get("age")) : null,
                 qualification: f.get("qualification") || null,
                 topics: String(f.get("topics") ?? "")
@@ -199,6 +204,16 @@ export default function Workspace({
               name="nationality"
               defaultValue={p.nationality ?? ""}
               maxLength={2}
+              placeholder="NG"
+            />
+          </label>
+          <label>
+            {t("Country of residence (optional two-letter code)")}
+            <input
+              name="residenceCountry"
+              defaultValue={p.residenceCountry ?? ""}
+              maxLength={2}
+              pattern="[A-Za-z]{2}"
               placeholder="NG"
             />
           </label>

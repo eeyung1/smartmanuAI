@@ -1,4 +1,8 @@
 export const adminChinese: Record<string, string> = {
+  "Allowed residence country codes, separated by commas":
+    "允许的居住国家代码，以逗号分隔",
+  "Residence and nationality are separate. Record residence restrictions only when supported by the source; ALL means explicitly unrestricted residence.":
+    "居住地与国籍不同。仅记录有来源支持的居住地限制；ALL 表示明确不限居住地。",
   "Retry-After pause requires source-policy review.":
     "Retry-After 暂停需要审核来源策略。",
   "Source retry not before (UTC)": "来源重试不得早于（UTC）",

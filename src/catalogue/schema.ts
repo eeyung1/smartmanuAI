@@ -27,6 +27,12 @@ export const sourceSchema = z
   .strict();
 export const eligibilityRulesSchema = z
   .object({
+    residenceCountries: z
+      .array(z.string().regex(/^(?:[A-Z]{2}|ALL)$/))
+      .min(1)
+      .max(250)
+      .nullable()
+      .optional(),
     nationalities: z
       .array(z.string().regex(/^(?:[A-Z]{2}|ALL)$/))
       .min(1)
