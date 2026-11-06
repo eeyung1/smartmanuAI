@@ -1,4 +1,18 @@
 export const adminChinese: Record<string, string> = {
+  "Workload age and scheduling": "待处理时长与调度",
+  "Queued jobs passing stored scheduling gates": "符合已记录调度条件的排队任务",
+  "Running jobs with expired leases": "租约已过期的运行任务",
+  "Enabled sources past their scheduled check time":
+    "已过计划检查时间的启用来源",
+  "Oldest queued job record": "最早创建的排队任务记录",
+  "Oldest pending candidate record": "最早创建的待审核候选记录",
+  "No matching pending records": "没有符合条件的待处理记录",
+  "{days}d {hours}h {minutes}m {seconds}s":
+    "{days}天 {hours}小时 {minutes}分 {seconds}秒",
+  "Ages start at record creation and include retries and holds; they are not time in the current state or execution duration. UTC ages clamp future creation times to zero.":
+    "时长从记录创建时开始，包含重试和等待时间；并非当前状态持续时间或实际运行耗时。UTC 时长将未来创建时间的结果设为零。",
+  "Scheduling counts reflect stored gates at this snapshot, not worker locks or source availability. Due sources may still be held for review or Retry-After. No alert or recovery action runs from this page.":
+    "调度计数反映快照中的已记录条件，不代表工作进程锁定情况或来源可用性。到期来源仍可能因复核或 Retry-After 而等待。此页面不会触发告警或恢复操作。",
   "Archive closed or rejected records on this page":
     "批量归档本页已关闭或已拒绝的记录",
   "Choose up to 25 records and provide one audit note. Each record commits separately; the batch can partially complete. Published and draft records cannot be archived here.":

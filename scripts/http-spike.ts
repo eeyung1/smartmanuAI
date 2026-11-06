@@ -319,6 +319,9 @@ try {
   assert.equal(operationsResponse.headers.get("cache-control"), "no-store");
   const operations = await operationsResponse.json();
   assert.equal(typeof operations.jobs.total, "string");
+  assert.equal(typeof operations.aging.queuedReady, "string");
+  assert.equal(typeof operations.aging.expiredLeases, "string");
+  assert.equal(typeof operations.sources.due, "string");
   assert.equal(typeof operations.budget.reservedMicros, "string");
   assert.ok(BigInt(operations.jobs.failed) >= 1n);
   assert.ok(!JSON.stringify(operations).includes("server.log"));
@@ -351,7 +354,9 @@ try {
     operationsChinese.headers.get("cache-control") ?? "",
     /private|no-store/,
   );
-  assert.match(await operationsChinese.text(), /运营概览/);
+  const operationsChineseHTML = await operationsChinese.text();
+  assert.match(operationsChineseHTML, /运营概览/);
+  assert.match(operationsChineseHTML, /待处理时长与调度/);
 
   assert.equal(
     (await fetch(base + "/api/me/notifications/history")).status,
