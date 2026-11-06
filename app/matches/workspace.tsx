@@ -168,6 +168,15 @@ export default function Workspace({
                     .trim()
                     .toUpperCase() || null,
                 age: f.get("age") ? Number(f.get("age")) : null,
+                birthYear: f.get("birthYear")
+                  ? Number(f.get("birthYear"))
+                  : null,
+                ageAsOf:
+                  f.get("age") && f.get("confirmAge") === "on"
+                    ? new Date().toISOString().slice(0, 10)
+                    : String(f.get("age") ?? "") === String(p.age ?? "")
+                      ? (p.ageAsOf ?? null)
+                      : null,
                 qualification: f.get("qualification") || null,
                 topics: String(f.get("topics") ?? "")
                   .split(",")
@@ -227,6 +236,31 @@ export default function Workspace({
               defaultValue={p.age ?? ""}
             />
           </label>
+          <label>
+            <input
+              type="checkbox"
+              name="confirmAge"
+              defaultChecked={
+                p.ageAsOf === new Date().toISOString().slice(0, 10)
+              }
+            />
+            {t("I confirm this age is current today (UTC).")}
+          </label>
+          <label>
+            {t("Birth year (optional)")}
+            <input
+              type="number"
+              name="birthYear"
+              min={1900}
+              max={new Date().getUTCFullYear()}
+              defaultValue={p.birthYear ?? ""}
+            />
+          </label>
+          <p>
+            {t(
+              "Provide age or birth year, not both. Old ages need confirmation; birth year gives a range without collecting your birthday.",
+            )}
+          </p>
           <label>
             {t("Highest qualification")}{" "}
             <select name="qualification" defaultValue={p.qualification ?? ""}>

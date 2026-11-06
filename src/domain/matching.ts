@@ -1,8 +1,9 @@
+import { currentAgeRange } from "./age";
 import { createHash } from "node:crypto";
 import type { SQL } from "../db";
 import { detailsSchema, type Details } from "../catalogue/schema";
 import { preferencesSchema, type Preferences } from "./profile";
-export const MATCH_RULES_VERSION = "2";
+export const MATCH_RULES_VERSION = "3";
 const groups = [
   ["smart manufacturing", "intelligent manufacturing", "智能制造", "智慧制造"],
   ["industrial automation", "automation", "工业自动化"],
@@ -43,7 +44,11 @@ export function materialFingerprint(details: Details) {
     )
     .digest("hex");
 }
-export function evaluateMatch(profile: Preferences, details: Details) {
+export function evaluateMatch(
+  profile: Preferences,
+  details: Details,
+  now = new Date(),
+) {
   const reasons: string[] = [],
     unknowns: string[] = [],
     failures: string[] = [];
@@ -137,13 +142,23 @@ export function evaluateMatch(profile: Preferences, details: Details) {
       else reasons.push("Nationality meets the recorded restriction.");
     }
     if (rules.minAge !== null || rules.maxAge !== null) {
-      if (profile.age === null)
-        unknowns.push("Add your age to check the recorded age limits.");
+      const range = currentAgeRange(profile, now);
+      if (!range)
+        unknowns.push(
+          "Confirm your current age or add your birth year to check age limits.",
+        );
       else if (
-        (rules.minAge !== null && profile.age < rules.minAge) ||
-        (rules.maxAge !== null && profile.age > rules.maxAge)
+        (rules.minAge !== null && range.max < rules.minAge) ||
+        (rules.maxAge !== null && range.min > rules.maxAge)
       )
         failures.push("Your age is outside the recorded limits.");
+      else if (
+        (rules.minAge !== null && range.min < rules.minAge) ||
+        (rules.maxAge !== null && range.max > rules.maxAge)
+      )
+        unknowns.push(
+          "Your birth-year age range overlaps an age limit; check the source and your birthday.",
+        );
       else reasons.push("Age meets the recorded limits.");
     } else unknowns.push("Age requirements are not stated.");
     if (rules.minQualification) {

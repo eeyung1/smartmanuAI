@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **5 November 2026**, through [implementation PR #38](https://github.com/eeyung1/smartmanuAI/pull/38). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #39](https://github.com/eeyung1/smartmanuAI/pull/39). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -63,7 +63,9 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Dedicated multi-step onboarding with persisted progress, completion checks and contextual guidance.
 - [x] Preserve validated internal opportunity/save destinations through sign-in and onboarding; reject external redirect destinations.
 - [x] Optional residence-country field in profile settings and persisted onboarding; separately reviewed residence-country eligibility rules with known-failure/unknown handling.
-- [ ] Language-test details, detailed qualification equivalence and age/birth-year freshness handling.
+- [x] Optional age-confirmation date or birth year in onboarding/profile settings, with UTC-day freshness and conservative birth-year range checks; legacy undated ages remain unknown.
+- [ ] Language-test details and detailed qualification equivalence.
+- [ ] Institution-specific age-at-deadline/event rules and timezone qualification.
 - [ ] User-facing session inventory, individual session revocation and verified account-email change flow.
 - [ ] Production identity configuration, real authentication email and trusted proxy/rate-limit qualification.
 - [ ] Public catalogue/API rate limiting and production security/CSRF policy qualification.

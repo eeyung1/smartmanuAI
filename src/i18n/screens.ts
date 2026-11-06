@@ -126,6 +126,15 @@ export const screenChinese: Record<string, string> = {
     "您的居住国家不符合已记录的限制。",
   "Residence meets the recorded restriction.": "居住地符合已记录的限制。",
   "Nationality (two-letter country code)": "国籍（两位国家代码）",
+  "I confirm this age is current today (UTC).":
+    "我确认此年龄截至今天（UTC）仍准确。",
+  "Birth year (optional)": "出生年份（可选）",
+  "Provide age or birth year, not both. Old ages need confirmation; birth year gives a range without collecting your birthday.":
+    "请填写年龄或出生年份，不要同时填写。旧年龄需要确认；出生年份提供年龄范围，无需收集您的生日。",
+  "Confirm your current age or add your birth year to check age limits.":
+    "请确认您目前的年龄或添加出生年份，以核对年龄限制。",
+  "Your birth-year age range overlaps an age limit; check the source and your birthday.":
+    "根据出生年份计算的年龄范围跨越年龄限制；请结合官方来源和您的生日核实。",
   "Age (optional)": "年龄（选填）",
   "Highest qualification": "最高学历",
   "Not supplied": "未提供",
