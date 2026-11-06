@@ -1,4 +1,8 @@
 export const controlChinese: Record<string, string> = {
+  "Keep deadline reminders for saved opportunities marked applied":
+    "继续接收已标记为已申请的收藏项目的截止日期提醒",
+  "This option requires deadline reminders and notifications to be enabled. Turning it off stops future reminders for applied items; reminders already accepted by the local sink cannot be recalled.":
+    "此选项需要开启截止日期提醒和通知。关闭后将停止已申请项目的后续提醒；本地测试收件箱已接收的提醒无法撤回。",
   "Digest history": "摘要历史",
   "This list covers stored local digests. Reminders, change alerts and delivery simulations have separate records. Local sink acceptance is not confirmation of email or Telegram delivery.":
     "此列表显示已存储的本地摘要。提醒、项目更新及投递模拟有单独的记录。本地测试收件箱接收不代表邮件或 Telegram 已送达。",

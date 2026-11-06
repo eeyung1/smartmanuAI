@@ -56,7 +56,7 @@ export async function dispatchDeadlineReminders(
          JOIN sources s ON s.id=o.source_id
          JOIN notification_preferences p ON p.user_id=t.user_id
          LEFT JOIN profiles pr ON pr.user_id=t.user_id
-        WHERE t.saved=true AND t.status IN ('interested','applying')
+        WHERE t.saved=true AND (t.status IN ('interested','applying') OR (t.status='applied' AND p.applied_reminders_enabled=true))
           AND o.state='published' AND o.verified_at >= $1
           AND p.enabled=true AND p.deadline_reminders_enabled=true
           AND p.consent_version=$2
@@ -94,7 +94,7 @@ export async function dispatchDeadlineReminders(
              JOIN notification_preferences p ON p.user_id=t.user_id
              LEFT JOIN profiles pr ON pr.user_id=t.user_id
             WHERE t.user_id=$1 AND t.opportunity_id=$2 AND t.saved=true
-              AND t.status IN ('interested','applying')
+              AND (t.status IN ('interested','applying') OR (t.status='applied' AND p.applied_reminders_enabled=true))
               AND o.state='published' AND o.verified_at >= $3
               AND p.enabled=true AND p.deadline_reminders_enabled=true
               AND p.consent_version=$4

@@ -207,3 +207,7 @@ A default-off independent material-change opt-in now controls local saved-item d
 ## 35 Digest-history checkpoint (6 November 2026)
 
 Stored digests have a private bilingual history screen and owner-scoped API with channel/state filters and 20-row cursor pages. Ordering preserves database microseconds and uses IDs to resolve ties. Cursors bind filters, while session ownership is always enforced independently. Dates are shown in UTC; accepted means local-sink acceptance, not provider delivery. Results are live rather than a snapshot. Migration 017 adds an owner/date/ID index. Reminder, material-change and delivery-simulation history remain separate and unified pagination remains open.
+
+## 36 Applied-reminder checkpoint (6 November 2026)
+
+A separate default-off `appliedRemindersEnabled` preference lets users retain local deadline reminders after marking a saved opportunity applied. The candidate scan and locked dispatch recheck both require this flag for applied records, while interested/applying saves retain existing behavior. Main reminder opt-in, master enablement, consent, saved state, publication, freshness, deadline and suppression gates remain required. Legacy settings/onboarding clients preserve omitted values, version conflicts still reject stale writes and account export includes the setting. English/Simplified Chinese controls explain its dependency and that local acceptance cannot be recalled. Migration 018 adds only the private preference column. Live source rechecks and real transport remain unfinished.

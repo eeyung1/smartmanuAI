@@ -63,3 +63,7 @@ Saved-item material-change preferences add `notification_preferences.material_ch
 ## Application migration 017 (6 November 2026)
 
 Digest history adds the `notification_digest_history_owner` index on `(user_id, created_at DESC, id)`. Apply `017_digest_history_index.sql` only inside the existing private smartmanuai schema and record it in the app migration ledger. Health now requires 17 migration records. The table count remains 39; the read-only runtime gains no private-history privileges and hosted sign-in remains disabled.
+
+## Application migration 018 (6 November 2026)
+
+Add `notification_preferences.applied_reminders_enabled boolean NOT NULL DEFAULT false` only within the existing private smartmanuai schema and record `018_applied_reminder_preference.sql` in the app migration ledger. Health now requires 18 app migrations. Table count remains 39, existing users are not opted in, and staging reader permissions and disabled hosted account/worker behavior stay in place.

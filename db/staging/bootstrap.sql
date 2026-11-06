@@ -160,6 +160,10 @@ CREATE INDEX notification_digest_history_owner
   ON notification_digests(user_id, created_at DESC, id);
 
 INSERT INTO schema_migrations(name) VALUES('017_digest_history_index.sql');
+ALTER TABLE notification_preferences
+  ADD COLUMN applied_reminders_enabled boolean NOT NULL DEFAULT false;
+
+INSERT INTO schema_migrations(name) VALUES('018_applied_reminder_preference.sql');
 DO $guard$ DECLARE item record; BEGIN FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='smartmanuai' LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY','smartmanuai',item.tablename); END LOOP; FOR item IN SELECT p.oid::regprocedure AS signature FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='smartmanuai' LOOP EXECUTE format('ALTER FUNCTION %s SET search_path=smartmanuai,pg_catalog',item.signature); END LOOP; END $guard$;
 REVOKE ALL ON SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "smartmanuai" FROM PUBLIC;
