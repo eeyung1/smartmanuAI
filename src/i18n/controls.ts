@@ -1,4 +1,28 @@
 export const controlChinese: Record<string, string> = {
+  "Outside your opportunity types.": "不符合您选择的机会类型。",
+  "Outside your funding preferences.": "不符合您的资助偏好。",
+  "Outside your participation modes.": "不符合您的参与方式。",
+  "Outside your teaching languages.": "不符合您选择的授课语言。",
+  "Outside your preferred countries.": "不在您的首选国家范围内。",
+  "Outside your target study levels.": "不符合您的目标学历层次。",
+  "No overlap with your selected topics.": "与您选择的主题没有重叠。",
+  "Your nationality does not meet the recorded restriction.":
+    "您的国籍不符合已记录的限制。",
+  "Your age is outside the recorded limits.": "您的年龄不在已记录的范围内。",
+  "Your qualification is below the recorded minimum.":
+    "您的学历低于已记录的最低要求。",
+  "Private profile comparison": "私人资料比较",
+  "Browse beyond your preferences": "浏览偏好范围以外的项目",
+  "All catalogue results stay visible. Private notes compare the displayed records with your saved profile; they do not confirm admission eligibility or include every source requirement.":
+    "目录中的所有结果仍会显示。私人说明将当前记录与您保存的资料进行比较；这并不确认录取资格，也不涵盖来源的所有要求。",
+  "Back to your profile and matches": "返回个人资料和匹配项目",
+  "Save a profile in your private space to see comparison notes.":
+    "请在私人空间保存个人资料，以查看比较说明。",
+  "Outside your preferences or recorded requirements":
+    "不符合您的偏好或已记录的要求",
+  "No recorded mismatch; eligibility needs checking":
+    "未发现已记录的不匹配；资格仍需核实",
+  "Requirements to check": "需要核实的要求",
   "Keep deadline reminders for saved opportunities marked applied":
     "继续接收已标记为已申请的收藏项目的截止日期提醒",
   "This option requires deadline reminders and notifications to be enabled. Turning it off stops future reminders for applied items; reminders already accepted by the local sink cannot be recalled.":
