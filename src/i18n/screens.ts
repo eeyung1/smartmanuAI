@@ -135,6 +135,27 @@ export const screenChinese: Record<string, string> = {
     "请确认您目前的年龄或添加出生年份，以核对年龄限制。",
   "Your birth-year age range overlaps an age limit; check the source and your birthday.":
     "根据出生年份计算的年龄范围跨越年龄限制；请结合官方来源和您的生日核实。",
+  "Mandatory language-test requirement (optional)":
+    "必需的语言考试要求（可选）",
+  "Language-test result (optional)": "语言考试成绩（可选）",
+  "Use the exact test name and version. Different score scales are not converted. Leave all fields blank if unknown.":
+    "请使用准确的考试名称及版本。不转换不同分制；如未知，请全部留空。",
+  "Record one mandatory overall-score requirement supported by source evidence. Alternatives, waivers and section scores need manual review.":
+    "仅记录有来源证据支持的一项必需总分要求。替代考试、豁免及单项分数须人工审核。",
+  "Self-reported results only. Enter validity from your result and the source; do not guess an expiry date.":
+    "仅使用自报成绩。请根据成绩记录及来源填写有效期，不要猜测到期日期。",
+  "Test name and version": "考试名称及版本",
+  "Maximum score on this scale": "此分制的满分",
+  "Required minimum overall score": "所需最低总分",
+  "Your overall score": "您的总分",
+  "Test date": "考试日期",
+  "Valid through (if known)": "有效期至（如已知）",
+  "Your recorded language-test score is below the source minimum.":
+    "您记录的语言考试成绩低于来源要求的最低分数。",
+  "Your recorded language-test score meets the source minimum.":
+    "您记录的语言考试成绩达到来源要求的最低分数。",
+  "Language-test evidence needs checking: missing, expired or different test/version/scale.":
+    "语言考试资料需要核实：资料缺失、过期或考试、版本、分制不一致。",
   "Age (optional)": "年龄（选填）",
   "Highest qualification": "最高学历",
   "Not supplied": "未提供",

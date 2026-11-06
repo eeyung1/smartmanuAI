@@ -1,4 +1,6 @@
 export const errorChinese: Record<string, string> = {
+  "Language-test requirements need an eligibility quotation.":
+    "语言考试要求需要资格来源引文。",
   "Account actions are unavailable in this staging preview.":
     "此暂存预览暂不提供账户操作。",
   "Sign-in is unavailable in this staging preview.": "此暂存预览暂不提供登录。",

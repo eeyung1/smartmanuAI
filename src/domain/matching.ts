@@ -1,9 +1,10 @@
+import { checkLanguageTest, languageTestKey } from "./language-tests";
 import { currentAgeRange } from "./age";
 import { createHash } from "node:crypto";
 import type { SQL } from "../db";
 import { detailsSchema, type Details } from "../catalogue/schema";
 import { preferencesSchema, type Preferences } from "./profile";
-export const MATCH_RULES_VERSION = "3";
+export const MATCH_RULES_VERSION = "4";
 const groups = [
   ["smart manufacturing", "intelligent manufacturing", "智能制造", "智慧制造"],
   ["industrial automation", "automation", "工业自动化"],
@@ -28,6 +29,16 @@ export function materialFingerprint(details: Details) {
         eligibilityRules: details.eligibilityRules
           ? {
               ...details.eligibilityRules,
+              ...(details.eligibilityRules.languageTest
+                ? {
+                    languageTest: {
+                      ...details.eligibilityRules.languageTest,
+                      name: languageTestKey(
+                        details.eligibilityRules.languageTest.name,
+                      ),
+                    },
+                  }
+                : {}),
               ...(details.eligibilityRules.residenceCountries
                 ? {
                     residenceCountries: [
@@ -175,6 +186,21 @@ export function evaluateMatch(
       else reasons.push("Qualification meets the recorded minimum.");
     } else unknowns.push("Minimum qualification is not stated.");
   }
+  const language = checkLanguageTest(
+    profile.languageTest,
+    rules?.languageTest,
+    now,
+  );
+  if (language === "below")
+    failures.push(
+      "Your recorded language-test score is below the source minimum.",
+    );
+  else if (language === "meets")
+    reasons.push("Your recorded language-test score meets the source minimum.");
+  else
+    unknowns.push(
+      "Language-test evidence needs checking: missing, expired or different test/version/scale.",
+    );
   unknowns.push(
     "Check the official eligibility text for additional requirements, including language tests.",
   );
