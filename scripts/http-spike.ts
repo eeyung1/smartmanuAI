@@ -610,6 +610,27 @@ try {
   assert.match(cadenceHTML, /采集间隔/);
   assert.match(cadenceHTML, /name="sourceLanguage"/);
   assert.match(cadenceHTML, /保存来源资料/);
+  assert.match(cadenceHTML, /采集任务计数/);
+  const countsResponse = await fetch(
+    base + "/api/admin/research?source=" + backoffSource.id,
+    { headers: { Cookie: admin } },
+  );
+  assert.equal(countsResponse.status, 200);
+  assert.equal(countsResponse.headers.get("cache-control"), "no-store");
+  const countsData = await countsResponse.json();
+  assert.deepEqual(
+    countsData.sources.find(
+      (item: { id: string }) => item.id === backoffSource.id,
+    ).collection_counts,
+    { total: "1", completed: "0", failed: "1", active: "0", cancelled: "0" },
+  );
+  assert.deepEqual(
+    cadenceData.sources.find(
+      (item: { id: string }) => item.id === officialSource.id,
+    ).collection_counts,
+    { total: "0", completed: "0", failed: "0", active: "0", cancelled: "0" },
+  );
+
   const metadataSource = cadenceData.sources.find(
     (item: { id: string }) => item.id === officialSource.id,
   );

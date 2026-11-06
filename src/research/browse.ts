@@ -1,3 +1,4 @@
+import { sourceJobCounts } from "./source-counts";
 import { z } from "zod";
 import type { SQL } from "../db";
 import { CatalogueError, requireAdmin } from "../catalogue/service";
@@ -146,13 +147,18 @@ export async function selectedResearchData(
   }
   if (sourceId) {
     let source = data.sources.find((row) => row.id === sourceId);
-    if (!source)
+    if (!source) {
       source = (
         await sql.query(
           "SELECT s.id,s.name,s.url,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id WHERE s.id=$1",
           [sourceId],
         )
       ).rows[0];
+      if (source)
+        source.collection_counts = (
+          await sourceJobCounts(sql, actor, [sourceId])
+        )[sourceId];
+    }
     if (!source) throw new CatalogueError(404, "Source not found.");
     data.sources = [
       source,

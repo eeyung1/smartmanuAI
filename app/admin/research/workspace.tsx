@@ -15,6 +15,13 @@ type Dashboard = {
     source_type: string;
     source_language: string;
     metadata_version: number;
+    collection_counts: {
+      total: string;
+      completed: string;
+      failed: string;
+      active: string;
+      cancelled: string;
+    };
   }[];
   jobs: {
     id: string;
@@ -78,6 +85,11 @@ export default function ResearchWorkspace({
             "Saving an enabled source policy clears Retry-After pauses after operator review.",
           )}
         </p>
+        <p>
+          {t(
+            "Counts cover current stored collection-job states across retained history, not attempt totals. Completed includes unchanged checks; active includes queued retries. Cancellations are separate. Collection completion does not confirm opportunity review or publication.",
+          )}
+        </p>
         {data.sources.length ? (
           data.sources.map((source) => (
             <article key={source.id} id={"source-" + source.id}>
@@ -90,6 +102,33 @@ export default function ResearchWorkspace({
                     ? t("Collection enabled")
                     : t("Collection paused")}
               </p>
+              <section aria-label={t("Collection job counts")}>
+                <h4>{t("Collection job counts")}</h4>
+                <dl>
+                  {(
+                    [
+                      ["total", "Total stored jobs"],
+                      ["completed", "Completed collection jobs"],
+                      ["failed", "Failed collection jobs"],
+                      ["active", "Active collection jobs"],
+                      ["cancelled", "Cancelled collection jobs"],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <div key={key}>
+                      <dt>{t(label)}</dt>
+                      <dd>{source.collection_counts[key]}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <Link
+                  href={
+                    "/admin/research/browse?kind=jobs&source=" +
+                    encodeURIComponent(source.id)
+                  }
+                >
+                  {t("Browse this source’s collection jobs")}
+                </Link>
+              </section>
               <form
                 key={source.id + ":" + source.metadata_version}
                 onSubmit={(event) => {
