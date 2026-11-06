@@ -119,6 +119,7 @@ for (const kind of ["pglite", "postgres"])
           paused: "1",
           reviewHolds: "1",
           futureHolds: "1",
+          due: "1",
         });
         assert.deepEqual(data.usage, {
           total: "3",

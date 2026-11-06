@@ -3,6 +3,7 @@ import type { Locale } from "@/src/i18n/locale";
 import { screenText, researchState } from "@/src/i18n/screens";
 import {
   formatBudgetUnits,
+  durationParts,
   type operationsOverview,
 } from "@/src/research/operations";
 export default function OperationsSummary({
@@ -12,12 +13,14 @@ export default function OperationsSummary({
   data: Awaited<ReturnType<typeof operationsOverview>>;
   locale: Locale;
 }) {
-  const t = (key: string) => screenText(locale, key);
-  const date = new Intl.DateTimeFormat(locale === "zh-Hans" ? "zh-CN" : "en", {
+  const t = (key: string, values?: Record<string, string | number>) =>
+    screenText(locale, key, values);
+  const dates = new Intl.DateTimeFormat(locale === "zh-Hans" ? "zh-CN" : "en", {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: "UTC",
-  }).format(new Date(data.observedAt));
+  });
+  const date = dates.format(new Date(data.observedAt));
   return (
     <div lang={locale}>
       <h1>{t("Operations overview")}</h1>
@@ -29,6 +32,67 @@ export default function OperationsSummary({
       <p>
         {t("Snapshot time")}: <time dateTime={data.observedAt}>{date} UTC</time>
       </p>
+      <section>
+        <h2>{t("Workload age and scheduling")}</h2>
+        <dl>
+          <div>
+            <dt>{t("Queued jobs passing stored scheduling gates")}</dt>
+            <dd>{data.aging.queuedReady}</dd>
+          </div>
+          <div>
+            <dt>{t("Running jobs with expired leases")}</dt>
+            <dd>{data.aging.expiredLeases}</dd>
+          </div>
+          <div>
+            <dt>{t("Enabled sources past their scheduled check time")}</dt>
+            <dd>{data.sources.due}</dd>
+          </div>
+          {(
+            [
+              [
+                "oldestQueuedAt",
+                "oldestQueuedAgeSeconds",
+                "Oldest queued job record",
+              ],
+              [
+                "oldestPendingAt",
+                "oldestPendingAgeSeconds",
+                "Oldest pending candidate record",
+              ],
+            ] as const
+          ).map(([atKey, ageKey, label]) => (
+            <div key={atKey}>
+              <dt>{t(label)}</dt>
+              <dd>
+                {data.aging[atKey] !== null && data.aging[ageKey] !== null ? (
+                  <>
+                    <time dateTime={data.aging[atKey]!}>
+                      {dates.format(new Date(data.aging[atKey]!))} UTC
+                    </time>
+                    {" · "}
+                    {t(
+                      "{days}d {hours}h {minutes}m {seconds}s",
+                      durationParts(data.aging[ageKey]!),
+                    )}
+                  </>
+                ) : (
+                  t("No matching pending records")
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p>
+          {t(
+            "Ages start at record creation and include retries and holds; they are not time in the current state or execution duration. UTC ages clamp future creation times to zero.",
+          )}
+        </p>
+        <p>
+          {t(
+            "Scheduling counts reflect stored gates at this snapshot, not worker locks or source availability. Due sources may still be held for review or Retry-After. No alert or recovery action runs from this page.",
+          )}
+        </p>
+      </section>
       <section>
         <h2>{t("Collection queue")}</h2>
         <p>
