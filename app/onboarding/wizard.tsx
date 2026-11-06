@@ -159,6 +159,15 @@ export default function OnboardingWizard({
                 .trim()
                 .toUpperCase() || null,
             age: form.get("age") ? Number(form.get("age")) : null,
+            birthYear: form.get("birthYear")
+              ? Number(form.get("birthYear"))
+              : null,
+            ageAsOf:
+              form.get("age") && form.get("confirmAge") === "on"
+                ? new Date().toISOString().slice(0, 10)
+                : String(form.get("age") ?? "") === String(p.age ?? "")
+                  ? (p.ageAsOf ?? null)
+                  : null,
             qualification: (form.get("qualification") || null) as
               Preferences["qualification"] | null,
           }
@@ -315,6 +324,31 @@ export default function OnboardingWizard({
                 defaultValue={p.age ?? ""}
               />
             </label>
+            <label>
+              <input
+                type="checkbox"
+                name="confirmAge"
+                defaultChecked={
+                  p.ageAsOf === new Date().toISOString().slice(0, 10)
+                }
+              />
+              {t("I confirm this age is current today (UTC).")}
+            </label>
+            <label>
+              {t("Birth year (optional)")}
+              <input
+                type="number"
+                name="birthYear"
+                min={1900}
+                max={new Date().getUTCFullYear()}
+                defaultValue={p.birthYear ?? ""}
+              />
+            </label>
+            <p>
+              {t(
+                "Provide age or birth year, not both. Old ages need confirmation; birth year gives a range without collecting your birthday.",
+              )}
+            </p>
             <label>
               {t("Highest qualification")}
               <select name="qualification" defaultValue={p.qualification ?? ""}>

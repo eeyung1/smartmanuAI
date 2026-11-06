@@ -19,6 +19,18 @@ export const preferencesSchema = z
       .regex(/^[A-Z]{2}$/)
       .nullable()
       .default(null),
+    birthYear: z
+      .number()
+      .int()
+      .min(1900)
+      .refine((year) => year <= new Date().getUTCFullYear())
+      .nullable()
+      .optional(),
+    ageAsOf: z.iso
+      .date()
+      .refine((day) => day <= new Date().toISOString().slice(0, 10))
+      .nullable()
+      .optional(),
     age: z.number().int().min(0).max(120).nullable().default(null),
     qualification: z
       .enum(["secondary", "bachelor", "master", "doctorate", "other"])
@@ -65,6 +77,18 @@ const onboardingValuesSchema = z
       .string()
       .regex(/^[A-Z]{2}$/)
       .nullable(),
+    birthYear: z
+      .number()
+      .int()
+      .min(1900)
+      .refine((year) => year <= new Date().getUTCFullYear())
+      .nullable()
+      .optional(),
+    ageAsOf: z.iso
+      .date()
+      .refine((day) => day <= new Date().toISOString().slice(0, 10))
+      .nullable()
+      .optional(),
     age: z.number().int().min(0).max(120).nullable(),
     qualification: z
       .enum(["secondary", "bachelor", "master", "doctorate", "other"])
@@ -95,6 +119,8 @@ const onboardingStepSchemas = {
       nationality: true,
       residenceCountry: true,
       age: true,
+      birthYear: true,
+      ageAsOf: true,
       qualification: true,
     })
     .strict(),
@@ -121,6 +147,8 @@ export type OnboardingProgress = z.infer<typeof onboardingSchema>;
 
 export async function saveProfile(sql: SQL, userId: string, input: unknown) {
   const data = preferencesSchema.parse(input);
+  if (data.age !== null && data.birthYear != null)
+    throw new Error("Provide age or birth year, not both.");
   await sql.query(
     "INSERT INTO profiles(user_id,preferences) VALUES($1,$2) ON CONFLICT(user_id) DO UPDATE SET preferences=EXCLUDED.preferences,version=profiles.version+1 WHERE profiles.preferences IS DISTINCT FROM EXCLUDED.preferences",
     [userId, JSON.stringify(data)],
@@ -170,6 +198,13 @@ export async function saveOnboardingStep(
   const stepValues = onboardingStepSchemas[
     request.step as keyof typeof onboardingStepSchemas
   ].parse(request.values);
+  if (
+    "age" in stepValues &&
+    stepValues.age != null &&
+    "birthYear" in stepValues &&
+    stepValues.birthYear != null
+  )
+    throw new Error("Provide age or birth year, not both.");
   return sql.transaction(async (tx) => {
     await tx.query("SELECT id FROM auth_user WHERE id=$1 FOR NO KEY UPDATE", [
       userId,

@@ -28,6 +28,7 @@ import { createDraft, reviewOpportunity } from "../src/catalogue/service";
 const profile = preferencesSchema.parse({
   nationality: "NG",
   age: 25,
+  ageAsOf: new Date().toISOString().slice(0, 10),
   qualification: "bachelor",
   targetLevels: ["master"],
   topics: ["intelligent manufacturing"],
