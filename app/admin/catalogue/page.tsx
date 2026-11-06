@@ -1,3 +1,4 @@
+import BulkArchive from "./bulk-archive";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
@@ -97,6 +98,24 @@ export default async function AdminCatalogue({
         </Link>
       </form>
       <p>{t("Results: {count}", { count: data.total })}</p>
+      {!sources ? (
+        <BulkArchive
+          key={data.items
+            .map((item) => String(item.id) + ":" + String(item.revision))
+            .join(",")}
+          items={data.items
+            .filter((item) =>
+              ["closed", "rejected"].includes(String(item.state)),
+            )
+            .map((item) => ({
+              id: String(item.id),
+              title: String(item.title),
+              revision: Number(item.revision),
+              state: String(item.state),
+            }))}
+        />
+      ) : null}
+
       {data.items.length ? (
         data.items.map((item) => (
           <article key={String(item.id)}>

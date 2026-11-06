@@ -685,6 +685,75 @@ try {
   assert.equal(metadataSource.source_language, "zh");
   assert.equal(metadataSource.metadata_version, 2);
 
+  const bulkDraftResponse = await post("/api/admin/opportunities", {
+    sourceId: source.id,
+    details: { ...fixtureDetails, title: "Bulk archive HTTP fixture" },
+    evidence: fixtureEvidence,
+    note: "Create a bounded bulk archive fixture.",
+  });
+  const bulkDraft = await bulkDraftResponse.json();
+  assert.equal(bulkDraftResponse.status, 201);
+  assert.equal(
+    (
+      await post("/api/admin/opportunities/" + bulkDraft.id + "/review", {
+        action: "reject",
+        expectedRevision: 1,
+        note: "Reject before the bulk archive test.",
+      })
+    ).status,
+    200,
+  );
+  const bulkInput = {
+    items: [{ id: bulkDraft.id, expectedRevision: 2 }],
+    note: "Archive selected synthetic fixtures.",
+  };
+  assert.equal(
+    (await post("/api/admin/opportunities/archive-batch", bulkInput, a)).status,
+    403,
+  );
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/opportunities/archive-batch", {
+        method: "POST",
+        headers: {
+          Cookie: admin,
+          Origin: "https://attacker.example.test",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bulkInput),
+      })
+    ).status,
+    403,
+  );
+  assert.equal(
+    (
+      await post("/api/admin/opportunities/archive-batch", {
+        ...bulkInput,
+        items: [bulkInput.items[0], bulkInput.items[0]],
+      })
+    ).status,
+    400,
+  );
+  const bulkHTML = await (
+    await fetch(base + "/admin/catalogue?state=rejected&q=Bulk+archive+HTTP", {
+      headers: { Cookie: admin + "; " + localeCookie },
+    })
+  ).text();
+  assert.match(bulkHTML, /批量归档本页/);
+  assert.match(bulkHTML, /name="archiveRecord"/);
+  const archivedBatchResponse = await post(
+    "/api/admin/opportunities/archive-batch",
+    bulkInput,
+  );
+  assert.equal(archivedBatchResponse.status, 200);
+  assert.equal(archivedBatchResponse.headers.get("cache-control"), "no-store");
+  const archivedBatch = await archivedBatchResponse.json();
+  assert.equal(archivedBatch.results[0].outcome, "archived");
+  assert.equal(archivedBatch.results[0].revision, 3);
+  const replayBatch = await (
+    await post("/api/admin/opportunities/archive-batch", bulkInput)
+  ).json();
+  assert.equal(replayBatch.results[0].reason, "conflict");
   const created = await post("/api/admin/opportunities", {
     sourceId: source.id,
     details: { ...fixtureDetails, title: "HTTP reviewed factory course" },
