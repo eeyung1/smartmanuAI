@@ -55,3 +55,7 @@ The Vercel production target serves the read-only staging configuration. Set the
 Migrations 013–015 were applied to `smartmanuai` in the existing `l2e-studylink` project, creating onboarding progress, reminder preferences and archive state support. There are 39 application tables with RLS and 15 application migration records. No source or opportunity fixtures were inserted. The reader has no account-reading or catalogue-writing privileges.
 
 After every configuration change, redeploy and require `/api/health` to return HTTP 200 with `database: connected`, then verify `/opportunities` renders. Deployment READY alone does not establish database health. Authentication, background research and live channels remain disabled in this mode.
+
+## Application migration 016 (6 November 2026)
+
+Saved-item material-change preferences add `notification_preferences.material_changes_enabled` with a non-null false default. Apply it only within `smartmanuai` using the existing owner role, record `016_material_change_preference.sql` in the application's migration ledger, and retain the read-only runtime role. The application now requires 16 migration records in its health check. Table count remains 39 and no users are automatically opted in. This additive migration can precede the application release; it does not enable hosted accounts, research or delivery.

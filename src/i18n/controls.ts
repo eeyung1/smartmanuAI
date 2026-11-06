@@ -1,4 +1,10 @@
 export const controlChinese: Record<string, string> = {
+  "Send separate 7-day and 2-day deadline reminders":
+    "单独接收提前 7 天及 2 天的截止日期提醒",
+  "Send separate saved-item deadline, funding and closure updates":
+    "单独接收收藏项目的截止日期、资助及关闭更新",
+  "These updates are outside the digest schedule and use your selected channel. Pausing digests pauses all alerts. Turning updates off cancels queued updates; re-enabling does not replay old updates.":
+    "这些更新不受摘要时间安排限制，使用您选择的渠道。暂停摘要会暂停所有通知。关闭更新会取消排队中的更新；重新启用不会重发旧更新。",
   "YOUR ALERT PREFERENCES": "您的提醒偏好",
   "Stay in the loop.": "及时了解新机会。",
   "Choose one channel and a digest schedule. In this local prototype, email and Telegram are simulated: messages stay in a private local test sink. No real channel is connected.":

@@ -714,6 +714,7 @@ try {
     200,
   );
   const alertSettings = {
+    materialChangesEnabled: true,
     expectedVersion: 0,
     enabled: true,
     channel: "telegram",
@@ -744,6 +745,22 @@ try {
     403,
   );
   assert.equal((await updateAlerts(alertSettings)).status, 200);
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/notifications", { headers: { Cookie: a } })
+      ).json()
+    ).settings.materialChangesEnabled,
+    true,
+  );
+  assert.equal(
+    (
+      await (
+        await fetch(base + "/api/me/notifications", { headers: { Cookie: b } })
+      ).json()
+    ).settings.materialChangesEnabled,
+    false,
+  );
   assert.equal((await updateAlerts(alertSettings)).status, 409);
   assert.equal(
     (
@@ -1115,6 +1132,7 @@ try {
     await fetch(base + "/notifications", { headers: { Cookie: languageUser } })
   ).text();
   assert.match(alertsZH, /摘要设置/);
+  assert.match(alertsZH, /单独接收收藏项目/);
   assert.match(alertsZH, /真实渠道需要单独设置并另行取得同意/);
   assert.match(alertsZH, /<option value="email"[^>]*>邮件——本地模拟<\/option>/);
   assert.match(alertsZH, /<option value="weekly"[^>]*>每周一 09:00<\/option>/);

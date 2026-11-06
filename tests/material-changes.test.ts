@@ -104,7 +104,7 @@ test("PGlite: queues high-priority alerts once for active saved users", async ()
       [opportunityId],
     );
     await db.sql.query(
-      "INSERT INTO notification_preferences(user_id,enabled,channel,version,consent_version) VALUES('change-user',true,'email',1,'local-sink-v1')",
+      "INSERT INTO notification_preferences(user_id,enabled,channel,version,consent_version,material_changes_enabled) VALUES('change-user',true,'email',1,'local-sink-v1',true)",
     );
     const revised = {
       ...baseDetails,
