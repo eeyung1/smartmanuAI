@@ -306,6 +306,53 @@ try {
   const a = await login("http-alice@example.test");
   const b = await login("http-bob@example.test");
   const admin = await login("reviewer@example.test");
+  assert.equal((await fetch(base + "/api/admin/operations")).status, 401);
+  assert.equal(
+    (await fetch(base + "/api/admin/operations", { headers: { Cookie: a } }))
+      .status,
+    403,
+  );
+  const operationsResponse = await fetch(base + "/api/admin/operations", {
+    headers: { Cookie: admin },
+  });
+  assert.equal(operationsResponse.status, 200);
+  assert.equal(operationsResponse.headers.get("cache-control"), "no-store");
+  const operations = await operationsResponse.json();
+  assert.equal(typeof operations.jobs.total, "string");
+  assert.equal(typeof operations.budget.reservedMicros, "string");
+  assert.ok(BigInt(operations.jobs.failed) >= 1n);
+  assert.ok(!JSON.stringify(operations).includes("server.log"));
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/operations?userId=someone-else", {
+        headers: { Cookie: admin },
+      })
+    ).status,
+    400,
+  );
+  assert.equal(
+    (await fetch(base + "/admin/operations", { headers: { Cookie: a } }))
+      .status,
+    404,
+  );
+  const operationsAnonymous = await fetch(base + "/admin/operations", {
+    redirect: "manual",
+  });
+  assert.equal(operationsAnonymous.status, 307);
+  assert.match(
+    operationsAnonymous.headers.get("location") ?? "",
+    /returnTo=%2Fadmin%2Foperations/,
+  );
+  const operationsChinese = await fetch(base + "/admin/operations", {
+    headers: { Cookie: admin + "; " + localeCookie },
+  });
+  assert.equal(operationsChinese.status, 200);
+  assert.match(
+    operationsChinese.headers.get("cache-control") ?? "",
+    /private|no-store/,
+  );
+  assert.match(await operationsChinese.text(), /运营概览/);
+
   assert.equal(
     (await fetch(base + "/api/me/notifications/history")).status,
     401,

@@ -49,6 +49,8 @@ export default async function Research({
         )}{" "}
       </p>
       <p>
+        <Link href="/admin/operations">{t("Operations overview")}</Link>
+        {" · "}
         <Link href="/admin/research/browse">
           {t("Browse all research records")}
         </Link>
