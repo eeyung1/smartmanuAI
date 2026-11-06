@@ -36,6 +36,10 @@ export default function OperationsSummary({
         <h2>{t("Workload age and scheduling")}</h2>
         <dl>
           <div>
+            <dt>{t("Hosts with active collection leases")}</dt>
+            <dd>{data.aging.busyHosts}</dd>
+          </div>
+          <div>
             <dt>{t("Queued jobs passing stored scheduling gates")}</dt>
             <dd>{data.aging.queuedReady}</dd>
           </div>

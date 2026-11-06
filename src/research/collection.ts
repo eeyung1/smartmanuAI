@@ -93,11 +93,39 @@ export async function claimCollection(sql: SQL) {
   return sql.transaction(async (tx) => {
     const row = (
       await tx.query(
-        "SELECT j.id,j.source_id,s.url FROM research_jobs j JOIN sources s ON s.id=j.source_id JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id WHERE p.enabled AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) AND (p.last_request_at IS NULL OR p.last_request_at+p.request_delay_seconds*INTERVAL '1 second'<=NOW()) AND j.attempts<3 AND ((j.state='queued' AND j.available_at<=NOW()) OR (j.state='running' AND j.lease_until<NOW())) ORDER BY j.created_at,j.id LIMIT 1 FOR UPDATE OF p SKIP LOCKED",
+        "SELECT j.id,j.source_id,s.url,s.collection_host FROM research_jobs j JOIN sources s ON s.id=j.source_id JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id WHERE p.enabled AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) AND (p.last_request_at IS NULL OR p.last_request_at+p.request_delay_seconds*INTERVAL '1 second'<=NOW()) AND j.attempts<3 AND ((j.state='queued' AND j.available_at<=NOW()) OR (j.state='running' AND j.lease_until<NOW())) AND NOT EXISTS(SELECT 1 FROM sources busy_source JOIN research_jobs busy_job ON busy_job.source_id=busy_source.id WHERE busy_source.collection_host=s.collection_host AND busy_job.state='running' AND busy_job.lease_until>NOW()) ORDER BY j.created_at,j.id LIMIT 1",
       )
     ).rows[0];
     if (!row) return null;
-    // The selected policy is locked before rechecking/locking its job.
+    // Host mutex first, then policy and job. Existing running leases also block the host.
+    await tx.query(
+      "INSERT INTO collection_host_locks(hostname) VALUES($1) ON CONFLICT DO NOTHING",
+      [row.collection_host],
+    );
+    const host = (
+      await tx.query(
+        "SELECT hostname FROM collection_host_locks WHERE hostname=$1 FOR UPDATE SKIP LOCKED",
+        [row.collection_host],
+      )
+    ).rows[0];
+    if (!host) return null;
+    if (
+      (
+        await tx.query(
+          "SELECT j.id FROM research_jobs j JOIN sources s ON s.id=j.source_id WHERE s.collection_host=$1 AND j.state='running' AND j.lease_until>NOW() LIMIT 1",
+          [row.collection_host],
+        )
+      ).rows.length
+    )
+      return null;
+    const policy = (
+      await tx.query(
+        "SELECT p.source_id FROM source_collection_policies p LEFT JOIN source_retry_after r ON r.source_id=p.source_id WHERE p.source_id=$1 AND p.enabled AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) AND (p.last_request_at IS NULL OR p.last_request_at+p.request_delay_seconds*INTERVAL '1 second'<=NOW()) FOR UPDATE OF p SKIP LOCKED",
+        [row.source_id],
+      )
+    ).rows[0];
+    if (!policy) return null;
+
     const current = (
       await tx.query(
         "SELECT id FROM research_jobs WHERE id=$1 AND source_id=$2 AND attempts<3 AND ((state='queued' AND available_at<=NOW()) OR (state='running' AND lease_until<NOW())) FOR UPDATE SKIP LOCKED",
@@ -305,7 +333,7 @@ export async function researchDashboard(sql: SQL, actor: string) {
   await requireAdmin(sql, actor);
   const sources = (
     await sql.query(
-      "SELECT s.id,s.name,s.url,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
+      "SELECT s.id,s.name,s.url,s.collection_host,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
     )
   ).rows;
   const counts = await sourceJobCounts(

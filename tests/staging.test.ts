@@ -124,7 +124,7 @@ for (const kind of ["pglite", "postgres"])
               (await tx.query("SELECT COUNT(*) AS n FROM schema_migrations"))
                 .rows[0].n,
             ),
-            22,
+            23,
           );
           assert.deepEqual(
             (await tx.query("SELECT id FROM opportunities")).rows.map(
@@ -139,6 +139,7 @@ for (const kind of ["pglite", "postgres"])
         });
         for (const query of [
           `SELECT * FROM "${schema}".auth_user`,
+          `SELECT * FROM "${schema}".collection_host_locks`,
           `INSERT INTO "${schema}".sources(id,name,url,created_by) VALUES('bad','bad','https://example.test','reviewer')`,
           `CREATE TABLE "${schema}".bad(id text)`,
           `SELECT * FROM public.auth_user`,
@@ -165,7 +166,7 @@ for (const kind of ["pglite", "postgres"])
                   )
                 ).rows[0].n,
               ),
-              22,
+              23,
             );
             assert.equal(
               (await scoped.sql.query("SELECT current_schema() AS name"))

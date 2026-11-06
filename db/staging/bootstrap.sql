@@ -183,6 +183,12 @@ ALTER TABLE source_collection_policies
   ADD COLUMN last_request_at timestamptz;
 
 INSERT INTO schema_migrations(name) VALUES('022_source_attempt_delay.sql');
+ALTER TABLE sources ADD COLUMN collection_host text GENERATED ALWAYS AS (lower(rtrim(split_part(split_part(split_part(split_part(url,'://',2),'/',1),'?',1),'#',1),'.'))) STORED;
+CREATE INDEX sources_collection_host ON sources(collection_host);
+CREATE TABLE collection_host_locks(hostname text PRIMARY KEY);
+CREATE INDEX research_jobs_running_lease ON research_jobs(source_id,lease_until) WHERE state='running';
+
+INSERT INTO schema_migrations(name) VALUES('023_host_collection_leases.sql');
 DO $guard$ DECLARE item record; BEGIN FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='smartmanuai' LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY','smartmanuai',item.tablename); END LOOP; FOR item IN SELECT p.oid::regprocedure AS signature FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='smartmanuai' LOOP EXECUTE format('ALTER FUNCTION %s SET search_path=smartmanuai,pg_catalog',item.signature); END LOOP; END $guard$;
 REVOKE ALL ON SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "smartmanuai" FROM PUBLIC;

@@ -321,6 +321,7 @@ try {
   assert.equal(typeof operations.jobs.total, "string");
   assert.equal(typeof operations.aging.queuedReady, "string");
   assert.equal(typeof operations.aging.expiredLeases, "string");
+  assert.equal(typeof operations.aging.busyHosts, "string");
   assert.equal(typeof operations.sources.due, "string");
   assert.equal(typeof operations.budget.reservedMicros, "string");
   assert.ok(BigInt(operations.jobs.failed) >= 1n);
@@ -662,6 +663,13 @@ try {
   assert.match(cadenceHTML, /name="cadenceHours"/);
   assert.match(cadenceHTML, /采集间隔/);
   assert.match(cadenceHTML, /尝试最小间隔/);
+  assert.match(cadenceHTML, /采集主机名/);
+  assert.equal(
+    cadenceData.sources.find(
+      (item: { id: string }) => item.id === officialSource.id,
+    ).collection_host,
+    "school.example.edu",
+  );
   assert.equal(
     cadenceData.sources.find(
       (item: { id: string }) => item.id === officialSource.id,
