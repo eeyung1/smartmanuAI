@@ -36,6 +36,7 @@ export async function POST(request: Request) {
           sourceId: z.uuid(),
           enabled: z.boolean(),
           permissionNote: z.string(),
+          cadenceHours: z.number().int().min(6).max(168).optional(),
         }),
         z.object({
           action: z.literal("extract"),

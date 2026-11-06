@@ -124,7 +124,7 @@ for (const kind of ["pglite", "postgres"])
               (await tx.query("SELECT COUNT(*) AS n FROM schema_migrations"))
                 .rows[0].n,
             ),
-            18,
+            19,
           );
           assert.deepEqual(
             (await tx.query("SELECT id FROM opportunities")).rows.map(
@@ -165,7 +165,7 @@ for (const kind of ["pglite", "postgres"])
                   )
                 ).rows[0].n,
               ),
-              18,
+              19,
             );
             assert.equal(
               (await scoped.sql.query("SELECT current_schema() AS name"))

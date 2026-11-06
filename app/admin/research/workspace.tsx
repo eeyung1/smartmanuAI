@@ -10,6 +10,7 @@ type Dashboard = {
     synthetic: boolean;
     enabled: boolean;
     permission_note: string | null;
+    cadence_hours: number;
   }[];
   jobs: {
     id: string;
@@ -90,6 +91,7 @@ export default function ResearchWorkspace({
                     sourceId: source.id,
                     enabled: f.get("enabled") === "on",
                     permissionNote: f.get("note"),
+                    cadenceHours: Number(f.get("cadenceHours")),
                   });
                 }}
               >
@@ -112,6 +114,23 @@ export default function ResearchWorkspace({
                     defaultValue={source.permission_note ?? ""}
                   />
                 </label>
+                <label>
+                  {t("Collection interval (hours)")}
+                  <input
+                    type="number"
+                    name="cadenceHours"
+                    min={6}
+                    max={168}
+                    step={1}
+                    required
+                    defaultValue={source.cadence_hours}
+                  />
+                </label>
+                <p>
+                  {t(
+                    "Choose 6–168 hours. Changes apply after the next scheduled check; existing due dates and active jobs stay in place. This interval does not refresh published opportunity verification.",
+                  )}
+                </p>
                 <button disabled={busy || source.synthetic}>
                   {t("Save collection policy")}{" "}
                 </button>

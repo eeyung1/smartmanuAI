@@ -14,6 +14,7 @@ const policySchema = z
     sourceId: z.uuid(),
     enabled: z.boolean(),
     permissionNote: z.string().trim().min(10).max(1000),
+    cadenceHours: z.number().int().min(6).max(168).optional(),
   })
   .strict();
 export async function collectionPolicy(
@@ -25,7 +26,7 @@ export async function collectionPolicy(
   const v = policySchema.parse(input);
   await sql.transaction(async (tx) => {
     const source = (
-      await tx.query("SELECT * FROM sources WHERE id=$1 FOR UPDATE", [
+      await tx.query("SELECT * FROM sources WHERE id=$1 FOR NO KEY UPDATE", [
         v.sourceId,
       ])
     ).rows[0];
@@ -40,8 +41,8 @@ export async function collectionPolicy(
         "Synthetic sources cannot be collected live.",
       );
     await tx.query(
-      "INSERT INTO source_collection_policies(source_id,enabled,permission_note,actor_id) VALUES($1,$2,$3,$4) ON CONFLICT(source_id) DO UPDATE SET enabled=$2,permission_note=$3,actor_id=$4,updated_at=NOW()",
-      [v.sourceId, v.enabled, v.permissionNote, actor],
+      "INSERT INTO source_collection_policies(source_id,enabled,permission_note,actor_id,cadence_hours) VALUES($1,$2,$3,$4,COALESCE($5,24)) ON CONFLICT(source_id) DO UPDATE SET enabled=$2,permission_note=$3,actor_id=$4,cadence_hours=COALESCE($5,source_collection_policies.cadence_hours),updated_at=NOW()",
+      [v.sourceId, v.enabled, v.permissionNote, actor, v.cadenceHours ?? null],
     );
     if (v.enabled)
       await tx.query("DELETE FROM source_retry_after WHERE source_id=$1", [
@@ -68,7 +69,7 @@ export async function scheduleSources(sql: SQL) {
         [randomUUID(), row.source_id],
       );
       await tx.query(
-        "UPDATE source_collection_policies SET next_due_at=NOW()+INTERVAL '1 day' WHERE source_id=$1",
+        "UPDATE source_collection_policies SET next_due_at=NOW()+cadence_hours*INTERVAL '1 hour' WHERE source_id=$1",
         [row.source_id],
       );
     }
@@ -283,7 +284,7 @@ export async function researchDashboard(sql: SQL, actor: string) {
   return {
     sources: (
       await sql.query(
-        "SELECT s.id,s.name,s.url,s.synthetic,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
+        "SELECT s.id,s.name,s.url,s.synthetic,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
       )
     ).rows,
     jobs: (

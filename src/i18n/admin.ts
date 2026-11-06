@@ -1,4 +1,7 @@
 export const adminChinese: Record<string, string> = {
+  "Collection interval (hours)": "采集间隔（小时）",
+  "Choose 6–168 hours. Changes apply after the next scheduled check; existing due dates and active jobs stay in place. This interval does not refresh published opportunity verification.":
+    "请选择 6 至 168 小时。更改将在下次计划检查后生效；现有到期时间和运行中的任务保持不变。此间隔不会更新已发布项目的核实时间。",
   "Allowed residence country codes, separated by commas":
     "允许的居住国家代码，以逗号分隔",
   "Residence and nationality are separate. Record residence restrictions only when supported by the source; ALL means explicitly unrestricted residence.":
