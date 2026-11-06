@@ -19,6 +19,9 @@ export default function NotificationSettings({
     [deadlineRemindersEnabled, setDeadlineRemindersEnabled] = useState(
       initial.deadlineRemindersEnabled,
     ),
+    [materialChangesEnabled, setMaterialChangesEnabled] = useState(
+      initial.materialChangesEnabled,
+    ),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
   const [testLink, setTestLink] = useState("");
@@ -37,6 +40,7 @@ export default function NotificationSettings({
       setSettings(value);
       setEnabled(value.enabled);
       setDeadlineRemindersEnabled(value.deadlineRemindersEnabled);
+      setMaterialChangesEnabled(value.materialChangesEnabled);
       const refreshed = await fetch("/api/me/notifications");
       if (!refreshed.ok)
         throw Error(
@@ -73,6 +77,7 @@ export default function NotificationSettings({
               expectedVersion: settings.version,
               enabled,
               deadlineRemindersEnabled,
+              materialChangesEnabled,
               channel: f.get("channel"),
               frequency: f.get("frequency"),
               timezone: f.get("timezone"),
@@ -98,6 +103,24 @@ export default function NotificationSettings({
             />
             {t("Send separate 7-day and 2-day deadline reminders")}{" "}
           </label>
+          <label className="inline">
+            <input
+              type="checkbox"
+              name="materialChangesEnabled"
+              checked={materialChangesEnabled}
+              onChange={(event) =>
+                setMaterialChangesEnabled(event.target.checked)
+              }
+            />
+            {t(
+              "Send separate saved-item deadline, funding and closure updates",
+            )}
+          </label>
+          <p>
+            {t(
+              "These updates are outside the digest schedule and use your selected channel. Pausing digests pauses all alerts. Turning updates off cancels queued updates; re-enabling does not replay old updates.",
+            )}
+          </p>
           <label>
             {t("Channel")}{" "}
             <select name="channel" defaultValue={settings.channel}>

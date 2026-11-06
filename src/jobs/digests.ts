@@ -21,6 +21,7 @@ export const notificationSettingsSchema = z
     expectedVersion: z.number().int().min(0),
     enabled: z.boolean(),
     deadlineRemindersEnabled: z.boolean().optional(),
+    materialChangesEnabled: z.boolean().optional(),
     channel: z.enum(["email", "telegram"]),
     frequency: z.enum(["daily", "weekly"]),
     timezone: timezoneSchema,
@@ -34,7 +35,7 @@ export const notificationSettingsSchema = z
 export async function readNotificationSettings(sql: SQL, userId: string) {
   const row = (
     await sql.query(
-      "SELECT enabled,deadline_reminders_enabled,channel,version,consent_version,timezone,frequency,next_due_at FROM notification_preferences WHERE user_id=$1",
+      "SELECT enabled,deadline_reminders_enabled,material_changes_enabled,channel,version,consent_version,timezone,frequency,next_due_at FROM notification_preferences WHERE user_id=$1",
       [userId],
     )
   ).rows[0];
@@ -48,6 +49,7 @@ export async function readNotificationSettings(sql: SQL, userId: string) {
   return {
     enabled: row?.enabled === true,
     deadlineRemindersEnabled: row?.deadline_reminders_enabled === true,
+    materialChangesEnabled: row?.material_changes_enabled === true,
     emailSuppressionReason,
     channel: (row?.channel ?? "email") as "email" | "telegram",
     version: Number(row?.version ?? 0),
@@ -103,11 +105,13 @@ export async function saveNotificationSettings(
     const deadlineRemindersEnabled =
       value.deadlineRemindersEnabled ??
       row?.deadline_reminders_enabled === true;
+    const materialChangesEnabled =
+      value.materialChangesEnabled ?? row?.material_changes_enabled === true;
     const next = value.enabled
       ? nextDigestSlot(now, value.timezone, value.frequency).toISOString()
       : null;
     await tx.query(
-      "INSERT INTO notification_preferences(user_id,enabled,deadline_reminders_enabled,channel,version,consent_version,timezone,frequency,next_due_at,email_consent_epoch) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(user_id) DO UPDATE SET enabled=$2,deadline_reminders_enabled=$3,channel=$4,version=$5,consent_version=$6,timezone=$7,frequency=$8,next_due_at=$9,email_consent_epoch=$10",
+      "INSERT INTO notification_preferences(user_id,enabled,deadline_reminders_enabled,channel,version,consent_version,timezone,frequency,next_due_at,email_consent_epoch,material_changes_enabled) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT(user_id) DO UPDATE SET enabled=$2,deadline_reminders_enabled=$3,channel=$4,version=$5,consent_version=$6,timezone=$7,frequency=$8,next_due_at=$9,email_consent_epoch=$10,material_changes_enabled=$11",
       [
         userId,
         value.enabled,
@@ -119,8 +123,18 @@ export async function saveNotificationSettings(
         value.frequency,
         next,
         emailEpoch,
+        materialChangesEnabled,
       ],
     );
+    if (
+      !value.enabled ||
+      !materialChangesEnabled ||
+      (row && row.channel !== value.channel)
+    )
+      await tx.query(
+        "UPDATE outbox SET state='suppressed' WHERE user_id=$1 AND state='queued' AND payload->>'type'='material_change'",
+        [userId],
+      );
     await tx.query(
       "DELETE FROM notification_digest_events WHERE user_id=$1 AND state='planned'",
       [userId],

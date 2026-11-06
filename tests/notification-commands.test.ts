@@ -60,7 +60,7 @@ test("notification commands run persisted local jobs once and refuse staging bef
         "INSERT INTO auth_user(id,name,email,created_at,updated_at) VALUES('command-user','Command user','command@example.test',NOW(),NOW())",
       );
       await db.sql.query(
-        "INSERT INTO notification_preferences(user_id,enabled,deadline_reminders_enabled,channel,consent_version) VALUES('command-user',true,true,'telegram','local-sink-v1')",
+        "INSERT INTO notification_preferences(user_id,enabled,deadline_reminders_enabled,channel,consent_version,material_changes_enabled) VALUES('command-user',true,true,'telegram','local-sink-v1',true)",
       );
       await db.sql.query(
         "INSERT INTO saved_items(user_id,opportunity_id,status,saved) VALUES('command-user','synthetic-course','applying',true)",

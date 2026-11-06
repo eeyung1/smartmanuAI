@@ -55,11 +55,17 @@ export async function dispatchOne(sql: SQL) {
     if (!item) return "empty";
     const pref = (
       await tx.query(
-        "SELECT enabled,channel FROM notification_preferences WHERE user_id=$1 FOR UPDATE",
+        "SELECT enabled,channel,material_changes_enabled,consent_version FROM notification_preferences WHERE user_id=$1 FOR UPDATE",
         [item.user_id],
       )
     ).rows[0];
-    if (!pref?.enabled) {
+    if (
+      !pref?.enabled ||
+      (item.payload.type === "material_change" &&
+        (!pref.material_changes_enabled ||
+          pref.consent_version !== "local-sink-v1" ||
+          item.payload.channel !== pref.channel))
+    ) {
       await tx.query("UPDATE outbox SET state='suppressed' WHERE id=$1", [
         item.id,
       ]);

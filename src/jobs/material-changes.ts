@@ -54,6 +54,20 @@ export async function detectMaterialChangeAlerts(sql: SQL, now = new Date()) {
     if (!changes.length) continue;
     scanned++;
     const result = await sql.transaction(async (tx) => {
+      const candidateUsers = (
+        await tx.query(
+          "SELECT user_id FROM saved_items WHERE opportunity_id=$1 AND saved AND status IN ('interested','applying') ORDER BY user_id",
+          [revision.opportunity_id],
+        )
+      ).rows.map((row) => String(row.user_id));
+      // Settings/deletion/tracker writes lock the owner first. Do not add newly
+      // saved owners to this pass after locking; they are picked up next run.
+      const owners = (
+        await tx.query(
+          "SELECT id FROM auth_user WHERE id=ANY($1::text[]) ORDER BY id FOR NO KEY UPDATE",
+          [candidateUsers],
+        )
+      ).rows.map((row) => String(row.id));
       await tx.query("SELECT id FROM opportunities WHERE id=$1 FOR SHARE", [
         revision.opportunity_id,
       ]);
@@ -75,9 +89,10 @@ export async function detectMaterialChangeAlerts(sql: SQL, now = new Date()) {
              LEFT JOIN profiles pr ON pr.user_id=t.user_id
             WHERE t.opportunity_id=$1 AND t.saved
               AND t.status IN ('interested','applying')
-              AND p.enabled AND p.consent_version='local-sink-v1'
+              AND p.enabled AND p.material_changes_enabled AND p.consent_version='local-sink-v1'
+              AND t.user_id=ANY($2::text[])
             ORDER BY t.user_id FOR UPDATE OF t,p`,
-          [revision.opportunity_id],
+          [revision.opportunity_id, owners],
         )
       ).rows;
       let inserted = 0,
@@ -106,6 +121,7 @@ export async function detectMaterialChangeAlerts(sql: SQL, now = new Date()) {
               user.user_id,
               JSON.stringify({
                 type: "material_change",
+                channel: String(user.channel),
                 change: change.kind,
                 priority: "high",
                 opportunityId: revision.opportunity_id,
