@@ -16,6 +16,7 @@ const policySchema = z
     enabled: z.boolean(),
     permissionNote: z.string().trim().min(10).max(1000),
     cadenceHours: z.number().int().min(6).max(168).optional(),
+    requestDelaySeconds: z.number().int().min(0).max(3600).optional(),
   })
   .strict();
 export async function collectionPolicy(
@@ -42,8 +43,15 @@ export async function collectionPolicy(
         "Synthetic sources cannot be collected live.",
       );
     await tx.query(
-      "INSERT INTO source_collection_policies(source_id,enabled,permission_note,actor_id,cadence_hours) VALUES($1,$2,$3,$4,COALESCE($5,24)) ON CONFLICT(source_id) DO UPDATE SET enabled=$2,permission_note=$3,actor_id=$4,cadence_hours=COALESCE($5,source_collection_policies.cadence_hours),updated_at=NOW()",
-      [v.sourceId, v.enabled, v.permissionNote, actor, v.cadenceHours ?? null],
+      "INSERT INTO source_collection_policies(source_id,enabled,permission_note,actor_id,cadence_hours,request_delay_seconds) VALUES($1,$2,$3,$4,COALESCE($5,24),COALESCE($6,0)) ON CONFLICT(source_id) DO UPDATE SET enabled=$2,permission_note=$3,actor_id=$4,cadence_hours=COALESCE($5,source_collection_policies.cadence_hours),request_delay_seconds=COALESCE($6,source_collection_policies.request_delay_seconds),updated_at=NOW()",
+      [
+        v.sourceId,
+        v.enabled,
+        v.permissionNote,
+        actor,
+        v.cadenceHours ?? null,
+        v.requestDelaySeconds ?? null,
+      ],
     );
     if (v.enabled)
       await tx.query("DELETE FROM source_retry_after WHERE source_id=$1", [
@@ -78,20 +86,33 @@ export async function scheduleSources(sql: SQL) {
   });
 }
 export async function claimCollection(sql: SQL) {
+  // Complete unrelated exhausted-job cleanup before taking any policy locks.
+  await sql.query(
+    "UPDATE research_jobs SET state='failed',error_code='attempts_exhausted',lease_token=NULL,lease_until=NULL WHERE state='running' AND lease_until<NOW() AND attempts>=3",
+  );
   return sql.transaction(async (tx) => {
-    await tx.query(
-      "UPDATE research_jobs SET state='failed',error_code='attempts_exhausted',lease_token=NULL,lease_until=NULL WHERE state='running' AND lease_until<NOW() AND attempts>=3",
-    );
     const row = (
       await tx.query(
-        "SELECT j.id,j.source_id,s.url FROM research_jobs j JOIN sources s ON s.id=j.source_id JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id WHERE p.enabled AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) AND j.attempts<3 AND ((j.state='queued' AND j.available_at<=NOW()) OR (j.state='running' AND j.lease_until<NOW())) ORDER BY j.created_at LIMIT 1 FOR UPDATE OF j SKIP LOCKED",
+        "SELECT j.id,j.source_id,s.url FROM research_jobs j JOIN sources s ON s.id=j.source_id JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id WHERE p.enabled AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) AND (p.last_request_at IS NULL OR p.last_request_at+p.request_delay_seconds*INTERVAL '1 second'<=NOW()) AND j.attempts<3 AND ((j.state='queued' AND j.available_at<=NOW()) OR (j.state='running' AND j.lease_until<NOW())) ORDER BY j.created_at,j.id LIMIT 1 FOR UPDATE OF p SKIP LOCKED",
       )
     ).rows[0];
     if (!row) return null;
+    // The selected policy is locked before rechecking/locking its job.
+    const current = (
+      await tx.query(
+        "SELECT id FROM research_jobs WHERE id=$1 AND source_id=$2 AND attempts<3 AND ((state='queued' AND available_at<=NOW()) OR (state='running' AND lease_until<NOW())) FOR UPDATE SKIP LOCKED",
+        [row.id, row.source_id],
+      )
+    ).rows[0];
+    if (!current) return null;
     const token = randomUUID();
     await tx.query(
       "UPDATE research_jobs SET state='running',attempts=attempts+1,lease_token=$2,lease_until=NOW()+INTERVAL '1 minute' WHERE id=$1",
       [row.id, token],
+    );
+    await tx.query(
+      "UPDATE source_collection_policies SET last_request_at=NOW() WHERE source_id=$1",
+      [row.source_id],
     );
     return {
       id: String(row.id),
@@ -284,7 +305,7 @@ export async function researchDashboard(sql: SQL, actor: string) {
   await requireAdmin(sql, actor);
   const sources = (
     await sql.query(
-      "SELECT s.id,s.name,s.url,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
+      "SELECT s.id,s.name,s.url,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
     )
   ).rows;
   const counts = await sourceJobCounts(

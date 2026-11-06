@@ -79,3 +79,7 @@ Add bounded `sources.source_type` and `sources.source_language` columns defaulti
 ## Application migration 021 (6 November 2026)
 
 Add `research_jobs_source_state` on `research_jobs(source_id,state)` within smartmanuai and record `021_source_job_counts_index.sql` in the app ledger. Health requires 21 app migrations. There are still 39 RLS tables, with no new runtime grants or hosted account/worker capability. Counters are derived from retained private job records rather than new event data.
+
+## Application migration 022 (6 November 2026)
+
+Add `source_collection_policies.request_delay_seconds integer NOT NULL DEFAULT 0 CHECK (request_delay_seconds BETWEEN 0 AND 3600)` and nullable `last_request_at timestamptz` within smartmanuai. Record `022_source_attempt_delay.sql` in the app ledger; health requires 22 migrations. There are still 39 RLS tables and reader grants remain unchanged. Zero/null preserves existing policies until an operator configures pacing or a worker claims a job. Hosted workers/accounts remain disabled.

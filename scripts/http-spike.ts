@@ -611,6 +611,7 @@ try {
         sourceId: officialSource.id,
         enabled: true,
         cadenceHours: 168,
+        requestDelaySeconds: 60,
         permissionNote: "Fixture review only; no worker is started.",
       })
     ).status,
@@ -660,6 +661,27 @@ try {
   ).text();
   assert.match(cadenceHTML, /name="cadenceHours"/);
   assert.match(cadenceHTML, /采集间隔/);
+  assert.match(cadenceHTML, /尝试最小间隔/);
+  assert.equal(
+    cadenceData.sources.find(
+      (item: { id: string }) => item.id === officialSource.id,
+    ).request_delay_seconds,
+    60,
+  );
+  for (const requestDelaySeconds of [-1, 3601, 1.5, "60", null])
+    assert.equal(
+      (
+        await post("/api/admin/research", {
+          action: "policy",
+          sourceId: officialSource.id,
+          enabled: false,
+          permissionNote: "Invalid delay must be refused.",
+          requestDelaySeconds,
+        })
+      ).status,
+      400,
+    );
+
   assert.match(cadenceHTML, /name="sourceLanguage"/);
   assert.match(cadenceHTML, /保存来源资料/);
   assert.match(cadenceHTML, /采集任务计数/);

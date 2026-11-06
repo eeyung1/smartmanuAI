@@ -12,6 +12,7 @@ type Dashboard = {
     enabled: boolean;
     permission_note: string | null;
     cadence_hours: number;
+    request_delay_seconds: number;
     source_type: string;
     source_language: string;
     metadata_version: number;
@@ -163,6 +164,7 @@ export default function ResearchWorkspace({
                     enabled: f.get("enabled") === "on",
                     permissionNote: f.get("note"),
                     cadenceHours: Number(f.get("cadenceHours")),
+                    requestDelaySeconds: Number(f.get("requestDelaySeconds")),
                   });
                 }}
               >
@@ -200,6 +202,23 @@ export default function ResearchWorkspace({
                 <p>
                   {t(
                     "Choose 6–168 hours. Changes apply after the next scheduled check; existing due dates and active jobs stay in place. This interval does not refresh published opportunity verification.",
+                  )}
+                </p>
+                <label>
+                  {t("Minimum attempt delay (seconds)")}
+                  <input
+                    name="requestDelaySeconds"
+                    type="number"
+                    min={0}
+                    max={3600}
+                    step={1}
+                    required
+                    defaultValue={source.request_delay_seconds}
+                  />
+                </label>
+                <p>
+                  {t(
+                    "Choose 0–3600 seconds between collection claims for this source, including retries. Zero keeps the previous behavior. This is separate from scheduling cadence and is not a shared host-wide limit.",
                   )}
                 </p>
                 <button disabled={busy || source.synthetic}>
