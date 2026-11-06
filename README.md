@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **6 November 2026**, through [implementation PR #44](https://github.com/eeyung1/smartmanuAI/pull/44). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #45](https://github.com/eeyung1/smartmanuAI/pull/45). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -95,7 +95,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [ ] Precise source deadline timestamps, source timezones and full rolling-deadline semantics.
 - [ ] Broader location facets if the final geographic scope requires them.
 - [ ] Last successful shared catalogue-refresh indicator in empty results.
-- [ ] Personal mismatch labels when deliberately browsing outside the profile; public browsing itself is available.
+- [x] Private `/matches/explore` browsing beyond profile preferences, with mismatch/unknown-requirement notes on displayed records, unchanged catalogue results and no eligibility guarantee.
 - [ ] Verify official-source coverage and field accuracy against a live reviewed opportunity sample.
 
 ### 3. Administrator catalogue, evidence and publication
@@ -358,6 +358,7 @@ These are implemented routes, not the separate routes proposed in the original s
 | `/account/sessions` | Private active-sign-in inventory and revocation (recent authentication required) |
 | `/sign-in`                                  | Local magic-link sign-in                                                          |
 | `/onboarding` | Resumable profile/preferences wizard with validated return destination |
+| `/matches/explore` | Private catalogue browsing with saved-profile comparison notes |
 | `/matches`                                  | Private preferences, matches and saved/dismissed tracker                          |
 | `/notifications/history` | Private paginated digest history with channel/state filters |
 | `/notifications`                            | Local digest settings, Telegram links, unsubscribe tests and delivery simulations |

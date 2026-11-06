@@ -636,6 +636,49 @@ try {
     ).json(),
     null,
   );
+  const anonymousExplore = await fetch(base + "/matches/explore", {
+    redirect: "manual",
+  });
+  assert.equal(anonymousExplore.status, 307);
+  assert.match(
+    anonymousExplore.headers.get("location") ?? "",
+    /returnTo=%2Fmatches%2Fexplore/,
+  );
+  const missingBrowse = await fetch(base + "/matches/explore", {
+    headers: { Cookie: b },
+  });
+  assert.match(
+    await missingBrowse.text(),
+    /Save a profile in your private space/,
+  );
+  const privateBrowse = await fetch(base + "/matches/explore?language=en", {
+    headers: { Cookie: a },
+  });
+  assert.equal(privateBrowse.status, 200);
+  assert.match(
+    privateBrowse.headers.get("cache-control") ?? "",
+    /private|no-store/,
+  );
+  const privateBrowseHTML = await privateBrowse.text();
+  assert.match(
+    privateBrowseHTML,
+    /No recorded mismatch; eligibility needs checking/,
+  );
+  assert.match(privateBrowseHTML, /Requirements to check/);
+  assert.match(privateBrowseHTML, /action="\/matches\/explore"/);
+  const noPrivatePublic = await (
+    await fetch(base + "/opportunities", { headers: { Cookie: a } })
+  ).text();
+  assert.ok(!noPrivatePublic.includes("Private profile comparison"));
+  const invalidBrowse = await fetch(
+    base + "/matches/explore?userId=someone-else",
+    { headers: { Cookie: a } },
+  );
+  assert.match(await invalidBrowse.text(), /Some filters are invalid/);
+  const privateChinese = await fetch(base + "/matches/explore", {
+    headers: { Cookie: a + "; " + localeCookie },
+  });
+  assert.match(await privateChinese.text(), /资格仍需核实/);
   const forged = await fetch(base + "/api/me/profile", {
     method: "PATCH",
     headers: { Cookie: b, Origin: base, "Content-Type": "application/json" },
@@ -1691,6 +1734,43 @@ try {
     combinedHTML,
     /<option value="master"[^>]*selected[^>]*>硕士<\/option>/,
   );
+  assert.equal(
+    (
+      await fetch(base + "/api/me/profile", {
+        method: "PATCH",
+        headers: {
+          Cookie: admin,
+          Origin: base,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          categories: ["scholarship"],
+          interfaceLanguage: "en",
+        }),
+      })
+    ).status,
+    200,
+  );
+  const exploreCombined = await (
+    await fetch(base + "/matches/explore?" + combinedFilter, {
+      headers: { Cookie: admin },
+    })
+  ).text();
+  assert.match(
+    exploreCombined,
+    /Outside your preferences or recorded requirements/,
+  );
+  const privateNext = exploreCombined.match(
+    /href="(\/matches\/explore\?[^"]*page=2[^"]*)"/,
+  );
+  assert.ok(privateNext);
+  const privateNextURL = new URL(privateNext[1].replaceAll("&amp;", "&"), base);
+  for (const [key, value] of combinedFilter)
+    assert.equal(privateNextURL.searchParams.get(key), value);
+  const exploreSecond = await (
+    await fetch(privateNextURL, { headers: { Cookie: admin } })
+  ).text();
+  assert.equal((exploreSecond.match(/<article>/g) ?? []).length, 1);
   const nextHref = combinedHTML.match(/href="([^"]*page=2[^"]*)"/);
   assert.ok(nextHref);
   const nextURL = new URL(nextHref[1].replaceAll("&amp;", "&"), base);

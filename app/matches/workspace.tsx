@@ -564,7 +564,9 @@ export default function Workspace({
             </button>
           ) : null}
         </nav>
-        <Link href="/opportunities">{t("Explore all opportunities")}</Link>
+        <Link href="/matches/explore">
+          {t("Browse beyond your preferences")}
+        </Link>
       </section>
       <button
         disabled={busy}
