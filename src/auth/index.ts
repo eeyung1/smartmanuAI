@@ -18,6 +18,14 @@ export async function createLocalAuth(
     baseURL: config.baseURL,
     secret: config.secret,
     trustedOrigins: [config.baseURL],
+    // The account-session UI uses owner-scoped IDs and never returns other session tokens.
+    disabledPaths: [
+      "/list-sessions",
+      "/revoke-session",
+      "/revoke-sessions",
+      "/revoke-other-sessions",
+    ],
+    session: { cookieCache: { enabled: false } },
     databaseHooks: {
       session: {
         create: {

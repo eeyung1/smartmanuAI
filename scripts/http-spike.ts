@@ -302,6 +302,65 @@ try {
   const a = await login("http-alice@example.test");
   const b = await login("http-bob@example.test");
   const admin = await login("reviewer@example.test");
+  assert.equal((await fetch(base + "/api/me/sessions")).status, 401);
+  const sessionListResponse = await fetch(base + "/api/me/sessions", {
+    headers: { Cookie: a },
+  });
+  assert.equal(sessionListResponse.status, 200);
+  assert.equal(sessionListResponse.headers.get("cache-control"), "no-store");
+  const sessionList = await sessionListResponse.json();
+  assert.equal(sessionList.total, 1);
+  assert.equal(
+    sessionList.items.filter((item: { current: boolean }) => item.current)
+      .length,
+    1,
+  );
+  assert.ok(!JSON.stringify(sessionList).includes('"token"'));
+  const currentDeviceId = sessionList.items.find(
+    (item: { current: boolean }) => item.current,
+  ).id;
+  assert.equal(
+    (
+      await fetch(base + "/api/me/sessions?page=1&page=2", {
+        headers: { Cookie: a },
+      })
+    ).status,
+    400,
+  );
+  const sessionPost = (body: unknown, origin = base) =>
+    fetch(base + "/api/me/sessions", {
+      method: "POST",
+      headers: {
+        Cookie: a,
+        Origin: origin,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  assert.equal(
+    (
+      await sessionPost(
+        { sessionId: currentDeviceId },
+        "https://attacker.example",
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (await sessionPost({ sessionId: currentDeviceId, userId: "forged" }))
+      .status,
+    400,
+  );
+  const sessionScreen = await fetch(base + "/account/sessions", {
+    headers: { Cookie: a + "; " + localeCookie },
+  });
+  assert.equal(sessionScreen.status, 200);
+  assert.match(await sessionScreen.text(), /活跃登录/);
+  assert.equal(
+    (await fetch(base + "/api/me/profile", { headers: { Cookie: a } })).status,
+    200,
+  );
+
   assert.equal((await fetch(base + "/api/admin/research")).status, 401);
   assert.equal(
     (await fetch(base + "/api/admin/research", { headers: { Cookie: a } }))
@@ -2260,6 +2319,13 @@ try {
     404,
   );
   assert.equal((await fetch(base + "/privacy/status")).status, 200);
+  const selfRevocation = await sessionPost({ sessionId: currentDeviceId });
+  assert.equal(selfRevocation.status, 200);
+  assert.equal((await selfRevocation.json()).currentSessionRevoked, true);
+  assert.equal(
+    (await fetch(base + "/api/me/profile", { headers: { Cookie: a } })).status,
+    401,
+  );
   const logout = await fetch(base + "/api/auth/sign-out", {
     method: "POST",
     headers: { Cookie: a, Origin: base, "Content-Type": "application/json" },
@@ -2271,7 +2337,7 @@ try {
     401,
   );
   console.log(
-    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, admin catalogue/older editor selection, research navigation, audited job recovery and Retry-After controls, stable form values and sign-out",
+    "PASS: web HTML, magic-link cookies, private API isolation, profile persistence, saved-item deduplication, origin rejection, locale isolation, translated catalogue/workspace, localized consent/privacy/unsubscribe flows, localized admin review/extraction, localized 404 recovery, expanded filter pagination/validation, private audit history/cursors, admin catalogue/older editor selection, research navigation, audited job recovery and Retry-After controls, stable form values, private session inventory/revocation and sign-out",
   );
 } catch (error) {
   console.error(await readFile(join(dir, "server.log"), "utf8"));

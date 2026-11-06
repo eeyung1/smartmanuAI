@@ -156,6 +156,27 @@ export const screenChinese: Record<string, string> = {
     "您记录的语言考试成绩达到来源要求的最低分数。",
   "Language-test evidence needs checking: missing, expired or different test/version/scale.":
     "语言考试资料需要核实：资料缺失、过期或考试、版本、分制不一致。",
+  "Return to active sign-ins": "返回活跃登录",
+  "Active sign-ins": "活跃登录",
+  "Manage active sign-ins": "管理活跃登录",
+  "These are active sign-ins, not a complete activity history. Browser hints may be missing or inaccurate; update times are session updates, not last activity.":
+    "此处显示活跃登录，并非完整活动记录。浏览器提示可能缺失或不准确；更新时间指会话更新，并非最后活动时间。",
+  "Viewing and revoking sessions requires a sign-in within the last ten minutes. Revoking this sign-in signs you out.":
+    "查看及撤销会话需要在最近十分钟内登录。撤销当前登录会使您退出。",
+  "Sign in again": "重新登录",
+  "This sign-in": "当前登录",
+  "Another sign-in": "其他登录",
+  "Browser information unavailable": "无浏览器信息",
+  "Created (UTC)": "创建时间（UTC）",
+  "Session updated (UTC)": "会话更新时间（UTC）",
+  "Expires (UTC)": "到期时间（UTC）",
+  "Confirm revoking this sign-in": "确认撤销此登录",
+  "Revoke sign-in": "撤销登录",
+  "No active sign-ins on this page.": "本页无活跃登录。",
+  "Session pages": "登录会话分页",
+  "Sign-in revoked or already unavailable.": "登录已撤销或已不可用。",
+  "Sign in again before managing your sessions.":
+    "请重新登录后再管理您的会话。",
   "Age (optional)": "年龄（选填）",
   "Highest qualification": "最高学历",
   "Not supplied": "未提供",
