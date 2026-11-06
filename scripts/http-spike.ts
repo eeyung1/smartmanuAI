@@ -509,6 +509,7 @@ try {
         action: "policy",
         sourceId: officialSource.id,
         enabled: true,
+        cadenceHours: 168,
         permissionNote: "Fixture review only; no worker is started.",
       })
     ).status,
@@ -526,6 +527,38 @@ try {
     200,
   );
 
+  for (const cadenceHours of [5, 169, 6.5, "24", null]) {
+    assert.equal(
+      (
+        await post("/api/admin/research", {
+          action: "policy",
+          sourceId: officialSource.id,
+          enabled: false,
+          permissionNote: "Invalid cadence must not be saved.",
+          cadenceHours,
+        })
+      ).status,
+      400,
+    );
+  }
+  const cadenceData = await (
+    await fetch(base + "/api/admin/research?source=" + officialSource.id, {
+      headers: { Cookie: admin },
+    })
+  ).json();
+  assert.equal(
+    cadenceData.sources.find(
+      (item: { id: string }) => item.id === officialSource.id,
+    ).cadence_hours,
+    168,
+  );
+  const cadenceHTML = await (
+    await fetch(base + "/admin/research?source=" + officialSource.id, {
+      headers: { Cookie: admin + "; " + localeCookie },
+    })
+  ).text();
+  assert.match(cadenceHTML, /name="cadenceHours"/);
+  assert.match(cadenceHTML, /采集间隔/);
   const created = await post("/api/admin/opportunities", {
     sourceId: source.id,
     details: { ...fixtureDetails, title: "HTTP reviewed factory course" },

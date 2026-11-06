@@ -67,3 +67,7 @@ Digest history adds the `notification_digest_history_owner` index on `(user_id, 
 ## Application migration 018 (6 November 2026)
 
 Add `notification_preferences.applied_reminders_enabled boolean NOT NULL DEFAULT false` only within the existing private smartmanuai schema and record `018_applied_reminder_preference.sql` in the app migration ledger. Health now requires 18 app migrations. Table count remains 39, existing users are not opted in, and staging reader permissions and disabled hosted account/worker behavior stay in place.
+
+## Application migration 019 (6 November 2026)
+
+Add `source_collection_policies.cadence_hours integer NOT NULL DEFAULT 24 CHECK (cadence_hours BETWEEN 6 AND 168)` within the private smartmanuai schema and record `019_source_collection_cadence.sql` in the app migration ledger. Health requires 19 app migrations. All existing source policies retain the former 24-hour cadence. Table count remains 39 and runtime reader permissions do not expand. This does not enable hosted workers or change source verification.
