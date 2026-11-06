@@ -1,4 +1,6 @@
 export const errorChinese: Record<string, string> = {
+  "Sign in again before managing your sessions.":
+    "请重新登录后再管理您的会话。",
   "Language-test requirements need an eligibility quotation.":
     "语言考试要求需要资格来源引文。",
   "Account actions are unavailable in this staging preview.":

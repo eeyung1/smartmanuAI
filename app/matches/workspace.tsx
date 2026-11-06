@@ -153,6 +153,7 @@ export default function Workspace({
             "Interface, alert and teaching languages are independent. Source wording remains unchanged. Age and qualification are optional; unknown eligibility still needs checking.",
           )}{" "}
         </p>
+        <Link href="/account/sessions">{t("Manage active sign-ins")}</Link>
         <form
           onSubmit={(e) => {
             e.preventDefault();

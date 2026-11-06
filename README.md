@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **6 November 2026**, through [implementation PR #40](https://github.com/eeyung1/smartmanuAI/pull/40). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #41](https://github.com/eeyung1/smartmanuAI/pull/41). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -67,7 +67,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Optional self-reported language-test result (name/version, numeric scale, overall score, test date and known validity) in profile/onboarding, separate from teaching-language preferences.
 - [ ] Detailed qualification equivalence.
 - [ ] Institution-specific age-at-deadline/event rules and timezone qualification.
-- [ ] User-facing session inventory, individual session revocation and verified account-email change flow.
+- [x] Private paginated active-session screen/API with current-session markers, recent-authentication checks, individual revocation and tested cookie invalidation; no session tokens or IP addresses returned by the inventory.
+- [ ] Verified account-email change flow and production session/security-policy qualification.
 - [ ] Production identity configuration, real authentication email and trusted proxy/rate-limit qualification.
 - [ ] Public catalogue/API rate limiting and production security/CSRF policy qualification.
 - [ ] Public account-age/minor policy and complete onboarding acceptance tests.
@@ -353,6 +354,7 @@ These are implemented routes, not the separate routes proposed in the original s
 | ------------------------------------------- | --------------------------------------------------------------------------------- |
 | `/`, `/opportunities`                       | Public catalogue and filters                                                      |
 | `/opportunities/[id]`                       | Public details and save action                                                    |
+| `/account/sessions` | Private active-sign-in inventory and revocation (recent authentication required) |
 | `/sign-in`                                  | Local magic-link sign-in                                                          |
 | `/onboarding` | Resumable profile/preferences wizard with validated return destination |
 | `/matches`                                  | Private preferences, matches and saved/dismissed tracker                          |
@@ -365,7 +367,7 @@ These are implemented routes, not the separate routes proposed in the original s
 | `/admin/research`, `/admin/research/browse` | Collection policies, candidates and paginated research records                    |
 | `/admin/research/jobs/[id]`                 | Job detail, cancellation, replacement links and wait/review state                 |
 
-API groups: `/api/auth/*`; public `/api/opportunities*`; owner-only `/api/me/onboarding`, `/api/me/notifications/preview`, `/api/me/profile`, `/api/me/matches`, `/api/me/saved`, `/api/me/tracker`, `/api/me/notifications`, `/api/me/telegram`, `/api/me/email-unsubscribe`, `/api/me/delivery-tests` and `/api/me/privacy/*`; private-receipt `/api/privacy/status`; scoped `/api/notifications/unsubscribe`; authenticated `/api/webhooks/email` and `/api/webhooks/telegram`; and administrator `/api/admin/sources`, `/api/admin/opportunities*`, `/api/admin/catalogue` and `/api/admin/research*`. `/api/locale` updates the browser display choice. Method-specific contracts and authorization remain in the route handlers and linked implementation guides.
+API groups: `/api/auth/*`; public `/api/opportunities*`; owner-only `/api/me/sessions`, `/api/me/onboarding`, `/api/me/notifications/preview`, `/api/me/profile`, `/api/me/matches`, `/api/me/saved`, `/api/me/tracker`, `/api/me/notifications`, `/api/me/telegram`, `/api/me/email-unsubscribe`, `/api/me/delivery-tests` and `/api/me/privacy/*`; private-receipt `/api/privacy/status`; scoped `/api/notifications/unsubscribe`; authenticated `/api/webhooks/email` and `/api/webhooks/telegram`; and administrator `/api/admin/sources`, `/api/admin/opportunities*`, `/api/admin/catalogue` and `/api/admin/research*`. `/api/locale` updates the browser display choice. Method-specific contracts and authorization remain in the route handlers and linked implementation guides.
 
 ## Local development
 

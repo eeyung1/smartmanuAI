@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { interfaceLocale } from "@/src/i18n/server";
 import { screenText } from "@/src/i18n/screens";
 import { headers } from "next/headers";
@@ -21,6 +22,7 @@ export default async function Privacy() {
           "Export your application profile and activity, or request deletion. Both actions require a sign-in within the last ten minutes.",
         )}{" "}
       </p>
+      <Link href="/account/sessions">{t("Manage active sign-ins")}</Link>
       <PrivacyControls />
     </div>
   );
