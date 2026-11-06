@@ -1,5 +1,6 @@
 import { languageRequirementSchema } from "../domain/language-tests";
 import { z } from "zod";
+import { sourceTypes, sourceLanguages } from "./source-fields";
 import { isIP } from "node:net";
 export const publicURL = z
   .string()
@@ -24,6 +25,8 @@ export const sourceSchema = z
     name: z.string().trim().min(3).max(200),
     url: publicURL,
     synthetic: z.boolean().default(false),
+    sourceType: z.enum(sourceTypes).default("unknown"),
+    sourceLanguage: z.enum(sourceLanguages).default("unknown"),
   })
   .strict();
 export const eligibilityRulesSchema = z

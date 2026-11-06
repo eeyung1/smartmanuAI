@@ -169,6 +169,12 @@ ALTER TABLE source_collection_policies
   CHECK (cadence_hours BETWEEN 6 AND 168);
 
 INSERT INTO schema_migrations(name) VALUES('019_source_collection_cadence.sql');
+ALTER TABLE sources
+  ADD COLUMN source_type text NOT NULL DEFAULT 'unknown' CHECK (source_type IN ('unknown','university','government','scholarship_body','training_provider','event_organizer','other')),
+  ADD COLUMN source_language text NOT NULL DEFAULT 'unknown' CHECK (source_language IN ('unknown','en','zh','multilingual','other')),
+  ADD COLUMN metadata_version integer NOT NULL DEFAULT 1 CHECK (metadata_version > 0);
+
+INSERT INTO schema_migrations(name) VALUES('020_source_metadata.sql');
 DO $guard$ DECLARE item record; BEGIN FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='smartmanuai' LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY','smartmanuai',item.tablename); END LOOP; FOR item IN SELECT p.oid::regprocedure AS signature FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='smartmanuai' LOOP EXECUTE format('ALTER FUNCTION %s SET search_path=smartmanuai,pg_catalog',item.signature); END LOOP; END $guard$;
 REVOKE ALL ON SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "smartmanuai" FROM PUBLIC;

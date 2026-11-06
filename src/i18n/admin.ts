@@ -1,4 +1,18 @@
 export const adminChinese: Record<string, string> = {
+  "Source type": "来源类型",
+  "Source language": "来源语言",
+  University: "大学",
+  "Government body": "政府机构",
+  "Scholarship body": "奖学金机构",
+  "Training provider": "培训机构",
+  "Event organizer": "活动主办方",
+  "Multiple languages": "多种语言",
+  "Source metadata": "来源资料",
+  "Save source metadata": "保存来源资料",
+  "Operator labels only. Source type does not prove official status, and source language is separate from teaching and notification languages.":
+    "仅为管理员标签。来源类型不证明其官方身份，来源语言也不同于授课语言和通知语言。",
+  "Source metadata changed. Reload before saving.":
+    "来源资料已更改，请重新加载后再保存。",
   "Collection interval (hours)": "采集间隔（小时）",
   "Choose 6–168 hours. Changes apply after the next scheduled check; existing due dates and active jobs stay in place. This interval does not refresh published opportunity verification.":
     "请选择 6 至 168 小时。更改将在下次计划检查后生效；现有到期时间和运行中的任务保持不变。此间隔不会更新已发布项目的核实时间。",
