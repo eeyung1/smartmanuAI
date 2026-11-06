@@ -75,3 +75,7 @@ Add `source_collection_policies.cadence_hours integer NOT NULL DEFAULT 24 CHECK 
 ## Application migration 020 (6 November 2026)
 
 Add bounded `sources.source_type` and `sources.source_language` columns defaulting to unknown, plus positive `metadata_version` defaulting to 1, only within smartmanuai. Record `020_source_metadata.sql` in the application ledger; health requires 20 migrations. Table count remains 39 and existing reader grants remain unchanged. No sources are automatically classified or admitted for collection, and hosted admin/account access remains disabled.
+
+## Application migration 021 (6 November 2026)
+
+Add `research_jobs_source_state` on `research_jobs(source_id,state)` within smartmanuai and record `021_source_job_counts_index.sql` in the app ledger. Health requires 21 app migrations. There are still 39 RLS tables, with no new runtime grants or hosted account/worker capability. Counters are derived from retained private job records rather than new event data.

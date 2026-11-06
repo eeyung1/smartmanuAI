@@ -1,3 +1,4 @@
+import { sourceJobCounts } from "./source-counts";
 import { randomUUID, createHash } from "node:crypto";
 import { z } from "zod";
 import type { SQL } from "../db";
@@ -281,12 +282,20 @@ export async function collectOne(
 }
 export async function researchDashboard(sql: SQL, actor: string) {
   await requireAdmin(sql, actor);
+  const sources = (
+    await sql.query(
+      "SELECT s.id,s.name,s.url,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
+    )
+  ).rows;
+  const counts = await sourceJobCounts(
+    sql,
+    actor,
+    sources.map((source) => String(source.id)),
+  );
+  for (const source of sources)
+    source.collection_counts = counts[String(source.id)];
   return {
-    sources: (
-      await sql.query(
-        "SELECT s.id,s.name,s.url,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
-      )
-    ).rows,
+    sources,
     jobs: (
       await sql.query(
         "SELECT id,source_id,state,attempts,error_code,created_at FROM research_jobs ORDER BY created_at DESC LIMIT 50",

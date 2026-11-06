@@ -1,4 +1,13 @@
 export const adminChinese: Record<string, string> = {
+  "Counts cover current stored collection-job states across retained history, not attempt totals. Completed includes unchanged checks; active includes queued retries. Cancellations are separate. Collection completion does not confirm opportunity review or publication.":
+    "计数反映保留历史中采集任务的当前状态，而非尝试次数。已完成包含内容未变的检查；活动任务包含排队重试。已取消单独统计。采集完成不代表项目已审核或发布。",
+  "Collection job counts": "采集任务计数",
+  "Total stored jobs": "已存储任务总数",
+  "Completed collection jobs": "已完成采集任务",
+  "Failed collection jobs": "失败采集任务",
+  "Active collection jobs": "活动采集任务",
+  "Cancelled collection jobs": "已取消采集任务",
+  "Browse this source’s collection jobs": "浏览此来源的采集任务",
   "Source type": "来源类型",
   "Source language": "来源语言",
   University: "大学",

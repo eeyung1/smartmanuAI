@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **6 November 2026**, through [implementation PR #47](https://github.com/eeyung1/smartmanuAI/pull/47). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #48](https://github.com/eeyung1/smartmanuAI/pull/48). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -123,7 +123,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Bilingual publication preview of the public card/details with evidence, deadline and policy warnings before approval.
 - [x] Per-source collection cadence from 6–168 hours, defaulting to 24, with admin controls, legacy-value preservation and scheduler enforcement.
 - [x] Source type/language labels at registration and version-checked admin editing, with explicit unknown defaults and no automatic trust or collection changes.
-- [ ] Consolidated source success/failure counters.
+- [x] Consolidated per-source stored collection-job counts: completed, failed, active and cancelled across retained history, including selected older sources; these are current job states, not attempt or publication-success metrics.
 - [ ] Bulk moderation actions and a unified operations/cost dashboard.
 
 ### 4. Source collection, retrieval and job recovery
@@ -320,7 +320,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Pinned dependencies, lockfile, format/type/build checks and GitHub Actions validation.
 - [x] Read-only Vercel staging configuration, health endpoint and explicit disabled-account/channel UI.
 - [x] Additive private-schema bootstrap with RLS and a least-privilege catalogue reader, tested locally and in the PostgreSQL CI case.
-- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 6 November 2026; 39 RLS tables and 20 migrations in the shared l2e-studylink project.
+- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 6 November 2026; 39 RLS tables and 21 migrations in the shared l2e-studylink project.
 - [ ] Full production/managed database validation, private-account database roles and development/staging/production separation.
 - [ ] Approve exact current hosting/search/model/email/backup prices and capacity before provisioning.
 - [ ] Monthly research budget periods, actual-cost/invoice reconciliation and operator spend overview.
