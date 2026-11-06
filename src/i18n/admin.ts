@@ -1,4 +1,29 @@
 export const adminChinese: Record<string, string> = {
+  "Archive closed or rejected records on this page":
+    "批量归档本页已关闭或已拒绝的记录",
+  "Choose up to 25 records and provide one audit note. Each record commits separately; the batch can partially complete. Published and draft records cannot be archived here.":
+    "最多选择 25 条记录并填写一份审核说明。每条记录分别提交，批次可能部分完成。此处不能归档已发布记录或草稿。",
+  "Archive {count} selected records? Each successful archive creates a revision; this batch may partially complete.":
+    "归档所选的 {count} 条记录？每次成功归档都会新增修订；此批次可能部分完成。",
+  "Records to archive": "待归档记录",
+  "Shared archive audit note": "批量归档审核说明",
+  "Archive selected records": "归档所选记录",
+  "Batch archive results": "批量归档结果",
+  "Archived records: {count}": "已归档记录：{count}",
+  "Outcome unconfirmed; inspect history before retrying.":
+    "结果未确认；请查看历史后再重试。",
+  "Not attempted because the batch stopped.": "批次已停止，尚未尝试。",
+  "Skipped: the revision changed.": "已跳过：修订版本已变化。",
+  "Skipped: the record was not found.": "已跳过：未找到记录。",
+  "Skipped: only closed or rejected records can be archived.":
+    "已跳过：只能归档已关闭或已拒绝的记录。",
+  "Skipped: administrator access is no longer available.":
+    "已跳过：管理员权限已不可用。",
+  "Unable to confirm the batch outcome. Reload and inspect revision history before retrying.":
+    "无法确认批次结果。请重新加载并查看修订历史后再重试。",
+  "Reload for current states and revisions before another batch. Successful archives are not rolled back when another record is skipped.":
+    "下一批操作前请重新加载以获取当前状态和版本。其他记录被跳过时，已成功的归档不会回滚。",
+  "Reload catalogue": "重新加载目录",
   "Operations overview": "运营概览",
   "Read-only snapshot of retained records. Job and candidate states are not attempt counts, source coverage or publication-success measurements.":
     "保留记录的只读快照。任务和候选状态不等于尝试次数、来源覆盖率或发布成功率。",

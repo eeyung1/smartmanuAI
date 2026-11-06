@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **6 November 2026**, through [implementation PR #49](https://github.com/eeyung1/smartmanuAI/pull/49). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #50](https://github.com/eeyung1/smartmanuAI/pull/50). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -125,7 +125,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Source type/language labels at registration and version-checked admin editing, with explicit unknown defaults and no automatic trust or collection changes.
 - [x] Consolidated per-source stored collection-job counts: completed, failed, active and cancelled across retained history, including selected older sources; these are current job states, not attempt or publication-success metrics.
 - [x] Read-only admin operations overview for collection queues, review candidates, source policies and exact shared-budget/model-ledger reservations.
-- [ ] Bulk moderation actions and live operations/actual-provider-cost reconciliation.
+- [x] Bounded bulk archiving of closed/rejected records on the current catalogue page, with confirmation, per-record revisions/audit notes and explicit partial/uncertain outcomes.
+- [ ] Broader bulk moderation (including publication) and live operations/actual-provider-cost reconciliation.
 
 ### 4. Source collection, retrieval and job recovery
 
