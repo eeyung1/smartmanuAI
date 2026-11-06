@@ -1,3 +1,4 @@
+import { languageRequirementSchema } from "../domain/language-tests";
 import { z } from "zod";
 import { isIP } from "node:net";
 export const publicURL = z
@@ -27,6 +28,7 @@ export const sourceSchema = z
   .strict();
 export const eligibilityRulesSchema = z
   .object({
+    languageTest: languageRequirementSchema.nullable().optional(),
     residenceCountries: z
       .array(z.string().regex(/^(?:[A-Z]{2}|ALL)$/))
       .min(1)

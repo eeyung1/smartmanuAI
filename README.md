@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **6 November 2026**, through [implementation PR #39](https://github.com/eeyung1/smartmanuAI/pull/39). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #40](https://github.com/eeyung1/smartmanuAI/pull/40). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -64,7 +64,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Preserve validated internal opportunity/save destinations through sign-in and onboarding; reject external redirect destinations.
 - [x] Optional residence-country field in profile settings and persisted onboarding; separately reviewed residence-country eligibility rules with known-failure/unknown handling.
 - [x] Optional age-confirmation date or birth year in onboarding/profile settings, with UTC-day freshness and conservative birth-year range checks; legacy undated ages remain unknown.
-- [ ] Language-test details and detailed qualification equivalence.
+- [x] Optional self-reported language-test result (name/version, numeric scale, overall score, test date and known validity) in profile/onboarding, separate from teaching-language preferences.
+- [ ] Detailed qualification equivalence.
 - [ ] Institution-specific age-at-deadline/event rules and timezone qualification.
 - [ ] User-facing session inventory, individual session revocation and verified account-email change flow.
 - [ ] Production identity configuration, real authentication email and trusted proxy/rate-limit qualification.
@@ -191,7 +192,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Tracker pagination, literal search and status filtering beyond the latest 100 rows.
 - [ ] Matching over the full catalogue beyond the 1,000-candidate bound and stronger cross-request snapshot consistency.
 - [x] Residence eligibility independent of nationality, including explicit unrestricted residence and missing-profile/source information.
-- [ ] Language-test and detailed qualification-equivalence rules.
+- [x] Source-evidenced single mandatory overall language-test threshold; compare only matching test/version/scale with current dated validity, and explain missing/expired/incompatible evidence.
+- [ ] Alternative tests, waivers, section-score combinations, source-specific validity cutoffs and detailed qualification-equivalence rules.
 - [ ] Complete FR04–FR06 acceptance against representative real user/source cases.
 
 ### 7. Languages, content and interface recovery
@@ -336,7 +338,7 @@ A checked subfeature above does not mark an entire public-MVP requirement accept
 | FR01 Private profiles | Local sign-in, persisted onboarding, isolated preferences, export and queued account purge | Additional profile fields, reviewer-deletion operations and production identity/privacy |
 | FR02 Discovery        | Combined public filters, URL state, counts and pagination                     | Live-source coverage, browser/navigation acceptance and any approved broader location scope  |
 | FR03 Details          | Evidence, funding breakdown, source links, conservative dates and freshness   | Live field-quality review and precise source deadline/timezone handling                      |
-| FR04 Personalization  | Known-failure exclusion, explicit unknowns and deterministic explanations     | Residence/language-test/equivalence rules and representative real-case acceptance            |
+| FR04 Personalization  | Known-failure exclusion, explicit unknowns and deterministic explanations     | Complex language-test/qualification-equivalence rules and representative real-case acceptance            |
 | FR05 Tracking         | Paginated/searchable save/status/dismiss/restore and latest-choice duplicate reconciliation          | Full browser acceptance and larger-catalogue matching consistency  |
 | FR06 Languages        | Independent preferences and English/Chinese controlled interface/alert text   | Reviewed source translations, final launch locales and linguistic/browser acceptance         |
 | FR07 Alerts           | Local consent, digests/previews, runnable reminders and queued change alerts          | Source rechecks, update-alert controls/dispatch, verified live channels and hosted scheduling                  |

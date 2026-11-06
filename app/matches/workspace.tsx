@@ -1,4 +1,6 @@
 "use client";
+import LanguageTestFields from "@/app/components/language-test-fields";
+import { languageTestFromForm } from "@/src/domain/language-test-form";
 import { useScreenText } from "@/src/i18n/context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -177,6 +179,7 @@ export default function Workspace({
                     : String(f.get("age") ?? "") === String(p.age ?? "")
                       ? (p.ageAsOf ?? null)
                       : null,
+                languageTest: languageTestFromForm(f),
                 qualification: f.get("qualification") || null,
                 topics: String(f.get("topics") ?? "")
                   .split(",")
@@ -261,6 +264,7 @@ export default function Workspace({
               "Provide age or birth year, not both. Old ages need confirmation; birth year gives a range without collecting your birthday.",
             )}
           </p>
+          <LanguageTestFields result={p.languageTest} />
           <label>
             {t("Highest qualification")}{" "}
             <select name="qualification" defaultValue={p.qualification ?? ""}>

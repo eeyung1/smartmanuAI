@@ -1,4 +1,6 @@
 "use client";
+import LanguageTestFields from "@/app/components/language-test-fields";
+import { languageTestFromForm } from "@/src/domain/language-test-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Locale } from "@/src/i18n/locale";
@@ -168,6 +170,7 @@ export default function OnboardingWizard({
                 : String(form.get("age") ?? "") === String(p.age ?? "")
                   ? (p.ageAsOf ?? null)
                   : null,
+            languageTest: languageTestFromForm(form),
             qualification: (form.get("qualification") || null) as
               Preferences["qualification"] | null,
           }
@@ -349,6 +352,7 @@ export default function OnboardingWizard({
                 "Provide age or birth year, not both. Old ages need confirmation; birth year gives a range without collecting your birthday.",
               )}
             </p>
+            <LanguageTestFields result={p.languageTest} />
             <label>
               {t("Highest qualification")}
               <select name="qualification" defaultValue={p.qualification ?? ""}>

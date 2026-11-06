@@ -1,4 +1,6 @@
 "use client";
+import LanguageTestFields from "@/app/components/language-test-fields";
+import { languageRequirementFromForm } from "@/src/domain/language-test-form";
 import { useScreenText } from "@/src/i18n/context";
 import OpportunityPreview from "./preview";
 import Link from "next/link";
@@ -167,6 +169,7 @@ export default function ReviewWorkspace({
               .split(",")
               .map((v) => v.trim().toUpperCase())
               .filter(Boolean);
+            const languageTest = languageRequirementFromForm(f);
             const minAge = String(f.get("minAge") ?? ""),
               maxAge = String(f.get("maxAge") ?? ""),
               minQualification = String(f.get("minQualification") ?? "");
@@ -178,8 +181,10 @@ export default function ReviewWorkspace({
                 residences.length ||
                 minAge ||
                 maxAge ||
-                minQualification
+                minQualification ||
+                languageTest
                   ? {
+                      languageTest,
                       nationalities: countries.length ? countries : null,
                       residenceCountries: residences.length ? residences : null,
                       minAge: minAge ? Number(minAge) : null,
@@ -458,6 +463,10 @@ export default function ReviewWorkspace({
                 defaultValue={details.eligibilityRules?.maxAge ?? ""}
               />
             </label>
+            <LanguageTestFields
+              source
+              requirement={details.eligibilityRules?.languageTest}
+            />
             <label>
               {t("Minimum qualification")}{" "}
               <select

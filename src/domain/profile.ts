@@ -1,3 +1,4 @@
+import { languageTestSchema } from "./language-tests";
 import { z } from "zod";
 import { publicOpportunity, CatalogueError } from "../catalogue/service";
 import type { SQL } from "../db";
@@ -9,6 +10,7 @@ export const preferencesSchema = z
       .array(z.enum(["en", "zh"]))
       .max(2)
       .default(["en"]),
+    languageTest: languageTestSchema.nullable().optional(),
     residenceCountry: z
       .string()
       .regex(/^[A-Z]{2}$/)
@@ -68,6 +70,7 @@ const onboardingValuesSchema = z
     interfaceLanguage: z.enum(["en", "zh-Hans"]),
     alertLanguage: z.enum(["en", "zh-Hans"]),
     teachingLanguages: z.array(z.enum(["en", "zh"])).max(2),
+    languageTest: languageTestSchema.nullable().optional(),
     residenceCountry: z
       .string()
       .regex(/^[A-Z]{2}$/)
@@ -122,6 +125,7 @@ const onboardingStepSchemas = {
       birthYear: true,
       ageAsOf: true,
       qualification: true,
+      languageTest: true,
     })
     .strict(),
   2: onboardingValuesSchema
