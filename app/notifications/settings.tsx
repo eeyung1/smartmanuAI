@@ -20,6 +20,9 @@ export default function NotificationSettings({
     [deadlineRemindersEnabled, setDeadlineRemindersEnabled] = useState(
       initial.deadlineRemindersEnabled,
     ),
+    [appliedRemindersEnabled, setAppliedRemindersEnabled] = useState(
+      initial.appliedRemindersEnabled,
+    ),
     [materialChangesEnabled, setMaterialChangesEnabled] = useState(
       initial.materialChangesEnabled,
     ),
@@ -42,6 +45,7 @@ export default function NotificationSettings({
       setEnabled(value.enabled);
       setDeadlineRemindersEnabled(value.deadlineRemindersEnabled);
       setMaterialChangesEnabled(value.materialChangesEnabled);
+      setAppliedRemindersEnabled(value.appliedRemindersEnabled);
       const refreshed = await fetch("/api/me/notifications");
       if (!refreshed.ok)
         throw Error(
@@ -78,6 +82,7 @@ export default function NotificationSettings({
               expectedVersion: settings.version,
               enabled,
               deadlineRemindersEnabled,
+              appliedRemindersEnabled,
               materialChangesEnabled,
               channel: f.get("channel"),
               frequency: f.get("frequency"),
@@ -104,6 +109,24 @@ export default function NotificationSettings({
             />
             {t("Send separate 7-day and 2-day deadline reminders")}{" "}
           </label>
+          <label className="inline">
+            <input
+              type="checkbox"
+              name="appliedRemindersEnabled"
+              checked={appliedRemindersEnabled}
+              onChange={(event) =>
+                setAppliedRemindersEnabled(event.target.checked)
+              }
+            />
+            {t(
+              "Keep deadline reminders for saved opportunities marked applied",
+            )}
+          </label>
+          <p>
+            {t(
+              "This option requires deadline reminders and notifications to be enabled. Turning it off stops future reminders for applied items; reminders already accepted by the local sink cannot be recalled.",
+            )}
+          </p>
           <label className="inline">
             <input
               type="checkbox"
@@ -219,6 +242,7 @@ export default function NotificationSettings({
               expectedVersion: settings.version,
               enabled: false,
               deadlineRemindersEnabled,
+              appliedRemindersEnabled,
               channel: settings.channel,
               frequency: settings.frequency,
               timezone: settings.timezone,

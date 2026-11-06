@@ -49,3 +49,7 @@ The detector locks candidate owners in sorted order before opportunity/tracker/p
 ## Stored digest history
 
 `/notifications/history` and GET `/api/me/notifications/history` expose only the authenticated owner’s digest ID, channel, state and creation date. Optional channel/state filters default to all. Pages contain at most 20 records, newest first, with microsecond timestamp/ID keyset cursors bound to the filters. Unknown/duplicate parameters and malformed cursors are rejected. Responses are private and no-store; payloads and destinations are excluded. Filter changes restart browsing. New rows and state changes can affect live results, so refresh the newest page when needed. Accepted records confirm the local sink only. Other alert families are not included.
+
+## Reminders after applying
+
+`appliedRemindersEnabled` defaults to false. Enabling it includes saved items marked applied in the local 7-day/2-day reminder windows. It does not enable reminders by itself: `deadlineRemindersEnabled`, master `enabled`, current local consent and all freshness/deadline/suppression gates must pass. Both initial selection and the owner-locked transaction recheck this choice. Turning it off prevents future acceptance for applied items; already accepted sink records remain. Re-enabling does not replay an already accepted event key, but a still-pending threshold/revision can qualify on a later run. Omitted fields preserve the stored value, including legacy/onboarding clients. This changes neither material-change eligibility nor live delivery readiness.

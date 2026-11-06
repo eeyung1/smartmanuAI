@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **6 November 2026**, through [implementation PR #43](https://github.com/eeyung1/smartmanuAI/pull/43). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #44](https://github.com/eeyung1/smartmanuAI/pull/44). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -230,8 +230,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Localized digest text and preserved funding/fee uncertainty, match reasons, source time and synthetic notices.
 - [x] Local seven-day/two-day saved-opportunity reminders with opt-in, 24-hour verification freshness and deadline/revision deduplication; runnable with `npm run reminders:once`.
 - [ ] Automatic official-source rechecks before reminders and live delivery qualification.
-- [x] Independent reminder opt-in; currently restricted to interested/applying saved items.
-- [ ] User choice to receive reminders for already-applied opportunities.
+- [x] Independent reminder opt-in for interested/applying saved items, with a separate default-off option for applied saves.
+- [x] User choice to retain local deadline reminders for already-applied saved opportunities, with current consent/pause/preference rechecks.
 - [x] Separate default-off local opt-in for saved-item deadline/funding/closure updates outside the digest schedule, with master-pause/channel-change cancellation and no replay after re-enabling.
 - [x] Queue local closure, funding reduction and deadline-change alerts for active saved items outside normal discovery funding filters, using `npm run changes:once`.
 - [ ] Dispatch queued change alerts with current consent, destination, suppression and privacy rechecks.
@@ -318,7 +318,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Pinned dependencies, lockfile, format/type/build checks and GitHub Actions validation.
 - [x] Read-only Vercel staging configuration, health endpoint and explicit disabled-account/channel UI.
 - [x] Additive private-schema bootstrap with RLS and a least-privilege catalogue reader, tested locally and in the PostgreSQL CI case.
-- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 6 November 2026; 39 RLS tables and 17 migrations in the shared l2e-studylink project.
+- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 6 November 2026; 39 RLS tables and 18 migrations in the shared l2e-studylink project.
 - [ ] Full production/managed database validation, private-account database roles and development/staging/production separation.
 - [ ] Approve exact current hosting/search/model/email/backup prices and capacity before provisioning.
 - [ ] Monthly research budget periods, actual-cost/invoice reconciliation and operator spend overview.

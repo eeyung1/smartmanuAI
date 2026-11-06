@@ -780,6 +780,7 @@ try {
   );
   const alertSettings = {
     materialChangesEnabled: true,
+    appliedRemindersEnabled: true,
     expectedVersion: 0,
     enabled: true,
     channel: "telegram",
@@ -826,6 +827,25 @@ try {
     ).settings.materialChangesEnabled,
     false,
   );
+  for (const [cookie, expected] of [
+    [a, true],
+    [b, false],
+  ] as const) {
+    const response = await fetch(base + "/api/me/notifications", {
+      headers: { Cookie: cookie },
+    });
+    assert.equal(
+      (await response.json()).settings.appliedRemindersEnabled,
+      expected,
+    );
+  }
+  const appliedSettingsHTML = await (
+    await fetch(base + "/notifications", {
+      headers: { Cookie: a + "; " + localeCookie },
+    })
+  ).text();
+  assert.match(appliedSettingsHTML, /name="appliedRemindersEnabled"/);
+  assert.match(appliedSettingsHTML, /已标记为已申请/);
   assert.equal((await updateAlerts(alertSettings)).status, 409);
   assert.equal(
     (
