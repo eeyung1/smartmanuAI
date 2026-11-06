@@ -37,6 +37,7 @@ export async function POST(request: Request) {
           enabled: z.boolean(),
           permissionNote: z.string(),
           cadenceHours: z.number().int().min(6).max(168).optional(),
+          requestDelaySeconds: z.number().int().min(0).max(3600).optional(),
         }),
         z.object({
           action: z.literal("extract"),

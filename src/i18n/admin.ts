@@ -1,4 +1,7 @@
 export const adminChinese: Record<string, string> = {
+  "Minimum attempt delay (seconds)": "尝试最小间隔（秒）",
+  "Choose 0–3600 seconds between collection claims for this source, including retries. Zero keeps the previous behavior. This is separate from scheduling cadence and is not a shared host-wide limit.":
+    "请选择同一来源采集认领之间的 0 至 3600 秒间隔，包括重试。零保留原有行为。此设置不同于计划采集间隔，也不是整个主机共享的限制。",
   "Workload age and scheduling": "待处理时长与调度",
   "Queued jobs passing stored scheduling gates": "符合已记录调度条件的排队任务",
   "Running jobs with expired leases": "租约已过期的运行任务",
