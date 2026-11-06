@@ -1,4 +1,37 @@
 export const adminChinese: Record<string, string> = {
+  "Operations overview": "运营概览",
+  "Read-only snapshot of retained records. Job and candidate states are not attempt counts, source coverage or publication-success measurements.":
+    "保留记录的只读快照。任务和候选状态不等于尝试次数、来源覆盖率或发布成功率。",
+  "Snapshot time": "快照时间",
+  "Collection queue": "采集队列",
+  "Review candidates": "审核候选记录",
+  "Total stored candidates": "已存储候选记录总数",
+  "Source policies": "来源策略",
+  "Enabled source policies": "已启用的来源策略",
+  "Paused or unconfigured sources": "已暂停或未配置的来源",
+  "Sources awaiting operator review": "等待管理员复核的来源",
+  "Sources with future Retry-After holds": "存在尚未到期重试等待的来源",
+  "Review and future-time holds can overlap. Enabling a source policy does not prove permission, availability or complete coverage.":
+    "复核等待和时间等待可能重叠。启用来源策略并不证明已获许可、来源可用或覆盖完整。",
+  "Research budget reservations": "研究预算预留",
+  "Internal budget units equal one million micro-units. Reservations are not settled provider charges, and no currency or invoice total is inferred. This is the existing shared budget, without monthly reset.":
+    "一个内部预算单位等于一百万微单位。预留不等于供应商已结算费用，也不推断币种或账单总额。这是现有共享预算，不会按月重置。",
+  "Configured budget limit": "已配置预算上限",
+  "Shared reserved budget": "共享已预留预算",
+  "Unreserved capacity": "尚未预留的额度",
+  "Reservations exceed the configured limit.": "预留金额超过已配置上限。",
+  "Budget configuration unavailable; no zero balance is assumed.":
+    "预算配置不可用；不将其视为零余额。",
+  "Stored model-attempt ledger": "已存储模型尝试台账",
+  "Total stored model attempts": "已存储模型尝试总数",
+  "Reserved attempts": "已预留的尝试",
+  "Completed attempts": "已完成的尝试",
+  "Uncertain attempts": "状态不确定的尝试",
+  "Reservations recorded in model ledger": "模型台账记录的预留",
+  "The shared budget can include other local work, so ledger reservations need not equal the shared reserved balance. Uncertain attempts require investigation; this page does not retry or settle them.":
+    "共享预算可能包含其他本地任务，因此台账预留不一定等于共享已预留余额。不确定的尝试需要调查；此页面不会重试或结算。",
+  "Back to research workspace": "返回研究工作区",
+  "Admin catalogue": "管理目录",
   "Counts cover current stored collection-job states across retained history, not attempt totals. Completed includes unchanged checks; active includes queued retries. Cancellations are separate. Collection completion does not confirm opportunity review or publication.":
     "计数反映保留历史中采集任务的当前状态，而非尝试次数。已完成包含内容未变的检查；活动任务包含排队重试。已取消单独统计。采集完成不代表项目已审核或发布。",
   "Collection job counts": "采集任务计数",

@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **6 November 2026**, through [implementation PR #48](https://github.com/eeyung1/smartmanuAI/pull/48). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #49](https://github.com/eeyung1/smartmanuAI/pull/49). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -124,7 +124,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Per-source collection cadence from 6–168 hours, defaulting to 24, with admin controls, legacy-value preservation and scheduler enforcement.
 - [x] Source type/language labels at registration and version-checked admin editing, with explicit unknown defaults and no automatic trust or collection changes.
 - [x] Consolidated per-source stored collection-job counts: completed, failed, active and cancelled across retained history, including selected older sources; these are current job states, not attempt or publication-success metrics.
-- [ ] Bulk moderation actions and a unified operations/cost dashboard.
+- [x] Read-only admin operations overview for collection queues, review candidates, source policies and exact shared-budget/model-ledger reservations.
+- [ ] Bulk moderation actions and live operations/actual-provider-cost reconciliation.
 
 ### 4. Source collection, retrieval and job recovery
 
@@ -323,7 +324,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 6 November 2026; 39 RLS tables and 21 migrations in the shared l2e-studylink project.
 - [ ] Full production/managed database validation, private-account database roles and development/staging/production separation.
 - [ ] Approve exact current hosting/search/model/email/backup prices and capacity before provisioning.
-- [ ] Monthly research budget periods, actual-cost/invoice reconciliation and operator spend overview.
+- [ ] Monthly research budget periods, actual-cost/invoice reconciliation and provider spend overview.
 - [ ] Budget alerts at 70%, optional-work reduction at 90%, and production hard-cap/reserved essential capacity behavior.
 - [ ] Queue-age, source-success, runtime, quota and delivery metrics with secret/token redaction.
 - [ ] Alert administrators after two consecutive failed runs and show last successful shared refresh.
@@ -369,10 +370,11 @@ These are implemented routes, not the separate routes proposed in the original s
 | `/admin/catalogue`                          | Paginated source/opportunity browser                                              |
 | `/admin/review`                             | Source registration, draft and revision editor                                    |
 | `/admin/review/[id]/history`                | Private revision audit comparisons                                                |
+| `/admin/operations` | Private read-only queue, source-policy and budget-reservation summary |
 | `/admin/research`, `/admin/research/browse` | Collection policies, candidates and paginated research records                    |
 | `/admin/research/jobs/[id]`                 | Job detail, cancellation, replacement links and wait/review state                 |
 
-API groups: `/api/auth/*`; public `/api/opportunities*`; owner-only `/api/me/sessions`, `/api/me/onboarding`, `/api/me/notifications/preview`, `/api/me/notifications/history`, `/api/me/profile`, `/api/me/matches`, `/api/me/saved`, `/api/me/tracker`, `/api/me/notifications`, `/api/me/telegram`, `/api/me/email-unsubscribe`, `/api/me/delivery-tests` and `/api/me/privacy/*`; private-receipt `/api/privacy/status`; scoped `/api/notifications/unsubscribe`; authenticated `/api/webhooks/email` and `/api/webhooks/telegram`; and administrator `/api/admin/sources`, `/api/admin/opportunities*`, `/api/admin/catalogue` and `/api/admin/research*`. `/api/locale` updates the browser display choice. Method-specific contracts and authorization remain in the route handlers and linked implementation guides.
+API groups: `/api/auth/*`; public `/api/opportunities*`; owner-only `/api/me/sessions`, `/api/me/onboarding`, `/api/me/notifications/preview`, `/api/me/notifications/history`, `/api/me/profile`, `/api/me/matches`, `/api/me/saved`, `/api/me/tracker`, `/api/me/notifications`, `/api/me/telegram`, `/api/me/email-unsubscribe`, `/api/me/delivery-tests` and `/api/me/privacy/*`; private-receipt `/api/privacy/status`; scoped `/api/notifications/unsubscribe`; authenticated `/api/webhooks/email` and `/api/webhooks/telegram`; and administrator `/api/admin/operations`, `/api/admin/sources`, `/api/admin/opportunities*`, `/api/admin/catalogue` and `/api/admin/research*`. `/api/locale` updates the browser display choice. Method-specific contracts and authorization remain in the route handlers and linked implementation guides.
 
 ## Local development
 
