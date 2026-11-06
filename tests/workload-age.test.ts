@@ -34,6 +34,7 @@ for (const kind of ["pglite", "postgres"])
         const empty = await operationsOverview(db.sql, actor);
         assert.deepEqual(empty.aging, {
           queuedReady: "0",
+          busyHosts: "0",
           expiredLeases: "0",
           oldestQueuedAt: null,
           oldestQueuedAgeSeconds: null,
@@ -74,7 +75,7 @@ for (const kind of ["pglite", "postgres"])
           } = fixture;
           const source = await createSource(db.sql, actor, {
             name: "Workload " + value.name,
-            url: "https://school.example.edu/" + value.name,
+            url: "https://" + value.name + ".school.example.edu/",
           });
           sources[value.name] = source.id;
           await db.sql.query(

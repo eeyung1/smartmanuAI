@@ -14,6 +14,7 @@ type OverviewRow = {
   >;
   aging: {
     queuedReady: string;
+    busyHosts: string;
     expiredLeases: string;
     oldestQueuedAt: string | null;
     oldestQueuedAgeSeconds: string | null;
@@ -33,13 +34,14 @@ export async function operationsOverview(sql: SQL, actor: string) {
  (SELECT jsonb_build_object('total',COUNT(*)::text,'enabled',(COUNT(*) FILTER(WHERE p.enabled))::text,'paused',(COUNT(*) FILTER(WHERE NOT COALESCE(p.enabled,false)))::text,'reviewHolds',(COUNT(*) FILTER(WHERE r.requires_review))::text,'futureHolds',(COUNT(*) FILTER(WHERE r.retry_after_at>NOW()))::text,'due',(COUNT(*) FILTER(WHERE p.enabled AND p.next_due_at<=NOW()))::text) FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id) AS sources,
  (SELECT jsonb_build_object('total',COUNT(*)::text,'reserved',(COUNT(*) FILTER(WHERE state='reserved'))::text,'completed',(COUNT(*) FILTER(WHERE state='completed'))::text,'uncertain',(COUNT(*) FILTER(WHERE state='uncertain'))::text,'reservationMicros',COALESCE(SUM(reserved_micros),0)::text) FROM research_usage) AS usage,
  (SELECT jsonb_build_object(
- 'queuedReady',(COUNT(*) FILTER(WHERE j.state='queued' AND j.available_at<=NOW() AND j.attempts<3 AND p.enabled AND (p.last_request_at IS NULL OR p.last_request_at+p.request_delay_seconds*INTERVAL '1 second'<=NOW()) AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW())))::text,
+ 'queuedReady',(COUNT(*) FILTER(WHERE j.state='queued' AND j.available_at<=NOW() AND j.attempts<3 AND p.enabled AND NOT EXISTS(SELECT 1 FROM sources busy_source JOIN research_jobs busy_job ON busy_job.source_id=busy_source.id WHERE busy_source.collection_host=s.collection_host AND busy_job.state='running' AND busy_job.lease_until>NOW()) AND (p.last_request_at IS NULL OR p.last_request_at+p.request_delay_seconds*INTERVAL '1 second'<=NOW()) AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW())))::text,
+ 'busyHosts',(SELECT COUNT(DISTINCT busy_source.collection_host)::text FROM sources busy_source JOIN research_jobs busy_job ON busy_job.source_id=busy_source.id WHERE busy_job.state='running' AND busy_job.lease_until>NOW()),
  'expiredLeases',(COUNT(*) FILTER(WHERE j.state='running' AND j.lease_until<NOW()))::text,
  'oldestQueuedAt',to_char((MIN(j.created_at) FILTER(WHERE j.state='queued')) AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'),
  'oldestQueuedAgeSeconds',CASE WHEN (MIN(j.created_at) FILTER(WHERE j.state='queued')) IS NULL THEN NULL ELSE GREATEST(0,FLOOR(EXTRACT(EPOCH FROM (NOW()-(MIN(j.created_at) FILTER(WHERE j.state='queued'))))))::text END,
  'oldestPendingAt',(SELECT to_char(MIN(created_at) AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') FROM research_candidates WHERE state='pending'),
  'oldestPendingAgeSeconds',(SELECT CASE WHEN MIN(created_at) IS NULL THEN NULL ELSE GREATEST(0,FLOOR(EXTRACT(EPOCH FROM (NOW()-MIN(created_at)))))::text END FROM research_candidates WHERE state='pending')
- ) FROM research_jobs j LEFT JOIN source_collection_policies p ON p.source_id=j.source_id LEFT JOIN source_retry_after r ON r.source_id=j.source_id WHERE j.state IN ('queued','running')) AS aging,
+ ) FROM research_jobs j JOIN sources s ON s.id=j.source_id LEFT JOIN source_collection_policies p ON p.source_id=j.source_id LEFT JOIN source_retry_after r ON r.source_id=j.source_id WHERE j.state IN ('queued','running')) AS aging,
  (SELECT jsonb_build_object('limitMicros',limit_micros::text,'reservedMicros',reserved_micros::text) FROM budget WHERE id=1) AS budget,
  to_char(NOW() AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "observedAt"`)
   ).rows[0];

@@ -8,6 +8,7 @@ type Dashboard = {
     id: string;
     name: string;
     url: string;
+    collection_host: string;
     synthetic: boolean;
     enabled: boolean;
     permission_note: string | null;
@@ -91,11 +92,20 @@ export default function ResearchWorkspace({
             "Counts cover current stored collection-job states across retained history, not attempt totals. Completed includes unchanged checks; active includes queued retries. Cancellations are separate. Collection completion does not confirm opportunity review or publication.",
           )}
         </p>
+        <p>
+          {t(
+            "One unexpired running collection lease is allowed per hostname, across registered source URLs. Completion, failure, cancellation or lease expiry releases the gate. This is lease-backed coordination, not a minimum gap between requests.",
+          )}
+        </p>
         {data.sources.length ? (
           data.sources.map((source) => (
             <article key={source.id} id={"source-" + source.id}>
               <h3 lang="">{source.name}</h3>
               <p>{source.url}</p>
+              <p>
+                {t("Collection hostname")}:{" "}
+                <span lang="">{source.collection_host}</span>
+              </p>
               <p>
                 {source.synthetic
                   ? t("Synthetic source; live collection unavailable.")

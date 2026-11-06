@@ -1,4 +1,8 @@
 export const adminChinese: Record<string, string> = {
+  "Collection hostname": "采集主机名",
+  "Hosts with active collection leases": "存在有效采集租约的主机",
+  "One unexpired running collection lease is allowed per hostname, across registered source URLs. Completion, failure, cancellation or lease expiry releases the gate. This is lease-backed coordination, not a minimum gap between requests.":
+    "同一主机名下的已注册来源 URL 共享一个尚未过期的运行采集租约。完成、失败、取消或租约到期后将解除限制。这是基于租约的协调，并非请求之间的最小间隔。",
   "Minimum attempt delay (seconds)": "尝试最小间隔（秒）",
   "Choose 0–3600 seconds between collection claims for this source, including retries. Zero keeps the previous behavior. This is separate from scheduling cadence and is not a shared host-wide limit.":
     "请选择同一来源采集认领之间的 0 至 3600 秒间隔，包括重试。零保留原有行为。此设置不同于计划采集间隔，也不是整个主机共享的限制。",

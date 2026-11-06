@@ -6,4 +6,4 @@ The research screen allows later edits, including for a selected source outside 
 
 These labels describe the source and do not verify ownership, official status or permission to crawl. Source language is independent of teaching language, interface language, notification language and translation support. Metadata changes do not enable collection, reset scheduling, clear Retry-After holds, modify opportunity facts or update verified timestamps. Existing publication review and collection permission controls still apply. Public catalogue projections do not include these admin labels.
 
-No automatic classification, metadata audit-history screen, consolidated success/failure counters or new live-provider capability is included. Migration 020 adds only constrained source columns in the private schema; there are still 39 tables.
+No automatic classification, metadata audit-history screen, consolidated success/failure counters or new live-provider capability is included. Migration 020 adds only constrained source columns in the private schema; hostname coordination is documented separately.

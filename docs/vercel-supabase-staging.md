@@ -83,3 +83,7 @@ Add `research_jobs_source_state` on `research_jobs(source_id,state)` within smar
 ## Application migration 022 (6 November 2026)
 
 Add `source_collection_policies.request_delay_seconds integer NOT NULL DEFAULT 0 CHECK (request_delay_seconds BETWEEN 0 AND 3600)` and nullable `last_request_at timestamptz` within smartmanuai. Record `022_source_attempt_delay.sql` in the app ledger; health requires 22 migrations. There are still 39 RLS tables and reader grants remain unchanged. Zero/null preserves existing policies until an operator configures pacing or a worker claims a job. Hosted workers/accounts remain disabled.
+
+## Application migration 023 (6 November 2026)
+
+Add generated `sources.collection_host`, its index, private `collection_host_locks(hostname)` and the partial running-lease index within smartmanuai. Enable RLS and revoke public/anon/authenticated/reader access to the new mutex table; the existing source reader sees only its previously reviewed-source scope. Record `023_host_collection_leases.sql` in the app ledger. Health requires 23 migrations and the private schema now contains 40 RLS tables. Stop old workers before migrating/restarting a future worker deployment; older binaries do not enforce host coordination. Hosted staging remains read-only with workers/accounts disabled.
