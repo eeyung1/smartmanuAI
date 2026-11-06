@@ -1734,9 +1734,26 @@ try {
     combinedHTML,
     /<option value="master"[^>]*selected[^>]*>硕士<\/option>/,
   );
+  assert.equal(
+    (
+      await fetch(base + "/api/me/profile", {
+        method: "PATCH",
+        headers: {
+          Cookie: admin,
+          Origin: base,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          categories: ["scholarship"],
+          interfaceLanguage: "en",
+        }),
+      })
+    ).status,
+    200,
+  );
   const exploreCombined = await (
     await fetch(base + "/matches/explore?" + combinedFilter, {
-      headers: { Cookie: a },
+      headers: { Cookie: admin },
     })
   ).text();
   assert.match(
@@ -1751,7 +1768,7 @@ try {
   for (const [key, value] of combinedFilter)
     assert.equal(privateNextURL.searchParams.get(key), value);
   const exploreSecond = await (
-    await fetch(privateNextURL, { headers: { Cookie: a } })
+    await fetch(privateNextURL, { headers: { Cookie: admin } })
   ).text();
   assert.equal((exploreSecond.match(/<article>/g) ?? []).length, 1);
   const nextHref = combinedHTML.match(/href="([^"]*page=2[^"]*)"/);
