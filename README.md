@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **6 November 2026**, through [implementation PR #42](https://github.com/eeyung1/smartmanuAI/pull/42). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **6 November 2026**, through [implementation PR #43](https://github.com/eeyung1/smartmanuAI/pull/43). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -237,7 +237,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [ ] Dispatch queued change alerts with current consent, destination, suppression and privacy rechecks.
 - [ ] Production consent version, verified destination/binding integration and real email/Telegram dispatch.
 - [x] User-facing preview of fresh, unseen digest content without scheduling or sending.
-- [ ] Full notification-history pagination.
+- [x] Owner-only stored digest history with channel/state filters and timestamp/ID cursor pagination beyond 20 records.
+- [ ] Unified paginated history for reminders, material changes and delivery simulations.
 - [ ] Continuously scheduled hosted digest/reminder execution and live end-to-end acceptance.
 
 ### 9. Telegram connection and revocation
@@ -317,7 +318,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Pinned dependencies, lockfile, format/type/build checks and GitHub Actions validation.
 - [x] Read-only Vercel staging configuration, health endpoint and explicit disabled-account/channel UI.
 - [x] Additive private-schema bootstrap with RLS and a least-privilege catalogue reader, tested locally and in the PostgreSQL CI case.
-- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 6 November 2026; 39 RLS tables and 16 migrations in the shared l2e-studylink project.
+- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 6 November 2026; 39 RLS tables and 17 migrations in the shared l2e-studylink project.
 - [ ] Full production/managed database validation, private-account database roles and development/staging/production separation.
 - [ ] Approve exact current hosting/search/model/email/backup prices and capacity before provisioning.
 - [ ] Monthly research budget periods, actual-cost/invoice reconciliation and operator spend overview.
@@ -358,6 +359,7 @@ These are implemented routes, not the separate routes proposed in the original s
 | `/sign-in`                                  | Local magic-link sign-in                                                          |
 | `/onboarding` | Resumable profile/preferences wizard with validated return destination |
 | `/matches`                                  | Private preferences, matches and saved/dismissed tracker                          |
+| `/notifications/history` | Private paginated digest history with channel/state filters |
 | `/notifications`                            | Local digest settings, Telegram links, unsubscribe tests and delivery simulations |
 | `/privacy`, `/privacy/status`               | Export/deletion request and private receipt status                                |
 | `/unsubscribe?token=...`                    | Scoped email opt-out confirmation                                                 |
@@ -367,7 +369,7 @@ These are implemented routes, not the separate routes proposed in the original s
 | `/admin/research`, `/admin/research/browse` | Collection policies, candidates and paginated research records                    |
 | `/admin/research/jobs/[id]`                 | Job detail, cancellation, replacement links and wait/review state                 |
 
-API groups: `/api/auth/*`; public `/api/opportunities*`; owner-only `/api/me/sessions`, `/api/me/onboarding`, `/api/me/notifications/preview`, `/api/me/profile`, `/api/me/matches`, `/api/me/saved`, `/api/me/tracker`, `/api/me/notifications`, `/api/me/telegram`, `/api/me/email-unsubscribe`, `/api/me/delivery-tests` and `/api/me/privacy/*`; private-receipt `/api/privacy/status`; scoped `/api/notifications/unsubscribe`; authenticated `/api/webhooks/email` and `/api/webhooks/telegram`; and administrator `/api/admin/sources`, `/api/admin/opportunities*`, `/api/admin/catalogue` and `/api/admin/research*`. `/api/locale` updates the browser display choice. Method-specific contracts and authorization remain in the route handlers and linked implementation guides.
+API groups: `/api/auth/*`; public `/api/opportunities*`; owner-only `/api/me/sessions`, `/api/me/onboarding`, `/api/me/notifications/preview`, `/api/me/notifications/history`, `/api/me/profile`, `/api/me/matches`, `/api/me/saved`, `/api/me/tracker`, `/api/me/notifications`, `/api/me/telegram`, `/api/me/email-unsubscribe`, `/api/me/delivery-tests` and `/api/me/privacy/*`; private-receipt `/api/privacy/status`; scoped `/api/notifications/unsubscribe`; authenticated `/api/webhooks/email` and `/api/webhooks/telegram`; and administrator `/api/admin/sources`, `/api/admin/opportunities*`, `/api/admin/catalogue` and `/api/admin/research*`. `/api/locale` updates the browser display choice. Method-specific contracts and authorization remain in the route handlers and linked implementation guides.
 
 ## Local development
 

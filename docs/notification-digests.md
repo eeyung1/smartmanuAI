@@ -45,3 +45,7 @@ The React review checklist was applied to the settings screen. Browser visual/ac
 Disabling updates, pausing notifications or changing channels suppresses queued material-change records. Re-enabling does not replay already queued/suppressed revision keys. The local sink consumer rechecks the material opt-in, consent version and frozen channel; this does not qualify production email/Telegram delivery or replace destination, suppression and source rechecks. Work already sent cannot be recalled.
 
 The detector locks candidate owners in sorted order before opportunity/tracker/preference rows, matching settings and deletion lock ordering. Users saved after that owner snapshot are deferred to the next pass. PostgreSQL concurrency tests exercise queue creation against opt-out. The account export includes the new preference.
+
+## Stored digest history
+
+`/notifications/history` and GET `/api/me/notifications/history` expose only the authenticated owner’s digest ID, channel, state and creation date. Optional channel/state filters default to all. Pages contain at most 20 records, newest first, with microsecond timestamp/ID keyset cursors bound to the filters. Unknown/duplicate parameters and malformed cursors are rejected. Responses are private and no-store; payloads and destinations are excluded. Filter changes restart browsing. New rows and state changes can affect live results, so refresh the newest page when needed. Accepted records confirm the local sink only. Other alert families are not included.

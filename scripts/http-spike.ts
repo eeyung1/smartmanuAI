@@ -191,6 +191,10 @@ await seed.sql.query(
   "INSERT INTO source_retry_after(source_id,retry_after_at,requires_review) VALUES($1,$2,true)",
   [backoffSource.id, backoffUntil],
 );
+await seed.sql.query(
+  `INSERT INTO notification_digests(id,user_id,preference_version,channel,slot,state,payload)
+   SELECT 'http-history-'||n,'local-fixture-reviewer',1,'email','history-'||n,'accepted','{"private":"hidden"}'::jsonb FROM generate_series(1,45) n`,
+);
 await seed.close();
 const log = await open(join(dir, "server.log"), "w");
 const server = spawn(
@@ -302,6 +306,67 @@ try {
   const a = await login("http-alice@example.test");
   const b = await login("http-bob@example.test");
   const admin = await login("reviewer@example.test");
+  assert.equal(
+    (await fetch(base + "/api/me/notifications/history")).status,
+    401,
+  );
+  const historyResponse = await fetch(
+    base + "/api/me/notifications/history?channel=email&state=accepted",
+    { headers: { Cookie: admin } },
+  );
+  assert.equal(historyResponse.status, 200);
+  assert.equal(historyResponse.headers.get("cache-control"), "no-store");
+  const history = await historyResponse.json();
+  assert.equal(history.items.length, 20);
+  assert.ok(history.nextCursor);
+  assert.ok(!JSON.stringify(history).includes('"payload"'));
+  const olderHistory = await (
+    await fetch(
+      base +
+        "/api/me/notifications/history?channel=email&state=accepted&cursor=" +
+        history.nextCursor,
+      { headers: { Cookie: admin } },
+    )
+  ).json();
+  assert.equal(olderHistory.items.length, 20);
+  assert.ok(
+    olderHistory.items.every(
+      (item: { id: string }) =>
+        !history.items.some((first: { id: string }) => first.id === item.id),
+    ),
+  );
+  const ownHistory = await (
+    await fetch(base + "/api/me/notifications/history", {
+      headers: { Cookie: a },
+    })
+  ).json();
+  assert.deepEqual(ownHistory.items, []);
+  for (const query of [
+    "channel=email&channel=telegram",
+    "userId=local-fixture-reviewer",
+    "cursor=invalid",
+  ]) {
+    assert.equal(
+      (
+        await fetch(base + "/api/me/notifications/history?" + query, {
+          headers: { Cookie: admin },
+        })
+      ).status,
+      400,
+    );
+  }
+  const chineseHistory = await fetch(base + "/notifications/history", {
+    headers: { Cookie: admin + "; " + localeCookie },
+  });
+  assert.equal(chineseHistory.status, 200);
+  assert.match(await chineseHistory.text(), /摘要历史/);
+  const invalidHistory = await fetch(
+    base + "/notifications/history?cursor=invalid",
+    { headers: { Cookie: admin } },
+  );
+  assert.equal(invalidHistory.status, 200);
+  assert.match(await invalidHistory.text(), /Invalid history filters/);
+
   assert.equal((await fetch(base + "/api/me/sessions")).status, 401);
   const sessionListResponse = await fetch(base + "/api/me/sessions", {
     headers: { Cookie: a },

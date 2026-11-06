@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 import type { readNotificationSettings } from "@/src/jobs/digests";
@@ -230,6 +231,9 @@ export default function NotificationSettings({
       </section>
       <section>
         <h2>{t("Recent local digests")}</h2>
+        <Link href="/notifications/history">
+          {t("Browse full digest history")}
+        </Link>
         {history.length ? (
           <ul>
             {history.map((item) => (

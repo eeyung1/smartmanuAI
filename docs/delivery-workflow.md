@@ -203,3 +203,7 @@ Cookie session caching is explicitly disabled; unused Better Auth token-based se
 ## 34 Saved-item update preferences checkpoint (6 November 2026)
 
 A default-off independent material-change opt-in now controls local saved-item deadline, funding and closure updates. Old clients preserve the setting when omitted; explicit updates retain optimistic version checks. Master pause, opt-out and channel changes suppress queued material-change records, and re-enabling does not replay old revision keys. The detector uses owner-first locking to serialize settings/deletion against queue creation; the fixture dispatcher rejects stale consent or channel routing. Bilingual controls, account export, command fixtures and staging bootstrap include the field. Application migration 016 is additive in the private smartmanuai schema. Live dispatch, destination/source/suppression rechecks, hosted scheduling and applied-item choices remain open.
+
+## 35 Digest-history checkpoint (6 November 2026)
+
+Stored digests have a private bilingual history screen and owner-scoped API with channel/state filters and 20-row cursor pages. Ordering preserves database microseconds and uses IDs to resolve ties. Cursors bind filters, while session ownership is always enforced independently. Dates are shown in UTC; accepted means local-sink acceptance, not provider delivery. Results are live rather than a snapshot. Migration 017 adds an owner/date/ID index. Reminder, material-change and delivery-simulation history remain separate and unified pagination remains open.

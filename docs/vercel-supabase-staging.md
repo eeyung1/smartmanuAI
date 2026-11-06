@@ -59,3 +59,7 @@ After every configuration change, redeploy and require `/api/health` to return H
 ## Application migration 016 (6 November 2026)
 
 Saved-item material-change preferences add `notification_preferences.material_changes_enabled` with a non-null false default. Apply it only within `smartmanuai` using the existing owner role, record `016_material_change_preference.sql` in the application's migration ledger, and retain the read-only runtime role. The application now requires 16 migration records in its health check. Table count remains 39 and no users are automatically opted in. This additive migration can precede the application release; it does not enable hosted accounts, research or delivery.
+
+## Application migration 017 (6 November 2026)
+
+Digest history adds the `notification_digest_history_owner` index on `(user_id, created_at DESC, id)`. Apply `017_digest_history_index.sql` only inside the existing private smartmanuai schema and record it in the app migration ledger. Health now requires 17 migration records. The table count remains 39; the read-only runtime gains no private-history privileges and hosted sign-in remains disabled.

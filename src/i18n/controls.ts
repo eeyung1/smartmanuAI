@@ -1,4 +1,22 @@
 export const controlChinese: Record<string, string> = {
+  "Digest history": "摘要历史",
+  "This list covers stored local digests. Reminders, change alerts and delivery simulations have separate records. Local sink acceptance is not confirmation of email or Telegram delivery.":
+    "此列表显示已存储的本地摘要。提醒、项目更新及投递模拟有单独的记录。本地测试收件箱接收不代表邮件或 Telegram 已送达。",
+  "All digest channels": "所有摘要渠道",
+  "Digest state": "摘要状态",
+  "All digest states": "所有摘要状态",
+  "Filter digest history": "筛选摘要历史",
+  "No digests match these filters.": "没有符合这些筛选条件的摘要。",
+  "Digest history navigation": "摘要历史导航",
+  "Newest digests": "最新摘要",
+  "Older digests": "更早的摘要",
+  "History is live: new records and state changes appear when you return to the newest results.":
+    "历史记录会更新：返回最新结果可查看新记录及状态变更。",
+  "Back to notification settings": "返回通知设置",
+  "Invalid history filters or cursor. Start from the newest results.":
+    "历史筛选条件或游标无效，请从最新结果开始。",
+  "Browse full digest history": "浏览完整摘要历史",
+
   "Send separate 7-day and 2-day deadline reminders":
     "单独接收提前 7 天及 2 天的截止日期提醒",
   "Send separate saved-item deadline, funding and closure updates":
