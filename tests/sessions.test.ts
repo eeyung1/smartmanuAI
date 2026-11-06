@@ -1,3 +1,5 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
@@ -77,11 +79,28 @@ async function login(
     actor: { userId: session.user.id, sessionId: session.session.id },
   };
 }
-for (const kind of ["pglite", "postgres"])
+for (const kind of ["pglite", "postgres"].filter(
+  (kind) =>
+    !process.env.SMARTMANU_SESSION_TEST_KIND ||
+    kind === process.env.SMARTMANU_SESSION_TEST_KIND,
+))
   test(
     `${kind}: session inventory is private and paginated; revocation invalidates real authentication cookies`,
     { skip: kind === "postgres" && !process.env.TEST_DATABASE_URL },
     async () => {
+      // Better Auth's in-memory authentication quotas are process-global.
+      // Each database scenario represents a separate deployment, so isolate its quota state.
+      if (kind === "postgres" && !process.env.SMARTMANU_SESSION_TEST_KIND) {
+        await promisify(execFile)(
+          process.execPath,
+          ["--import", "tsx", "--test", "tests/sessions.test.ts"],
+          {
+            env: { ...process.env, SMARTMANU_SESSION_TEST_KIND: "postgres" },
+            timeout: 60000,
+          },
+        );
+        return;
+      }
       const dir = await mkdtemp(join(tmpdir(), "smartmanu-sessions-")),
         schema = "sessions_" + randomUUID().replaceAll("-", "");
       let pool: Pool | undefined, url: string | undefined;
