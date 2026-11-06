@@ -34,10 +34,18 @@ export async function createSource(sql: SQL, userId: string, input: unknown) {
   const v = sourceSchema.parse(input);
   const id = randomUUID();
   await sql.query(
-    "INSERT INTO sources(id,name,url,synthetic,created_by) VALUES($1,$2,$3,$4,$5)",
-    [id, v.name, new URL(v.url).href, v.synthetic, userId],
+    "INSERT INTO sources(id,name,url,synthetic,created_by,source_type,source_language) VALUES($1,$2,$3,$4,$5,$6,$7)",
+    [
+      id,
+      v.name,
+      new URL(v.url).href,
+      v.synthetic,
+      userId,
+      v.sourceType,
+      v.sourceLanguage,
+    ],
   );
-  return { id, ...v };
+  return { id, ...v, metadataVersion: 1 };
 }
 export async function createDraft(
   sql: SQL,

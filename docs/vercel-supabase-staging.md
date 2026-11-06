@@ -71,3 +71,7 @@ Add `notification_preferences.applied_reminders_enabled boolean NOT NULL DEFAULT
 ## Application migration 019 (6 November 2026)
 
 Add `source_collection_policies.cadence_hours integer NOT NULL DEFAULT 24 CHECK (cadence_hours BETWEEN 6 AND 168)` within the private smartmanuai schema and record `019_source_collection_cadence.sql` in the app migration ledger. Health requires 19 app migrations. All existing source policies retain the former 24-hour cadence. Table count remains 39 and runtime reader permissions do not expand. This does not enable hosted workers or change source verification.
+
+## Application migration 020 (6 November 2026)
+
+Add bounded `sources.source_type` and `sources.source_language` columns defaulting to unknown, plus positive `metadata_version` defaulting to 1, only within smartmanuai. Record `020_source_metadata.sql` in the application ledger; health requires 20 migrations. Table count remains 39 and existing reader grants remain unchanged. No sources are automatically classified or admitted for collection, and hosted admin/account access remains disabled.

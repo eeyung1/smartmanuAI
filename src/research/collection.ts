@@ -284,7 +284,7 @@ export async function researchDashboard(sql: SQL, actor: string) {
   return {
     sources: (
       await sql.query(
-        "SELECT s.id,s.name,s.url,s.synthetic,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
+        "SELECT s.id,s.name,s.url,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
       )
     ).rows,
     jobs: (

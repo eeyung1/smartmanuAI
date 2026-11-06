@@ -1,4 +1,5 @@
 "use client";
+import SourceMetadataFields from "@/app/components/source-metadata-fields";
 import { useScreenText } from "@/src/i18n/context";
 import { useState } from "react";
 import Link from "next/link";
@@ -11,6 +12,9 @@ type Dashboard = {
     enabled: boolean;
     permission_note: string | null;
     cadence_hours: number;
+    source_type: string;
+    source_language: string;
+    metadata_version: number;
   }[];
   jobs: {
     id: string;
@@ -38,11 +42,15 @@ export default function ResearchWorkspace({
   const [data, setData] = useState(initial),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
-  async function submit(body: unknown) {
+  async function submit(
+    body: unknown,
+    endpoint = "/api/admin/research",
+    method = "POST",
+  ) {
     setBusy(true);
     try {
-      const r = await fetch("/api/admin/research", {
-        method: "POST",
+      const r = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
@@ -82,6 +90,30 @@ export default function ResearchWorkspace({
                     ? t("Collection enabled")
                     : t("Collection paused")}
               </p>
+              <form
+                key={source.id + ":" + source.metadata_version}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  const form = new FormData(event.currentTarget);
+                  void submit(
+                    {
+                      sourceId: source.id,
+                      expectedVersion: source.metadata_version,
+                      sourceType: form.get("sourceType"),
+                      sourceLanguage: form.get("sourceLanguage"),
+                    },
+                    "/api/admin/sources",
+                    "PATCH",
+                  );
+                }}
+              >
+                <h4>{t("Source metadata")}</h4>
+                <SourceMetadataFields
+                  sourceType={source.source_type}
+                  sourceLanguage={source.source_language}
+                />
+                <button disabled={busy}>{t("Save source metadata")}</button>
+              </form>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();

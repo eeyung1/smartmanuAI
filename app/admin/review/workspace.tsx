@@ -1,4 +1,5 @@
 "use client";
+import SourceMetadataFields from "@/app/components/source-metadata-fields";
 import LanguageTestFields from "@/app/components/language-test-fields";
 import { languageRequirementFromForm } from "@/src/domain/language-test-form";
 import { useScreenText } from "@/src/i18n/context";
@@ -128,6 +129,8 @@ export default function ReviewWorkspace({
                 name: f.get("name"),
                 url: f.get("url"),
                 synthetic: f.get("synthetic") === "on",
+                sourceType: f.get("sourceType"),
+                sourceLanguage: f.get("sourceLanguage"),
               });
               form.reset();
               setMessage("Source registered.");
@@ -151,6 +154,7 @@ export default function ReviewWorkspace({
             <input type="checkbox" name="synthetic" />
             {t("This is a synthetic local test source")}{" "}
           </label>
+          <SourceMetadataFields />
           <button disabled={busy}>{t("Register source")}</button>
         </form>
       </section>

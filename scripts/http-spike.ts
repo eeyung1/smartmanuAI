@@ -488,6 +488,55 @@ try {
   });
   assert.equal(official.status, 201);
   const officialSource = await official.json();
+  assert.equal(officialSource.sourceType, "unknown");
+  assert.equal(officialSource.sourceLanguage, "unknown");
+  const changeMetadata = (body: unknown, cookie = admin, origin = base) =>
+    fetch(base + "/api/admin/sources", {
+      method: "PATCH",
+      headers: {
+        Cookie: cookie,
+        Origin: origin,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  const metadata = {
+    sourceId: officialSource.id,
+    expectedVersion: 1,
+    sourceType: "university",
+    sourceLanguage: "zh",
+  };
+  assert.equal((await changeMetadata(metadata, a)).status, 403);
+  assert.equal(
+    (await changeMetadata(metadata, admin, "https://attacker.example.test"))
+      .status,
+    403,
+  );
+  assert.equal(
+    (await changeMetadata({ ...metadata, sourceType: "official" })).status,
+    400,
+  );
+  assert.equal(
+    (await changeMetadata({ ...metadata, url: "https://another.example.edu" }))
+      .status,
+    400,
+  );
+  assert.equal(
+    (
+      await fetch(base + "/api/admin/sources", {
+        method: "PATCH",
+        headers: { Origin: base, "Content-Type": "application/json" },
+        body: JSON.stringify(metadata),
+      })
+    ).status,
+    401,
+  );
+  const changedMetadata = await changeMetadata(metadata);
+  assert.equal(changedMetadata.status, 200);
+  assert.equal(changedMetadata.headers.get("cache-control"), "no-store");
+  assert.equal((await changedMetadata.json()).metadataVersion, 2);
+  assert.equal((await changeMetadata(metadata)).status, 409);
+
   assert.equal(
     (
       await post(
@@ -559,6 +608,15 @@ try {
   ).text();
   assert.match(cadenceHTML, /name="cadenceHours"/);
   assert.match(cadenceHTML, /采集间隔/);
+  assert.match(cadenceHTML, /name="sourceLanguage"/);
+  assert.match(cadenceHTML, /保存来源资料/);
+  const metadataSource = cadenceData.sources.find(
+    (item: { id: string }) => item.id === officialSource.id,
+  );
+  assert.equal(metadataSource.source_type, "university");
+  assert.equal(metadataSource.source_language, "zh");
+  assert.equal(metadataSource.metadata_version, 2);
+
   const created = await post("/api/admin/opportunities", {
     sourceId: source.id,
     details: { ...fixtureDetails, title: "HTTP reviewed factory course" },
