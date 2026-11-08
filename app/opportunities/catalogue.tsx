@@ -33,9 +33,16 @@ export default async function Catalogue({
     invalidFilters = true;
     filters = parseFilters({});
   }
-  const { items, total, page, pageSize } = invalidFilters
-    ? { items: [], total: 0, page: 1, pageSize: 12 }
-    : await listPublic((await getDatabase()).sql, filters);
+  const { items, total, page, pageSize, lastReviewedPublicationAt } =
+    invalidFilters
+      ? {
+          items: [],
+          total: 0,
+          page: 1,
+          pageSize: 12,
+          lastReviewedPublicationAt: null,
+        }
+      : await listPublic((await getDatabase()).sql, filters);
   const basePath = userId ? "/matches/explore" : "/opportunities";
   const personal =
     userId && !invalidFilters
@@ -275,6 +282,29 @@ export default async function Catalogue({
             ))}
           </div>
         )}
+        {!items.length && !invalidFilters ? (
+          <aside className="notice" aria-label={t("Catalogue review status")}>
+            <p>
+              {lastReviewedPublicationAt ? (
+                <>
+                  {t("Last reviewed publication (UTC):")}{" "}
+                  <time dateTime={lastReviewedPublicationAt}>
+                    {lastReviewedPublicationAt
+                      .replace("T", " ")
+                      .replace("Z", " UTC")}
+                  </time>
+                </>
+              ) : (
+                t("No reviewed non-synthetic publications are recorded yet.")
+              )}
+            </p>
+            <p>
+              {t(
+                "This catalogue-wide timestamp covers currently published records, including records hidden by filters or freshness limits. It does not confirm a complete source refresh or current availability.",
+              )}
+            </p>
+          </aside>
+        ) : null}
         <nav aria-label={t("Results pagination")} className="pagination">
           {page > 1 ? (
             <Link href={pageLink(page - 1)}>{t("Previous")}</Link>

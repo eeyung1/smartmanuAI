@@ -268,21 +268,31 @@ export async function listPublic(sql: SQL, input: Filters = {}) {
     );
   const page = Math.max(1, Math.min(1000, Math.floor(filters.page ?? 1)));
   const clause = where.join(" AND ");
-  const total = Number(
-    (
-      await sql.query(
-        `SELECT COUNT(*) AS total FROM opportunities o WHERE ${clause}`,
-        params,
-      )
-    ).rows[0].total,
-  );
+  const summary = (
+    await sql.query(
+      `SELECT COUNT(*) AS total,
+       (SELECT MAX(reviewed.verified_at) FROM opportunities reviewed JOIN sources source ON source.id=reviewed.source_id WHERE reviewed.state='published' AND NOT source.synthetic) AS last_reviewed_publication_at
+       FROM opportunities o WHERE ${clause}`,
+      params,
+    )
+  ).rows[0];
+  const total = Number(summary.total);
+  const lastReviewedPublicationAt = summary.last_reviewed_publication_at
+    ? new Date(String(summary.last_reviewed_publication_at)).toISOString()
+    : null;
   const rows = (
     await sql.query(
       `SELECT ${projection} FROM opportunities o JOIN sources s ON s.id=o.source_id WHERE ${clause} ORDER BY o.verified_at DESC,o.id LIMIT 12 OFFSET $${params.length + 1}`,
       [...params, (page - 1) * 12],
     )
   ).rows;
-  return { items: rows.map(publicRecord), total, page, pageSize: 12 };
+  return {
+    items: rows.map(publicRecord),
+    total,
+    page,
+    pageSize: 12,
+    lastReviewedPublicationAt,
+  };
 }
 export async function adminCatalogue(sql: SQL, userId: string) {
   await requireAdmin(sql, userId);

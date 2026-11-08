@@ -3,6 +3,12 @@ import { errorChinese } from "./errors";
 import { controlChinese } from "./controls";
 import type { Locale } from "./locale";
 export const screenChinese: Record<string, string> = {
+  "Catalogue review status": "目录审核状态",
+  "Last reviewed publication (UTC):": "最近一次已发布记录的审核时间（UTC）：",
+  "No reviewed non-synthetic publications are recorded yet.":
+    "目前尚无经过审核的非模拟发布记录。",
+  "This catalogue-wide timestamp covers currently published records, including records hidden by filters or freshness limits. It does not confirm a complete source refresh or current availability.":
+    "此目录级时间涵盖当前已发布的记录，包括因筛选或时效限制而隐藏的记录。它不表示所有来源均已刷新，也不保证机会当前仍然有效。",
   ...controlChinese,
   ...adminChinese,
   ...errorChinese,
