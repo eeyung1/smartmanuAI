@@ -101,7 +101,7 @@ for (const kind of ["pglite", "postgres"]) {
         const source = await createSource(db.sql, admin, {
           name: "Official fixture",
           url: "https://example.test/other",
-          synthetic: true,
+          synthetic: false,
         });
         const draft = await createDraft(db.sql, admin, {
           sourceId: source.id,
@@ -117,6 +117,10 @@ for (const kind of ["pglite", "postgres"]) {
         });
         assert.equal(await publicOpportunity(db.sql, draft.id), null);
         assert.equal((await listPublic(db.sql)).total, 1);
+        assert.equal(
+          (await listPublic(db.sql)).lastReviewedPublicationAt,
+          null,
+        );
         await assert.rejects(
           () =>
             reviewOpportunity(db.sql, admin, draft.id, {
@@ -177,7 +181,27 @@ for (const kind of ["pglite", "postgres"]) {
           ).total,
           1,
         );
-        assert.equal((await listPublic(db.sql, { q: "%" })).total, 0);
+        const empty = await listPublic(db.sql, { q: "%" });
+        assert.equal(empty.total, 0);
+        assert.ok(empty.lastReviewedPublicationAt);
+        assert.equal(
+          empty.lastReviewedPublicationAt,
+          (await listPublic(db.sql)).lastReviewedPublicationAt,
+        );
+        await db.sql.query(
+          "UPDATE opportunities SET verified_at=NOW()-INTERVAL '8 days' WHERE id=$1",
+          [draft.id],
+        );
+        const stale = await listPublic(db.sql, { category: "scholarship" });
+        assert.equal(stale.total, 0);
+        assert.ok(stale.lastReviewedPublicationAt);
+        assert.ok(
+          stale.lastReviewedPublicationAt < empty.lastReviewedPublicationAt,
+        );
+        await db.sql.query(
+          "UPDATE opportunities SET verified_at=$2 WHERE id=$1",
+          [draft.id, empty.lastReviewedPublicationAt],
+        );
         await saveItem(db.sql, "reader", draft.id);
         await saveItem(db.sql, "reader", draft.id);
         assert.equal((await listSaved(db.sql, "reader")).length, 1);
@@ -193,6 +217,10 @@ for (const kind of ["pglite", "postgres"]) {
         assert.equal(
           (await listPublic(db.sql, { category: "scholarship" })).total,
           0,
+        );
+        assert.equal(
+          (await listPublic(db.sql)).lastReviewedPublicationAt,
+          null,
         );
         await assert.rejects(() => saveItem(db.sql, "reader", draft.id));
         assert.equal((await listSaved(db.sql, "reader")).length, 1);
