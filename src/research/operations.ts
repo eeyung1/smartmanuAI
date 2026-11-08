@@ -91,7 +91,7 @@ export function budgetReservationStatus(
 ) {
   const limit = BigInt(limitMicros),
     reserved = BigInt(reservedMicros);
-  const level =
+  const level: "normal" | "warning" | "critical" | "full" =
     limit === 0n || reserved >= limit
       ? "full"
       : reserved * 100n >= limit * 90n
