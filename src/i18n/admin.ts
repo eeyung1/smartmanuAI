@@ -1,4 +1,17 @@
 export const adminChinese: Record<string, string> = {
+  "Reservations are below 70% of the configured limit.":
+    "预留量低于已配置上限的 70%。",
+  "Budget warning: reservations have reached 70% of the configured limit.":
+    "预算提醒：预留量已达到已配置上限的 70%。",
+  "Budget warning: reservations have reached 90% of the configured limit. Review optional research before running it.":
+    "预算提醒：预留量已达到已配置上限的 90%。运行可选研究前请先审核。",
+  "No unreserved budget capacity remains.": "没有剩余的未预留预算容量。",
+  "A zero limit has no meaningful utilization percentage.":
+    "上限为零时无法计算有意义的使用率。",
+  "Reserved capacity: {percent}% (rounded down).":
+    "已预留容量：{percent}%（向下取整）。",
+  "These warnings do not send messages, reduce workloads, reset the budget or measure provider spending. Existing reservation guards still apply to new work.":
+    "这些提醒不会发送消息、减少任务、重置预算或衡量供应商实际支出。新任务仍受现有预留限制保护。",
   "Collection schedule": "采集计划",
   "Fixed interval": "固定间隔",
   "Deadline-aware weekly/daily": "按截止日期每周或每天检查",

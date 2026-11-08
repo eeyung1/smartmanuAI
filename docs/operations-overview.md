@@ -23,3 +23,8 @@ The busy-host indicator counts distinct hostnames with running, unexpired job le
 Host cooldowns still active counts host records with a tracked last claim whose configured interval has not elapsed. This count can overlap busy hosts, and includes retained host records independently of whether work is currently queued.
 
 The effective source due target includes optional deadline-aware daily acceleration and untracked adaptive policies. It uses the same rule as scheduleSources, while holds can still prevent queueing.
+
+
+## Reservation warnings
+
+The shared budget shows normal (below 70%), warning (70% to below 90%), critical (90% to below full capacity) and full-capacity states. Exact integer ratios determine the state; displayed percentages truncate to two decimals. A zero limit always has no available capacity and no defined utilization percentage. These are current reservation indicators, not monthly spending or invoice figures. The read-only page neither sends alerts nor reduces optional work or changes the existing reservation guard.

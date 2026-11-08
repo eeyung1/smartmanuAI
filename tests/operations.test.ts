@@ -13,6 +13,7 @@ import { createSource } from "../src/catalogue/service";
 import {
   operationsOverview,
   formatBudgetUnits,
+  budgetReservationStatus,
 } from "../src/research/operations";
 import OperationsSummary from "../app/admin/operations/summary";
 for (const kind of ["pglite", "postgres"])
@@ -133,6 +134,7 @@ for (const kind of ["pglite", "postgres"])
           reservedMicros: "9007199254000000",
           availableMicros: "740993",
           overLimit: false,
+          reservationStatus: { level: "critical", percent: "99.99" },
         });
         assert.match(data.observedAt, /Z$/);
         assert.doesNotMatch(
@@ -155,6 +157,13 @@ for (const kind of ["pglite", "postgres"])
           assert.match(html, pattern);
           assert.match(html, /9007199254\.740993/);
           assert.match(html, /kind=jobs/);
+          assert.match(
+            html,
+            locale === "en"
+              ? /reservations have reached 90%/
+              : /预留量已达到已配置上限的 90%/,
+          );
+          assert.match(html, /99.99%/);
           assert.match(
             html,
             locale === "en"
@@ -205,3 +214,40 @@ for (const kind of ["pglite", "postgres"])
       }
     },
   );
+
+test("reservation warnings compare exact thresholds and handle zero/over-limit budgets", () => {
+  for (const [reserved, level, percent] of [
+    ["69", "normal", "69.00"],
+    ["70", "warning", "70.00"],
+    ["89", "warning", "89.00"],
+    ["90", "critical", "90.00"],
+    ["99", "critical", "99.00"],
+    ["100", "full", "100.00"],
+    ["101", "full", "101.00"],
+  ]) {
+    assert.deepEqual(budgetReservationStatus("100", reserved), {
+      level,
+      percent,
+    });
+  }
+  assert.deepEqual(budgetReservationStatus("0", "0"), {
+    level: "full",
+    percent: null,
+  });
+  assert.deepEqual(budgetReservationStatus("0", "1"), {
+    level: "full",
+    percent: null,
+  });
+  const limit = 90071992547409930n;
+  for (const threshold of [70n, 90n]) {
+    const boundary = (limit * threshold) / 100n;
+    assert.equal(
+      budgetReservationStatus(String(limit), String(boundary - 1n)).level,
+      threshold === 70n ? "normal" : "warning",
+    );
+    assert.equal(
+      budgetReservationStatus(String(limit), String(boundary + 1n)).level,
+      threshold === 70n ? "warning" : "critical",
+    );
+  }
+});

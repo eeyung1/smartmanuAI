@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **8 November 2026**, through [implementation PR #58](https://github.com/eeyung1/smartmanuAI/pull/58). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **8 November 2026**, through [implementation PR #59](https://github.com/eeyung1/smartmanuAI/pull/59). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -331,7 +331,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [ ] Full production/managed database validation, private-account database roles and development/staging/production separation.
 - [ ] Approve exact current hosting/search/model/email/backup prices and capacity before provisioning.
 - [ ] Monthly research budget periods, actual-cost/invoice reconciliation and provider spend overview.
-- [ ] Budget alerts at 70%, optional-work reduction at 90%, and production hard-cap/reserved essential capacity behavior.
+- [x] Read-only admin reservation warnings at exact 70%/90% thresholds and full capacity, with English/Chinese labels, precise percentages and zero-limit handling. Reservations are not provider charges.
+- [ ] External budget alerts, automatic optional-work reduction at 90%, and production hard-cap/reserved essential capacity behavior.
 - [x] Read-only workload-age indicators for queued records and pending candidates, stored-gate readiness, expired leases and scheduled-due sources, with exact UTC age semantics.
 - [ ] Live source-success, actual execution-duration, quota and delivery telemetry with secret/token redaction.
 - [ ] Alert administrators after two consecutive failed runs and show last successful shared refresh.
