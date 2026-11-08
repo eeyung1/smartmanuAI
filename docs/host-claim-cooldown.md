@@ -1,0 +1,11 @@
+# Shared hostname claim cooldown
+
+The research screen lets administrators configure 0–3600 seconds between claims for every registered URL on a hostname. Zero preserves prior behavior. This setting supplements the single-running-lease host gate and each source’s separate cooldown, policy and retry controls. It does not enable collection, clear Retry-After, change source cadence or cancel running work.
+
+PATCH `/api/admin/research/host-delay` accepts sourceId, expectedVersion and requestDelaySeconds. It requires a same-origin administrator session and rejects unknown fields, invalid bounds and client-supplied hostnames. The server derives the hostname from the source’s generated column. Sources on the same hostname share one settings version; stale edits return 409. Version zero means no host row has been observed. A newly created row starts at version one; a concurrent worker creating that row can require the operator to reload before saving.
+
+Workers persist last_claim_at while holding the hostname mutex, then require last_claim_at plus the shared interval to have elapsed before another claim. Initial candidate filtering and the locked recheck both enforce the gate. Worker timestamp updates do not change the operator settings version. Settings updates preserve claim history, including after a restart. Lowering an interval may make pending work immediately eligible; increasing it can extend the wait. History predating migration 024 is unknown/null, so the first tracked claim is allowed and subsequent claims use its timestamp.
+
+A finished, failed or cancelled attempt may free its running lease while its shared cooldown still applies. Expired-lease recovery must satisfy the cooldown too. Host cooldowns and active leases can overlap in the operations overview; queued-readiness includes both gates. Other hostnames stay independent.
+
+This measures the spacing of stored claim timestamps, not guaranteed HTTP request start times. Stalls, cancellations and expired work can affect network timing. Live request/cancellation/expiry qualification remains open. No request is made by editing these settings. Migration 024 adds constrained fields to the existing private host table and no new tables or runtime grants. Stop old workers before starting the upgraded worker version.

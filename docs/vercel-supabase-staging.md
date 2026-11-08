@@ -87,3 +87,7 @@ Add `source_collection_policies.request_delay_seconds integer NOT NULL DEFAULT 0
 ## Application migration 023 (6 November 2026)
 
 Add generated `sources.collection_host`, its index, private `collection_host_locks(hostname)` and the partial running-lease index within smartmanuai. Enable RLS and revoke public/anon/authenticated/reader access to the new mutex table; the existing source reader sees only its previously reviewed-source scope. Record `023_host_collection_leases.sql` in the app ledger. Health requires 23 migrations and the private schema now contains 40 RLS tables. Stop old workers before migrating/restarting a future worker deployment; older binaries do not enforce host coordination. Hosted staging remains read-only with workers/accounts disabled.
+
+## Application migration 024 (8 November 2026)
+
+Add `collection_host_locks.request_delay_seconds` (integer 0–3600, default 0), nullable `last_claim_at` and positive `version` (default 1) within smartmanuai. Record `024_host_claim_cooldown.sql` in the app ledger; health requires 24 migrations. There are still 40 RLS tables and no expanded reader/public grants. Existing host rows get no added delay and untracked history stays null until a new claim. Stop old worker binaries before any future worker upgrade; hosted workers/accounts remain disabled.

@@ -35,6 +35,7 @@ for (const kind of ["pglite", "postgres"])
         assert.deepEqual(empty.aging, {
           queuedReady: "0",
           busyHosts: "0",
+          coolingHosts: "0",
           expiredLeases: "0",
           oldestQueuedAt: null,
           oldestQueuedAgeSeconds: null,

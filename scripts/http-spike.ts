@@ -322,6 +322,7 @@ try {
   assert.equal(typeof operations.aging.queuedReady, "string");
   assert.equal(typeof operations.aging.expiredLeases, "string");
   assert.equal(typeof operations.aging.busyHosts, "string");
+  assert.equal(typeof operations.aging.coolingHosts, "string");
   assert.equal(typeof operations.sources.due, "string");
   assert.equal(typeof operations.budget.reservedMicros, "string");
   assert.ok(BigInt(operations.jobs.failed) >= 1n);
@@ -664,6 +665,47 @@ try {
   assert.match(cadenceHTML, /采集间隔/);
   assert.match(cadenceHTML, /尝试最小间隔/);
   assert.match(cadenceHTML, /采集主机名/);
+  assert.match(cadenceHTML, /共享主机名冷却间隔/);
+  const hostSettingSource = cadenceData.sources.find(
+    (item: { id: string }) => item.id === officialSource.id,
+  );
+  const hostSetting = {
+    sourceId: officialSource.id,
+    expectedVersion: hostSettingSource.host_policy_version,
+    requestDelaySeconds: 60,
+  };
+  const patchHost = (body: unknown, cookie = admin, origin = base) =>
+    fetch(base + "/api/admin/research/host-delay", {
+      method: "PATCH",
+      headers: {
+        Cookie: cookie,
+        Origin: origin,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  assert.equal((await patchHost(hostSetting, a)).status, 403);
+  assert.equal(
+    (await patchHost(hostSetting, admin, "https://attacker.example.test"))
+      .status,
+    403,
+  );
+  assert.equal(
+    (await patchHost({ ...hostSetting, requestDelaySeconds: 3601 })).status,
+    400,
+  );
+  assert.equal(
+    (await patchHost({ ...hostSetting, hostname: "other.example.edu" })).status,
+    400,
+  );
+  const hostChanged = await patchHost(hostSetting);
+  assert.equal(hostChanged.status, 200);
+  assert.equal(hostChanged.headers.get("cache-control"), "no-store");
+  const hostSaved = await hostChanged.json();
+  assert.equal(hostSaved.hostname, "school.example.edu");
+  assert.equal(hostSaved.requestDelaySeconds, 60);
+  assert.equal((await patchHost(hostSetting)).status, 409);
+
   assert.equal(
     cadenceData.sources.find(
       (item: { id: string }) => item.id === officialSource.id,

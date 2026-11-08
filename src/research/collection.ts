@@ -93,7 +93,7 @@ export async function claimCollection(sql: SQL) {
   return sql.transaction(async (tx) => {
     const row = (
       await tx.query(
-        "SELECT j.id,j.source_id,s.url,s.collection_host FROM research_jobs j JOIN sources s ON s.id=j.source_id JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id WHERE p.enabled AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) AND (p.last_request_at IS NULL OR p.last_request_at+p.request_delay_seconds*INTERVAL '1 second'<=NOW()) AND j.attempts<3 AND ((j.state='queued' AND j.available_at<=NOW()) OR (j.state='running' AND j.lease_until<NOW())) AND NOT EXISTS(SELECT 1 FROM sources busy_source JOIN research_jobs busy_job ON busy_job.source_id=busy_source.id WHERE busy_source.collection_host=s.collection_host AND busy_job.state='running' AND busy_job.lease_until>NOW()) ORDER BY j.created_at,j.id LIMIT 1",
+        "SELECT j.id,j.source_id,s.url,s.collection_host FROM research_jobs j JOIN sources s ON s.id=j.source_id JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id LEFT JOIN collection_host_locks h ON h.hostname=s.collection_host WHERE (h.last_claim_at IS NULL OR h.last_claim_at+h.request_delay_seconds*INTERVAL '1 second'<=NOW()) AND p.enabled AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) AND (p.last_request_at IS NULL OR p.last_request_at+p.request_delay_seconds*INTERVAL '1 second'<=NOW()) AND j.attempts<3 AND ((j.state='queued' AND j.available_at<=NOW()) OR (j.state='running' AND j.lease_until<NOW())) AND NOT EXISTS(SELECT 1 FROM sources busy_source JOIN research_jobs busy_job ON busy_job.source_id=busy_source.id WHERE busy_source.collection_host=s.collection_host AND busy_job.state='running' AND busy_job.lease_until>NOW()) ORDER BY j.created_at,j.id LIMIT 1",
       )
     ).rows[0];
     if (!row) return null;
@@ -104,7 +104,7 @@ export async function claimCollection(sql: SQL) {
     );
     const host = (
       await tx.query(
-        "SELECT hostname FROM collection_host_locks WHERE hostname=$1 FOR UPDATE SKIP LOCKED",
+        "SELECT hostname FROM collection_host_locks WHERE hostname=$1 AND (last_claim_at IS NULL OR last_claim_at+request_delay_seconds*INTERVAL '1 second'<=NOW()) FOR UPDATE SKIP LOCKED",
         [row.collection_host],
       )
     ).rows[0];
@@ -141,6 +141,10 @@ export async function claimCollection(sql: SQL) {
     await tx.query(
       "UPDATE source_collection_policies SET last_request_at=NOW() WHERE source_id=$1",
       [row.source_id],
+    );
+    await tx.query(
+      "UPDATE collection_host_locks SET last_claim_at=NOW() WHERE hostname=$1",
+      [row.collection_host],
     );
     return {
       id: String(row.id),
@@ -333,7 +337,7 @@ export async function researchDashboard(sql: SQL, actor: string) {
   await requireAdmin(sql, actor);
   const sources = (
     await sql.query(
-      "SELECT s.id,s.name,s.url,s.collection_host,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id ORDER BY s.created_at DESC LIMIT 100",
+      "SELECT s.id,s.name,s.url,s.collection_host,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at,COALESCE(h.request_delay_seconds,0) AS host_delay_seconds,COALESCE(h.version,0) AS host_policy_version FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN collection_host_locks h ON h.hostname=s.collection_host ORDER BY s.created_at DESC LIMIT 100",
     )
   ).rows;
   const counts = await sourceJobCounts(
