@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **8 November 2026**, through [implementation PR #56](https://github.com/eeyung1/smartmanuAI/pull/56). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **8 November 2026**, through [implementation PR #57](https://github.com/eeyung1/smartmanuAI/pull/57). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -267,7 +267,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 ### 10. Email unsubscribe and suppression
 
 - [x] Purpose-scoped signed unsubscribe capabilities with hashed nonces, consent epochs, expiry and idempotence.
-- [x] Non-mutating GET/HEAD landing; session-free confirmation and supported form-encoded one-click POST.
+- [x] Non-mutating GET/HEAD landing; session-free confirmation and bounded URL-encoded/multipart one-click POST, rejecting file fields and ambiguous duplicate tokens.
 - [x] Keep opt-out scoped to optional email digests, without pausing Telegram or authentication mail.
 - [x] Prevent old consent-epoch links from disabling a later explicit opt-in.
 - [x] Raw-body, timestamped Resend/Svix-shaped callback signature verification and event replay suppression.
@@ -276,7 +276,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Recheck suppression in settings, planning and dispatch; cancel affected queued email digests.
 - [x] No-store/no-referrer protections and escaped browser unsubscribe responses.
 - [ ] Verify a real sender/domain, authenticated mail/DKIM, provider account and public callback endpoint.
-- [ ] Complete production RFC 8058/mailbox interoperability, including required headers and multipart POST support.
+- [ ] Complete production RFC 8058/mailbox interoperability, including DKIM coverage of the existing unsubscribe headers and real mailbox/provider qualification.
 - [ ] Production suppression-review/support process, key rotation and token redaction in external logs.
 
 ### 11. Outbound adapters and delivery simulations

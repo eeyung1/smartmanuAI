@@ -1368,6 +1368,19 @@ try {
         body: "List-Unsubscribe=One-Click",
       },
     );
+  const multipart = new FormData();
+  multipart.set("List-Unsubscribe", "One-Click");
+  assert.equal(
+    (
+      await fetch(
+        base +
+          "/api/notifications/unsubscribe?token=" +
+          encodeURIComponent(nonce),
+        { method: "POST", body: multipart },
+      )
+    ).status,
+    200,
+  );
   assert.equal((await oneClick()).status, 200);
   assert.equal((await oneClick()).status, 200);
   assert.equal(

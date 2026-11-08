@@ -13,6 +13,7 @@ export const errorChinese: Record<string, string> = {
     "暂存预览：只读目录。登录及通知尚未启用。",
 
   "Email control testing is unavailable.": "邮件控制测试当前不可用。",
+  "Invalid unsubscribe form.": "退订表单无效。",
   "Invalid unsubscribe link.": "退订链接无效。",
   "Unsubscribe link expired.": "退订链接已过期。",
   "Invalid email webhook authentication.": "邮件回调验证失败。",

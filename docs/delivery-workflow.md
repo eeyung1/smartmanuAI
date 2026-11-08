@@ -260,3 +260,8 @@ Source policies now support optional deadline-aware scheduling while retaining f
 ### Checkpoint 48 — catalogue review indicator (8 November 2026)
 
 Empty public and private exploration results now show the catalogue-wide latest review timestamp among currently published non-synthetic records, including stale or filtered-out publications. No eligible publication produces an explicit unavailable message. English and Chinese copy distinguishes this timestamp from a complete source refresh or current availability. Invalid filters do not claim a successful review lookup. The public listing API exposes only this aggregate ISO timestamp, without source, reviewer or private data. Existing stale/deadline visibility rules remain unchanged; no migration or reader grants are needed. Tests cover synthetic exclusion, filter independence, stale publication visibility and closed-record exclusion. Full shared-refresh tracking remains open.
+
+
+### Checkpoint 49 — multipart unsubscribe requests (8 November 2026)
+
+The session-free email unsubscribe endpoint accepts URL-encoded and multipart form bodies through the same 64 KB streaming limit. It rejects malformed multipart, file fields, duplicate form values, repeated query tokens and conflicting query/body tokens before database access. Manual confirmation, signature/expiry/consent-epoch checks, idempotence and channel scope remain unchanged. Tests exercise parsing failures and the HTTP spike unsubscribes with multipart before replaying URL-encoded requests. No migration or live email activation is involved. RFC 8058 section 3.2 supports these form encodings; production DKIM header coverage and real mailbox interoperability remain unchecked.
