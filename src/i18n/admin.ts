@@ -1,4 +1,9 @@
 export const adminChinese: Record<string, string> = {
+  "Collection schedule": "采集计划",
+  "Fixed interval": "固定间隔",
+  "Deadline-aware weekly/daily": "按截止日期每周或每天检查",
+  "Fixed mode uses the interval below. Deadline-aware mode schedules weekly, or daily for published records closing today through the next 14 UTC days. Untracked schedules can run on the next pass. Collection does not reverify publication.":
+    "固定模式使用下方间隔。按截止日期模式每周调度；已发布记录在今天至未来 14 个 UTC 日内截止时改为每天。没有调度历史的来源可在下次执行时运行。采集不会重新核实发布信息。",
   "Registered URLs on a hostname share one active collection lease and the configured host cooldown. A cooldown can extend the wait after a lease ends. Exact HTTP request timing still needs qualification.":
     "同一主机名下的已注册 URL 共享一个活动采集租约及已配置的主机冷却间隔。租约结束后，冷却间隔可能继续限制认领。HTTP 请求的精确时间仍需实测验证。",
   "Active host leases and cooldowns can overlap; their counts are separate indicators.":

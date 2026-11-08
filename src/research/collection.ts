@@ -1,3 +1,8 @@
+import {
+  sourceDueSQL,
+  effectiveSourceDueSQL,
+  nextSourceDueSQL,
+} from "./schedule-policy";
 import { sourceJobCounts } from "./source-counts";
 import { randomUUID, createHash } from "node:crypto";
 import { z } from "zod";
@@ -17,6 +22,7 @@ const policySchema = z
     permissionNote: z.string().trim().min(10).max(1000),
     cadenceHours: z.number().int().min(6).max(168).optional(),
     requestDelaySeconds: z.number().int().min(0).max(3600).optional(),
+    scheduleMode: z.enum(["fixed", "deadline_aware"]).optional(),
   })
   .strict();
 export async function collectionPolicy(
@@ -43,7 +49,7 @@ export async function collectionPolicy(
         "Synthetic sources cannot be collected live.",
       );
     await tx.query(
-      "INSERT INTO source_collection_policies(source_id,enabled,permission_note,actor_id,cadence_hours,request_delay_seconds) VALUES($1,$2,$3,$4,COALESCE($5,24),COALESCE($6,0)) ON CONFLICT(source_id) DO UPDATE SET enabled=$2,permission_note=$3,actor_id=$4,cadence_hours=COALESCE($5,source_collection_policies.cadence_hours),request_delay_seconds=COALESCE($6,source_collection_policies.request_delay_seconds),updated_at=NOW()",
+      "INSERT INTO source_collection_policies(source_id,enabled,permission_note,actor_id,cadence_hours,request_delay_seconds,schedule_mode) VALUES($1,$2,$3,$4,COALESCE($5,24),COALESCE($6,0),COALESCE($7,'fixed')) ON CONFLICT(source_id) DO UPDATE SET enabled=$2,permission_note=$3,actor_id=$4,cadence_hours=COALESCE($5,source_collection_policies.cadence_hours),request_delay_seconds=COALESCE($6,source_collection_policies.request_delay_seconds),schedule_mode=COALESCE($7,source_collection_policies.schedule_mode),updated_at=NOW()",
       [
         v.sourceId,
         v.enabled,
@@ -51,6 +57,7 @@ export async function collectionPolicy(
         actor,
         v.cadenceHours ?? null,
         v.requestDelaySeconds ?? null,
+        v.scheduleMode ?? null,
       ],
     );
     if (v.enabled)
@@ -69,7 +76,7 @@ export async function scheduleSources(sql: SQL) {
   return sql.transaction(async (tx) => {
     const due = (
       await tx.query(
-        "SELECT p.source_id FROM source_collection_policies p LEFT JOIN source_retry_after r ON r.source_id=p.source_id WHERE p.enabled AND p.next_due_at<=NOW() AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) ORDER BY p.next_due_at LIMIT 25 FOR UPDATE OF p SKIP LOCKED",
+        `SELECT p.source_id FROM source_collection_policies p LEFT JOIN source_retry_after r ON r.source_id=p.source_id WHERE p.enabled AND ${sourceDueSQL} AND NOT COALESCE(r.requires_review,false) AND (r.retry_after_at IS NULL OR r.retry_after_at<=NOW()) ORDER BY ${effectiveSourceDueSQL},p.source_id LIMIT 25 FOR UPDATE OF p SKIP LOCKED`,
       )
     ).rows;
     for (const row of due) {
@@ -78,7 +85,7 @@ export async function scheduleSources(sql: SQL) {
         [randomUUID(), row.source_id],
       );
       await tx.query(
-        "UPDATE source_collection_policies SET next_due_at=NOW()+cadence_hours*INTERVAL '1 hour' WHERE source_id=$1",
+        `UPDATE source_collection_policies p SET next_due_at=${nextSourceDueSQL},last_scheduled_at=NOW() WHERE p.source_id=$1`,
         [row.source_id],
       );
     }
@@ -337,7 +344,7 @@ export async function researchDashboard(sql: SQL, actor: string) {
   await requireAdmin(sql, actor);
   const sources = (
     await sql.query(
-      "SELECT s.id,s.name,s.url,s.collection_host,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at,COALESCE(h.request_delay_seconds,0) AS host_delay_seconds,COALESCE(h.version,0) AS host_policy_version FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN collection_host_locks h ON h.hostname=s.collection_host ORDER BY s.created_at DESC LIMIT 100",
+      "SELECT s.id,s.name,s.url,s.collection_host,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at,COALESCE(p.schedule_mode,'fixed') AS schedule_mode,p.last_scheduled_at,COALESCE(h.request_delay_seconds,0) AS host_delay_seconds,COALESCE(h.version,0) AS host_policy_version FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN collection_host_locks h ON h.hostname=s.collection_host ORDER BY s.created_at DESC LIMIT 100",
     )
   ).rows;
   const counts = await sourceJobCounts(

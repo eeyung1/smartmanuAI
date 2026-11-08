@@ -195,6 +195,12 @@ ALTER TABLE collection_host_locks
   ADD COLUMN version integer NOT NULL DEFAULT 1 CHECK(version>0);
 
 INSERT INTO schema_migrations(name) VALUES('024_host_claim_cooldown.sql');
+ALTER TABLE source_collection_policies
+  ADD COLUMN schedule_mode text NOT NULL DEFAULT 'fixed' CHECK(schedule_mode IN ('fixed','deadline_aware')),
+  ADD COLUMN last_scheduled_at timestamptz;
+CREATE INDEX opportunities_source_deadline ON opportunities(source_id,(details->>'deadline')) WHERE state='published';
+
+INSERT INTO schema_migrations(name) VALUES('025_deadline_aware_schedule.sql');
 DO $guard$ DECLARE item record; BEGIN FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='smartmanuai' LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY','smartmanuai',item.tablename); END LOOP; FOR item IN SELECT p.oid::regprocedure AS signature FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='smartmanuai' LOOP EXECUTE format('ALTER FUNCTION %s SET search_path=smartmanuai,pg_catalog',item.signature); END LOOP; END $guard$;
 REVOKE ALL ON SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "smartmanuai" FROM PUBLIC;
