@@ -316,6 +316,24 @@ for (const kind of ["pglite", "postgres"])
           "UPDATE opportunities SET verified_at=NOW()-INTERVAL '8 days' WHERE id='synthetic-course'",
         );
         assert.equal((await matchesForUser(db.sql, "a")).total, 0);
+        await saveProfile(db.sql, "a", profile);
+        await db.sql.query(
+          "INSERT INTO opportunities(id,source_id,revision,state,details,evidence,verified_at) SELECT 'wide-'||LPAD(n::text,4,'0'),$1,1,'published',$2::jsonb,$3::jsonb,NOW()-n*INTERVAL '1 second' FROM generate_series(1,1002) AS n",
+          [sourceId, JSON.stringify(details), JSON.stringify(fixtureEvidence)],
+        );
+        const wide = await matchesForUser(db.sql, "a", 84);
+        assert.equal(wide.total, 1002);
+        assert.equal(wide.truncated, false);
+        assert.equal(wide.items.length, 6);
+        assert.ok(wide.items.some((item) => item.id === "wide-1002"));
+        // Older qualifying candidates remain reachable even behind 1,001 mismatches.
+        await db.sql.query(
+          "UPDATE opportunities SET details=jsonb_set(details,'{topics}','[\"robotics\"]'::jsonb) WHERE id LIKE 'wide-%' AND id!='wide-1002'",
+        );
+        const tail = await matchesForUser(db.sql, "a");
+        assert.equal(tail.total, 1);
+        assert.equal(tail.items[0].id, "wide-1002");
+        assert.equal((await matchesForUser(db.sql, "b")).total, 0);
       } finally {
         await db.close();
         if (pool) {

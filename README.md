@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **8 November 2026**, through [implementation PR #59](https://github.com/eeyung1/smartmanuAI/pull/59). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **8 November 2026**, through [implementation PR #60](https://github.com/eeyung1/smartmanuAI/pull/60). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -192,7 +192,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Explain ranking using topic overlap and explicit preference matches, without admission probabilities.
 - [x] English/Chinese topic synonym groups for smart/intelligent manufacturing, automation, robotics, industrial AI, digital twins and industrial IoT.
 - [x] Recalculate matches on request with profile, rules and opportunity versions.
-- [x] Twelve-item match pages over at most 1,000 eligible candidates, with a disclosed truncation flag.
+- [x] Twelve-item match pages rank the full fresh, funded, published candidate set, without the former 1,000-candidate cutoff. Profile facts and private dismissals use the same statement snapshot.
 - [x] Save once, remove a save, dismiss and restore, with owner-scoped persistence.
 - [x] Interested/applying/applied statuses; applied remains a user-reported status.
 - [x] Keep save state, application status and dismissal independent; reject stale tracker versions.
@@ -200,7 +200,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Relevant material changes can resurface a dismissed record; closed/stale saved history remains available.
 - [x] Preserve the last public title when the current record is an unpublished revision.
 - [x] Tracker pagination, literal search and status filtering beyond the latest 100 rows.
-- [ ] Matching over the full catalogue beyond the 1,000-candidate bound and stronger cross-request snapshot consistency.
+- [x] Match coverage beyond 1,000 candidates, including older matches behind nonmatching records, with exact totals for each request.
+- [ ] Stable matching snapshots across requests, production memory/latency qualification and full-catalogue digest planning beyond the existing 1,000-returned-match worker bound.
 - [x] Residence eligibility independent of nationality, including explicit unrestricted residence and missing-profile/source information.
 - [x] Source-evidenced single mandatory overall language-test threshold; compare only matching test/version/scale with current dated validity, and explain missing/expired/incompatible evidence.
 - [ ] Alternative tests, waivers, section-score combinations, source-specific validity cutoffs and detailed qualification-equivalence rules.
