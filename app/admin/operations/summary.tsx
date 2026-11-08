@@ -184,6 +184,30 @@ export default function OperationsSummary({
         </p>
         {data.budget ? (
           <>
+            <p role="status">
+              {t(
+                {
+                  normal: "Reservations are below 70% of the configured limit.",
+                  warning:
+                    "Budget warning: reservations have reached 70% of the configured limit.",
+                  critical:
+                    "Budget warning: reservations have reached 90% of the configured limit. Review optional research before running it.",
+                  full: "No unreserved budget capacity remains.",
+                }[data.budget.reservationStatus.level],
+              )}
+            </p>
+            <p>
+              {data.budget.reservationStatus.percent === null
+                ? t("A zero limit has no meaningful utilization percentage.")
+                : t("Reserved capacity: {percent}% (rounded down).", {
+                    percent: data.budget.reservationStatus.percent,
+                  })}
+            </p>
+            <p>
+              {t(
+                "These warnings do not send messages, reduce workloads, reset the budget or measure provider spending. Existing reservation guards still apply to new work.",
+              )}
+            </p>
             <dl>
               {(
                 [

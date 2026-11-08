@@ -53,6 +53,10 @@ export async function operationsOverview(sql: SQL, actor: string) {
     budget: row.budget
       ? {
           ...row.budget,
+          reservationStatus: budgetReservationStatus(
+            row.budget.limitMicros,
+            row.budget.reservedMicros,
+          ),
           availableMicros: (BigInt(row.budget.limitMicros) >
           BigInt(row.budget.reservedMicros)
             ? BigInt(row.budget.limitMicros) - BigInt(row.budget.reservedMicros)
@@ -77,5 +81,30 @@ export function durationParts(seconds: string) {
     hours: ((total % 86400n) / 3600n).toString(),
     minutes: ((total % 3600n) / 60n).toString(),
     seconds: (total % 60n).toString(),
+  };
+}
+
+/** Threshold comparisons never round or convert database bigint values to Number. */
+export function budgetReservationStatus(
+  limitMicros: string,
+  reservedMicros: string,
+) {
+  const limit = BigInt(limitMicros),
+    reserved = BigInt(reservedMicros);
+  const level =
+    limit === 0n || reserved >= limit
+      ? "full"
+      : reserved * 100n >= limit * 90n
+        ? "critical"
+        : reserved * 100n >= limit * 70n
+          ? "warning"
+          : "normal";
+  const hundredths = limit > 0n ? (reserved * 10000n) / limit : null;
+  return {
+    level,
+    percent:
+      hundredths === null
+        ? null
+        : `${hundredths / 100n}.${String(hundredths % 100n).padStart(2, "0")}`,
   };
 }
