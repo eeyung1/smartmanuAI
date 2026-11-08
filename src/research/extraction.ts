@@ -238,6 +238,29 @@ export async function extractCandidate(
     throw error;
   }
 }
+/** One candidate per invocation. Existing attempts, including uncertain attempts, are never retried. */
+export async function extractNextCandidate(
+  sql: SQL,
+  actor: string,
+  extract: Extractor,
+  options: { model: string; reservationMicros: number },
+) {
+  await requireAdmin(sql, actor);
+  const candidate = (
+    await sql.query(
+      "SELECT c.id FROM research_candidates c WHERE c.state='pending' AND NOT EXISTS(SELECT 1 FROM research_usage u WHERE u.candidate_id=c.id) ORDER BY c.created_at,c.id LIMIT 1",
+    )
+  ).rows[0];
+  if (!candidate) return { state: "idle" as const };
+  const candidateId = String(candidate.id);
+  // extractCandidate locks and reserves before the provider call. A competing worker
+  // may win after this selection; propagate that conflict without trying another call.
+  return {
+    candidateId,
+    ...(await extractCandidate(sql, actor, candidateId, extract, options)),
+  };
+}
+
 export function configuredGatewayExtractor(
   env: Record<string, string | undefined> = process.env,
 ): { extract: Extractor; model: string; reservationMicros: number } {
