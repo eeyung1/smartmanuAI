@@ -219,9 +219,21 @@ export async function matchesForUser(
   page = 1,
   pageSize = 12,
 ) {
+  // One statement observes profile, candidate facts and dismissals in one database snapshot.
   const stored = (
-    await sql.query(
-      "SELECT preferences,version FROM profiles WHERE user_id=$1",
+    await sql.query<{
+      preferences: unknown;
+      version: number;
+      candidates: Record<string, unknown>[];
+    }>(
+      `SELECT p.preferences,p.version,COALESCE((SELECT jsonb_agg(candidate) FROM (
+        SELECT o.id,o.revision,o.details,s.synthetic,t.version AS tracker_version,t.dismissed_fingerprint
+        FROM opportunities o JOIN sources s ON s.id=o.source_id
+        LEFT JOIN saved_items t ON t.opportunity_id=o.id AND t.user_id=p.user_id
+        WHERE o.state='published' AND o.verified_at>=NOW()-INTERVAL '7 days'
+          AND (o.details->>'deadline' IS NULL OR o.details->>'deadline'>TO_CHAR(CURRENT_TIMESTAMP AT TIME ZONE 'UTC','YYYY-MM-DD'))
+          AND o.details->>'funding' IN ('fully_funded','tuition_only','free_participation')
+      ) candidate),'[]'::jsonb) AS candidates FROM profiles p WHERE p.user_id=$1`,
       [userId],
     )
   ).rows[0];
@@ -237,14 +249,7 @@ export async function matchesForUser(
       truncated: false,
     };
   const profile = preferencesSchema.parse(stored.preferences);
-  const rows = (
-    await sql.query(
-      "SELECT o.id,o.revision,o.details,o.verified_at,s.synthetic,t.version AS tracker_version,t.dismissed_fingerprint FROM opportunities o JOIN sources s ON s.id=o.source_id LEFT JOIN saved_items t ON t.opportunity_id=o.id AND t.user_id=$1 WHERE o.state='published' AND o.verified_at>=NOW()-INTERVAL '7 days' AND (o.details->>'deadline' IS NULL OR o.details->>'deadline'>TO_CHAR(CURRENT_TIMESTAMP AT TIME ZONE 'UTC','YYYY-MM-DD')) AND o.details->>'funding' IN ('fully_funded','tuition_only','free_participation') ORDER BY o.verified_at DESC,o.id LIMIT 1001",
-      [userId],
-    )
-  ).rows;
-  const ranked = rows
-    .slice(0, 1000)
+  const ranked = stored.candidates
     .flatMap((row) => {
       const details = detailsSchema.parse(row.details);
       if (row.dismissed_fingerprint === materialFingerprint(details)) return [];
@@ -278,6 +283,6 @@ export async function matchesForUser(
     total: ranked.length,
     page,
     pageSize,
-    truncated: rows.length > 1000,
+    truncated: false,
   };
 }
