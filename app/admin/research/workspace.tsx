@@ -9,6 +9,8 @@ type Dashboard = {
     name: string;
     url: string;
     collection_host: string;
+    host_delay_seconds: number;
+    host_policy_version: number;
     synthetic: boolean;
     enabled: boolean;
     permission_note: string | null;
@@ -94,7 +96,7 @@ export default function ResearchWorkspace({
         </p>
         <p>
           {t(
-            "One unexpired running collection lease is allowed per hostname, across registered source URLs. Completion, failure, cancellation or lease expiry releases the gate. This is lease-backed coordination, not a minimum gap between requests.",
+            "Registered URLs on a hostname share one active collection lease and the configured host cooldown. A cooldown can extend the wait after a lease ends. Exact HTTP request timing still needs qualification.",
           )}
         </p>
         {data.sources.length ? (
@@ -113,6 +115,44 @@ export default function ResearchWorkspace({
                     ? t("Collection enabled")
                     : t("Collection paused")}
               </p>
+              <form
+                key={source.id + ":host:" + source.host_policy_version}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  const form = new FormData(event.currentTarget);
+                  void submit(
+                    {
+                      sourceId: source.id,
+                      expectedVersion: source.host_policy_version,
+                      requestDelaySeconds: Number(form.get("hostDelaySeconds")),
+                    },
+                    "/api/admin/research/host-delay",
+                    "PATCH",
+                  );
+                }}
+              >
+                <h4>{t("Shared hostname cooldown")}</h4>
+                <label>
+                  {t("Minimum host claim delay (seconds)")}
+                  <input
+                    name="hostDelaySeconds"
+                    type="number"
+                    min={0}
+                    max={3600}
+                    step={1}
+                    required
+                    defaultValue={source.host_delay_seconds}
+                  />
+                </label>
+                <p>
+                  {t(
+                    "Shared by every registered URL on this hostname. Choose 0–3600 seconds between host claims. Edits retain claim history; zero adds no delay. Existing running work is not cancelled, and exact HTTP start timing is not guaranteed.",
+                  )}
+                </p>
+                <button disabled={busy}>
+                  {t("Save shared host cooldown")}
+                </button>
+              </form>
               <section aria-label={t("Collection job counts")}>
                 <h4>{t("Collection job counts")}</h4>
                 <dl>

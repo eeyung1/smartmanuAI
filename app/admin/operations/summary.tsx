@@ -40,6 +40,10 @@ export default function OperationsSummary({
             <dd>{data.aging.busyHosts}</dd>
           </div>
           <div>
+            <dt>{t("Host cooldowns still active")}</dt>
+            <dd>{data.aging.coolingHosts}</dd>
+          </div>
+          <div>
             <dt>{t("Queued jobs passing stored scheduling gates")}</dt>
             <dd>{data.aging.queuedReady}</dd>
           </div>
@@ -86,6 +90,11 @@ export default function OperationsSummary({
             </div>
           ))}
         </dl>
+        <p>
+          {t(
+            "Active host leases and cooldowns can overlap; their counts are separate indicators.",
+          )}
+        </p>
         <p>
           {t(
             "Ages start at record creation and include retries and holds; they are not time in the current state or execution duration. UTC ages clamp future creation times to zero.",

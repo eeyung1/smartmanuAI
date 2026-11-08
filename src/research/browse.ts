@@ -150,7 +150,7 @@ export async function selectedResearchData(
     if (!source) {
       source = (
         await sql.query(
-          "SELECT s.id,s.name,s.url,s.collection_host,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id WHERE s.id=$1",
+          "SELECT s.id,s.name,s.url,s.collection_host,s.synthetic,s.source_type,s.source_language,s.metadata_version,COALESCE(p.enabled,false) AS enabled,p.permission_note,p.next_due_at,COALESCE(p.cadence_hours,24) AS cadence_hours,COALESCE(p.request_delay_seconds,0) AS request_delay_seconds,p.last_request_at,COALESCE(h.request_delay_seconds,0) AS host_delay_seconds,COALESCE(h.version,0) AS host_policy_version FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN collection_host_locks h ON h.hostname=s.collection_host WHERE s.id=$1",
           [sourceId],
         )
       ).rows[0];

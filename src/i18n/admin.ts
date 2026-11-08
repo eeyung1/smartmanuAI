@@ -1,4 +1,16 @@
 export const adminChinese: Record<string, string> = {
+  "Registered URLs on a hostname share one active collection lease and the configured host cooldown. A cooldown can extend the wait after a lease ends. Exact HTTP request timing still needs qualification.":
+    "同一主机名下的已注册 URL 共享一个活动采集租约及已配置的主机冷却间隔。租约结束后，冷却间隔可能继续限制认领。HTTP 请求的精确时间仍需实测验证。",
+  "Active host leases and cooldowns can overlap; their counts are separate indicators.":
+    "活动主机租约与冷却期可能重叠；两项计数是独立指标。",
+  "Shared hostname cooldown": "共享主机名冷却间隔",
+  "Minimum host claim delay (seconds)": "主机认领最小间隔（秒）",
+  "Save shared host cooldown": "保存共享主机冷却设置",
+  "Host cooldowns still active": "仍在冷却期的主机",
+  "Shared by every registered URL on this hostname. Choose 0–3600 seconds between host claims. Edits retain claim history; zero adds no delay. Existing running work is not cancelled, and exact HTTP start timing is not guaranteed.":
+    "此主机名下的所有已注册 URL 共享设置。请选择主机认领之间的 0 至 3600 秒间隔。编辑会保留认领历史；零表示不增加间隔。现有运行任务不会取消，也不保证 HTTP 请求的精确开始时间。",
+  "Host settings changed. Reload before saving.":
+    "主机设置已更改，请重新加载后再保存。",
   "Collection hostname": "采集主机名",
   "Hosts with active collection leases": "存在有效采集租约的主机",
   "One unexpired running collection lease is allowed per hostname, across registered source URLs. Completion, failure, cancellation or lease expiry releases the gate. This is lease-backed coordination, not a minimum gap between requests.":
