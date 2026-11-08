@@ -614,6 +614,7 @@ try {
         enabled: true,
         cadenceHours: 168,
         requestDelaySeconds: 60,
+        scheduleMode: "deadline_aware",
         permissionNote: "Fixture review only; no worker is started.",
       })
     ).status,
@@ -663,6 +664,26 @@ try {
   ).text();
   assert.match(cadenceHTML, /name="cadenceHours"/);
   assert.match(cadenceHTML, /采集间隔/);
+  assert.match(cadenceHTML, /按截止日期每周或每天检查/);
+  assert.equal(
+    cadenceData.sources.find(
+      (item: { id: string }) => item.id === officialSource.id,
+    ).schedule_mode,
+    "deadline_aware",
+  );
+  assert.equal(
+    (
+      await post("/api/admin/research", {
+        action: "policy",
+        sourceId: officialSource.id,
+        enabled: false,
+        permissionNote: "Invalid mode must be refused.",
+        scheduleMode: "daily",
+      })
+    ).status,
+    400,
+  );
+
   assert.match(cadenceHTML, /尝试最小间隔/);
   assert.match(cadenceHTML, /采集主机名/);
   assert.match(cadenceHTML, /共享主机名冷却间隔/);

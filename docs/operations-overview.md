@@ -16,8 +16,10 @@ The oldest queued job uses its original creation time, including time spent retr
 
 Queued jobs passing stored scheduling gates require enabled collection, fewer than three attempts, an available job timestamp, elapsed per-source and shared-host claim cooldowns, no active collection lease on the same hostname and no current operator-review/future Retry-After hold. A future policy next-due time does not block an already queued job. Row locks, network availability and provider limits are not observed, so this is not a guarantee that a worker can immediately claim or finish every counted job. Running records with expired leases are counted even when attempts are exhausted or policy gates would prevent recovery. Missing/future lease times are not expired leases.
 
-Enabled sources past next_due_at are counted independently of Retry-After/review holds, so held sources may remain due. No scheduler-success percentage, last-success time, automatic warning or recovery action is inferred or triggered. Later snapshots can change these values as workers proceed.
+Enabled sources past their effective scheduling target are counted independently of Retry-After/review holds, so held sources may remain due. No scheduler-success percentage, last-success time, automatic warning or recovery action is inferred or triggered. Later snapshots can change these values as workers proceed.
 
 The busy-host indicator counts distinct hostnames with running, unexpired job leases. On a free hostname, multiple queued records may be individually eligible in the snapshot even though actual claims serialize under the hostname gate.
 
 Host cooldowns still active counts host records with a tracked last claim whose configured interval has not elapsed. This count can overlap busy hosts, and includes retained host records independently of whether work is currently queued.
+
+The effective source due target includes optional deadline-aware daily acceleration and untracked adaptive policies. It uses the same rule as scheduleSources, while holds can still prevent queueing.

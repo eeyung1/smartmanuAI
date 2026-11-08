@@ -91,3 +91,7 @@ Add generated `sources.collection_host`, its index, private `collection_host_loc
 ## Application migration 024 (8 November 2026)
 
 Add `collection_host_locks.request_delay_seconds` (integer 0–3600, default 0), nullable `last_claim_at` and positive `version` (default 1) within smartmanuai. Record `024_host_claim_cooldown.sql` in the app ledger; health requires 24 migrations. There are still 40 RLS tables and no expanded reader/public grants. Existing host rows get no added delay and untracked history stays null until a new claim. Stop old worker binaries before any future worker upgrade; hosted workers/accounts remain disabled.
+
+## Application migration 025 (8 November 2026)
+
+Add constrained `source_collection_policies.schedule_mode` (default fixed), nullable `last_scheduled_at` and the partial `opportunities_source_deadline` index in smartmanuai. Record `025_deadline_aware_schedule.sql` in the app ledger; health requires 25 app migrations. There are still 40 RLS tables and no new runtime reader grants. Existing policies retain fixed intervals. Hosted scheduler/account enablement is unchanged.

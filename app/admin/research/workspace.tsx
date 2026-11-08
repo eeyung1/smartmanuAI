@@ -15,6 +15,7 @@ type Dashboard = {
     enabled: boolean;
     permission_note: string | null;
     cadence_hours: number;
+    schedule_mode: string;
     request_delay_seconds: number;
     source_type: string;
     source_language: string;
@@ -214,6 +215,7 @@ export default function ResearchWorkspace({
                     enabled: f.get("enabled") === "on",
                     permissionNote: f.get("note"),
                     cadenceHours: Number(f.get("cadenceHours")),
+                    scheduleMode: f.get("scheduleMode"),
                     requestDelaySeconds: Number(f.get("requestDelaySeconds")),
                   });
                 }}
@@ -237,6 +239,23 @@ export default function ResearchWorkspace({
                     defaultValue={source.permission_note ?? ""}
                   />
                 </label>
+                <label>
+                  {t("Collection schedule")}
+                  <select
+                    name="scheduleMode"
+                    defaultValue={source.schedule_mode}
+                  >
+                    <option value="fixed">{t("Fixed interval")}</option>
+                    <option value="deadline_aware">
+                      {t("Deadline-aware weekly/daily")}
+                    </option>
+                  </select>
+                </label>
+                <p>
+                  {t(
+                    "Fixed mode uses the interval below. Deadline-aware mode schedules weekly, or daily for published records closing today through the next 14 UTC days. Untracked schedules can run on the next pass. Collection does not reverify publication.",
+                  )}
+                </p>
                 <label>
                   {t("Collection interval (hours)")}
                   <input
