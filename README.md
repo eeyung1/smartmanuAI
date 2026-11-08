@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **8 November 2026**, through [implementation PR #57](https://github.com/eeyung1/smartmanuAI/pull/57). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **8 November 2026**, through [implementation PR #58](https://github.com/eeyung1/smartmanuAI/pull/58). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -178,7 +178,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Keep model extraction separate from publication, private profiles, notification credentials and delivery capability.
 - [x] Pinned eve fixture runtime with a fake model, narrow tool allowlist and guarded external-network access.
 - [x] Persist and reconnect a settled eve session after a hard process restart.
-- [ ] Automatic extraction dispatch, controlled repair workflow and measured provider input-token accounting.
+- [x] Explicit `research:once -- extract-next ADMIN_EMAIL` selects one oldest pending candidate without a previous model attempt, with existing reservation, evidence and human-review gates. Concurrent conflicts stop without fallback calls; uncertain attempts are skipped.
+- [ ] Recurring hosted extraction dispatch, controlled repair workflow and measured provider input-token accounting.
 - [ ] Actual-cost settlement, uncertain model-attempt recovery and safe operator retry decisions.
 - [ ] Live model qualification: output quality, privacy/data policy, regional access, token/cost bounds and failure behavior.
 - [ ] Arbitrary in-flight eve crash recovery, durable hosted workflow storage and version-upgrade compatibility.
@@ -425,6 +426,7 @@ Restart and visit `/admin/review`, `/admin/catalogue` or `/admin/research`. Role
 | `npm run privacy:once`                                      | Process at most one queued local account purge                                                                    |
 | `npm run research:once`                                     | Schedule due sources and process one collection job; live retrieval requires explicit enablement                  |
 | `npm run research:once -- extract ADMIN_EMAIL CANDIDATE_ID` | Optional paid extraction contract; requires reviewed model, credentials, cost reservation and explicit enablement |
+| `npm run research:once -- extract-next ADMIN_EMAIL` | Select one oldest pending candidate without a prior model attempt; same paid-research guards; no automatic retry |
 | `npm run agent:build` / `npm run spike`                     | Build/check the bounded fixture agent with its local network guard                                                |
 | `npm run check`                                             | Format, typecheck, tests, web build, HTTP checks, guarded agent build and restart spike                           |
 

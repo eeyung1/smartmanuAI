@@ -3,14 +3,19 @@ import { scheduleSources, collectOne } from "../src/research/collection";
 import {
   configuredGatewayExtractor,
   extractCandidate,
+  extractNextCandidate,
 } from "../src/research/extraction";
 const db = await getDatabase();
 try {
-  if (process.argv[2] === "extract") {
+  if (["extract", "extract-next"].includes(process.argv[2])) {
     const email = process.argv[3],
       candidate = process.argv[4];
-    if (!email || !candidate)
-      throw new Error("Pass an administrator email and candidate ID.");
+    if (!email || (process.argv[2] === "extract" && !candidate))
+      throw new Error(
+        process.argv[2] === "extract-next"
+          ? "Pass an administrator email."
+          : "Pass an administrator email and candidate ID.",
+      );
     const user = (
       await db.sql.query("SELECT id FROM auth_user WHERE email=$1", [email])
     ).rows[0];
@@ -18,7 +23,15 @@ try {
     const actor = String(user.id);
     const config = configuredGatewayExtractor();
     console.log(
-      await extractCandidate(db.sql, actor, candidate, config.extract, config),
+      process.argv[2] === "extract-next"
+        ? await extractNextCandidate(db.sql, actor, config.extract, config)
+        : await extractCandidate(
+            db.sql,
+            actor,
+            candidate,
+            config.extract,
+            config,
+          ),
     );
   } else {
     if (process.env.SMARTMANU_ENABLE_COLLECTION !== "1")

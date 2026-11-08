@@ -265,3 +265,8 @@ Empty public and private exploration results now show the catalogue-wide latest 
 ### Checkpoint 49 — multipart unsubscribe requests (8 November 2026)
 
 The session-free email unsubscribe endpoint accepts URL-encoded and multipart form bodies through the same 64 KB streaming limit. It rejects malformed multipart, file fields, duplicate form values, repeated query tokens and conflicting query/body tokens before database access. Manual confirmation, signature/expiry/consent-epoch checks, idempotence and channel scope remain unchanged. Tests exercise parsing failures and the HTTP spike unsubscribes with multipart before replaying URL-encoded requests. No migration or live email activation is involved. RFC 8058 section 3.2 supports these form encodings; production DKIM header coverage and real mailbox interoperability remain unchecked.
+
+
+### Checkpoint 50 — next-candidate extraction (8 November 2026)
+
+An explicit local `research:once -- extract-next ADMIN_EMAIL` command selects one oldest pending candidate without a research usage record. Selection uses created time and ID; existing per-candidate locks and budget reservation run before any provider call. Competing selection conflicts propagate without fallback calls, and reserved/completed/uncertain attempts are excluded from future automatic selections. Provider failures remain uncertain for operator inspection. Drafts require normal human review; this command does not revalidate collection permission or source freshness and is for an operator-approved pending queue. Tests exercise empty queues, admin checks, uncertainty exclusion, oldest-first selection, concurrent calls and unpublished drafts. No migration, hosted scheduling or paid-service activation is included.

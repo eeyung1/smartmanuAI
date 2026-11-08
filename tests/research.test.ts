@@ -7,7 +7,7 @@ import { randomUUID } from "node:crypto";
 import { Readable } from "node:stream";
 import type { IncomingMessage } from "node:http";
 import { Pool } from "pg";
-import { openDatabase } from "../src/db";
+import { openDatabase, type SQL } from "../src/db";
 import { seedLocalCatalogue, fixtureDetails } from "../src/catalogue/fixtures";
 import { createSource, publicOpportunity } from "../src/catalogue/service";
 import {
@@ -20,6 +20,7 @@ import {
 import {
   applyExtraction,
   extractCandidate,
+  extractNextCandidate,
   validateExtraction,
   configuredGatewayExtractor,
 } from "../src/research/extraction";
@@ -322,6 +323,108 @@ for (const kind of ["pglite", "postgres"])
               { model: "fixture/no-network", reservationMicros: 1000 },
             ),
           /already has/,
+        );
+        const options = {
+          model: "fixture/no-network",
+          reservationMicros: 1000,
+        };
+        await assert.rejects(
+          () =>
+            extractNextCandidate(
+              db.sql,
+              "stranger",
+              async () => modelValue,
+              options,
+            ),
+          /Administrator/,
+        );
+        assert.deepEqual(
+          await extractNextCandidate(
+            db.sql,
+            actor,
+            async () => {
+              throw Error("must not retry uncertain attempt");
+            },
+            options,
+          ),
+          { state: "idle" },
+        );
+        // Add two pending snapshots; stable ordering must choose the older candidate.
+        for (const [id, age] of [
+          ["next-old", 2],
+          ["next-new", 1],
+        ] as const) {
+          await db.sql.query(
+            "INSERT INTO source_snapshots(id,source_id,content_hash,content) VALUES($1,$2,$1,$3)",
+            [id, source.id, content],
+          );
+          await db.sql.query(
+            "INSERT INTO research_candidates(id,snapshot_id,created_at) VALUES($1,$1,NOW()-$2*INTERVAL '1 hour')",
+            [id, age],
+          );
+        }
+        let automaticCalls = 0,
+          selections = 0;
+        let release!: () => void;
+        const bothSelected = new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        const synchronized: SQL = {
+          transaction: db.sql.transaction.bind(db.sql),
+          exec: db.sql.exec.bind(db.sql),
+          query: async (statement, params) => {
+            const result = await db.sql.query(statement, params);
+            if (statement.startsWith("SELECT c.id FROM research_candidates")) {
+              if (++selections === 2) release();
+              await bothSelected;
+            }
+            return result as never;
+          },
+        };
+        const automatic = await Promise.allSettled(
+          [1, 2].map(() =>
+            extractNextCandidate(
+              synchronized,
+              actor,
+              async () => {
+                automaticCalls++;
+                return modelValue;
+              },
+              options,
+            ),
+          ),
+        );
+        assert.equal(automaticCalls, 1);
+        assert.equal(
+          automatic.filter((v) => v.status === "fulfilled").length,
+          1,
+        );
+        const selected = automatic.find((v) => v.status === "fulfilled");
+        assert.ok(
+          selected?.status === "fulfilled" && "candidateId" in selected.value,
+        );
+        assert.equal(selected.value.candidateId, "next-old");
+        const next = await extractNextCandidate(
+          db.sql,
+          actor,
+          async () => modelValue,
+          options,
+        );
+        assert.ok("candidateId" in next);
+        assert.equal(next.candidateId, "next-new");
+        assert.equal(next.state, "drafted");
+        assert.equal(
+          await publicOpportunity(db.sql, next.opportunityId!),
+          null,
+        );
+        assert.deepEqual(
+          await extractNextCandidate(
+            db.sql,
+            actor,
+            async () => modelValue,
+            options,
+          ),
+          { state: "idle" },
         );
         assert.equal(
           (
