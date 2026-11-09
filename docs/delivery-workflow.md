@@ -285,3 +285,8 @@ Private matching no longer truncates candidate evaluation to the newest 1,000 re
 ### Checkpoint 53 — full-catalogue digest coverage (9 November 2026)
 
 Shared digest preview, planning, local-sink dispatch and delivery-simulation rechecks now consume the complete ranking through `allMatchesForUser`. Private match pages retain their existing paginated response. Previously seen top-ranked opportunities no longer hide an unseen match beyond rank 1,000; new higher-ranked records do not invalidate an already accepted digest solely due to rank. The ten-item message cap, consent, freshness, deduplication, suppression and provider-simulation boundaries remain intact. Tests exercise 1,000 previously accepted records before one unseen tail record, preview owner isolation and delivery rechecks after 1,001 higher-ranked records arrive. Full-ranking memory/latency qualification and cross-request stability remain open. No migration or live delivery activation is included.
+
+
+### Checkpoint 54 — declared Chinese source encodings (9 November 2026)
+
+Retrieval now accepts explicitly HTTP-declared GB18030, GBK/GB2312 and Big5/Big5-HKSCS using fatal TextDecoder conversion before existing HTML stripping and excerpt normalization. GBK/GB2312 map to GB18030; Big5-HKSCS maps to Big5. Missing charset remains UTF-8, and duplicate/unknown declarations or malformed sequences fail closed. Fixed byte fixtures cover simplified/traditional Chinese, GB18030 four-byte characters, split chunks and the existing raw/excerpt byte caps. No dependencies, migrations, source activation or browser execution are added. Full ICU support is required for these decoders; live source-specific interoperability, meta charset detection and remaining adapters stay open.
