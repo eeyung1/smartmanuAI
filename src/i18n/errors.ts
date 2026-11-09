@@ -1,4 +1,8 @@
 export const errorChinese: Record<string, string> = {
+  "Different intake or event editions cannot be merged. Review both identities first.":
+    "不同入学批次或活动届次不能合并。请先审核两条记录的标识。",
+  "The intake or event edition must appear in the captured source.":
+    "入学批次或活动届次必须出现在已抓取的来源中。",
   "Sign in again before managing your sessions.":
     "请重新登录后再管理您的会话。",
   "Language-test requirements need an eligibility quotation.":

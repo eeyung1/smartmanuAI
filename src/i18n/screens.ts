@@ -3,6 +3,7 @@ import { errorChinese } from "./errors";
 import { controlChinese } from "./controls";
 import type { Locale } from "./locale";
 export const screenChinese: Record<string, string> = {
+  "Intake / event edition:": "入学批次／活动届次：",
   "Catalogue review status": "目录审核状态",
   "Last reviewed publication (UTC):": "最近一次已发布记录的审核时间（UTC）：",
   "No reviewed non-synthetic publications are recorded yet.":

@@ -18,13 +18,22 @@ export function topicKey(value: string) {
   return groups.find((g) => g.includes(key))?.[0] ?? key;
 }
 export function materialFingerprint(details: Details) {
-  const { title, summary, ...facts } = details;
+  const { title, summary, offeringIdentity, ...facts } = details;
   void title;
   void summary;
   return createHash("sha256")
     .update(
       JSON.stringify({
         ...facts,
+        ...(offeringIdentity
+          ? {
+              offeringIdentity: offeringIdentity
+                .normalize("NFC")
+                .trim()
+                .replace(/\s+/g, " ")
+                .toLowerCase(),
+            }
+          : {}),
         topics: [...new Set(details.topics.map(topicKey))].sort(),
         eligibilityRules: details.eligibilityRules
           ? {

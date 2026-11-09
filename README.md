@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **9 November 2026**, through [implementation PR #64](https://github.com/eeyung1/smartmanuAI/pull/64). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **9 November 2026**, through [implementation PR #65](https://github.com/eeyung1/smartmanuAI/pull/65). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -118,7 +118,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Administrator duplicate merge with surviving opportunity identity, archived duplicate and source-URL audit notes.
 - [ ] Persistent source aliases and automatic reconciliation across different URLs/intakes.
 - [x] Preserve each user's latest tracker status, saved/dismissed choice and exact timestamp when merging duplicates; ties keep the survivor and versions still advance.
-- [ ] Explicit intake/event identity reconciliation so new intakes remain distinct.
+- [x] Optional source-stated intake/event-edition labels in reviewed details; conflicting explicit editions block duplicate merges. Known edition changes affect material fingerprints while absent/null labels preserve legacy fingerprints.
+- [ ] Automatic intake/event identity reconciliation, unknown-label review and cross-source edition equivalence.
 - [x] Audited archive action for closed/rejected opportunities, hidden from public discovery.
 - [ ] Complete discovered/review/stale lifecycle automation and restoration policy.
 - [x] Bilingual publication preview of the public card/details with evidence, deadline and policy warnings before approval.

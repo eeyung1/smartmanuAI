@@ -38,6 +38,10 @@ export default async function Detail({
       <p className="intro" lang="">
         {d.organizer}
       </p>
+      <p>
+        {t("Intake / event edition:")}{" "}
+        <span lang="">{d.offeringIdentity ?? t("Not stated")}</span>
+      </p>
       {item.synthetic ? (
         <div className="notice">
           {t(
