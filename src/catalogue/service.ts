@@ -237,13 +237,11 @@ export async function publicOpportunity(sql: SQL, id: string) {
   ).rows;
   return {
     ...publicRecord(row),
-    sourceAliases: aliases
-      .slice(0, 10)
-      .map((source) => ({
-        name: String(source.name),
-        url: source.synthetic ? null : String(source.url),
-        synthetic: source.synthetic === true,
-      })),
+    sourceAliases: aliases.slice(0, 10).map((source) => ({
+      name: String(source.name),
+      url: source.synthetic ? null : String(source.url),
+      synthetic: source.synthetic === true,
+    })),
     sourceAliasesTruncated: aliases.length > 10,
   };
 }
