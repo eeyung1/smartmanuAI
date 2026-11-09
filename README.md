@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **9 November 2026**, through [implementation PR #61](https://github.com/eeyung1/smartmanuAI/pull/61). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **9 November 2026**, through [implementation PR #62](https://github.com/eeyung1/smartmanuAI/pull/62). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -138,7 +138,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Recover expired claims within the three-attempt cap; fence late results after expiry, reclamation, cancellation or source pause.
 - [x] HTTPS-only public URL admission, DNS address validation and pinned requests with hostname TLS verification.
 - [x] Block private/special network destinations; send no user cookies or authorization headers; reject all redirects.
-- [x] Fifteen-second retrieval deadline, 256,000-byte response cap and supported UTF-8/ASCII HTML/plain-text decoding.
+- [x] Fifteen-second retrieval deadline, 256,000-byte response cap and supported UTF-8/ASCII HTML/plain-text decoding, plus explicitly declared GB18030, GBK/GB2312 and Big5/Big5-HKSCS.
 - [x] Strip HTML scripts/styles/markup and normalize untrusted excerpts to at most 10,000 UTF-8 bytes.
 - [x] Hash/deduplicate snapshots per source; unchanged content does not create another extraction candidate.
 - [x] Persist ETag/Last-Modified metadata bound to the exact source URL and snapshot.
@@ -155,7 +155,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Bilingual job detail pages expose availability, Retry-After waits and review-required pauses without lease tokens.
 - [ ] Open-web search provider integration and scheduled English/Chinese discovery queries.
 - [ ] Candidate-link discovery and official-source admission from search/aggregator leads.
-- [ ] Structured feed, PDF, browser-rendered page and additional-encoding adapters.
+- [x] Declared Chinese-encoding adapters with strict decoding, duplicate-charset rejection and unchanged response/excerpt limits. Missing charset defaults to UTF-8; no encoding guessing.
+- [ ] Structured feed, PDF, browser-rendered page, meta-charset detection and other encoding adapters.
 - [ ] Multiple opportunity extraction from one page and cross-source semantic reconciliation.
 - [x] Persisted per-source collection-claim cooldown (0–3600 seconds), covering retries, lease recovery and subsequent jobs, with admin controls and aligned readiness metrics.
 - [x] Lease-backed single-active-claim coordination per normalized hostname across source URLs, with restart recovery, stale-worker fencing and aligned readiness metrics.

@@ -102,10 +102,32 @@ export async function readPage(response: IncomingMessage) {
     response.destroy();
     throw new RetrievalError("unsupported_content");
   }
-  const charset = /charset\s*=\s*["\']?([^;"\'\s]+)/i
-    .exec(response.headers["content-type"] ?? "")?.[1]
-    ?.toLowerCase();
-  if (charset && !["utf-8", "utf8", "us-ascii"].includes(charset)) {
+  const declarations = [
+    ...(response.headers["content-type"] ?? "").matchAll(
+      /(?:^|;)\s*charset\s*=\s*["']?([^;"'\s]+)/gi,
+    ),
+  ];
+  const charsetParameters = (response.headers["content-type"] ?? "")
+    .split(";")
+    .slice(1)
+    .filter((parameter) => /^\s*charset\b/i.test(parameter));
+  const charset = declarations[0]?.[1].toLowerCase() ?? "utf-8";
+  const encodings: Record<string, string> = {
+    "utf-8": "utf-8",
+    utf8: "utf-8",
+    "us-ascii": "utf-8",
+    gb18030: "gb18030",
+    gbk: "gb18030",
+    gb2312: "gb18030",
+    big5: "big5",
+    "big5-hkscs": "big5",
+  };
+  const encoding = encodings[charset];
+  if (
+    declarations.length > 1 ||
+    charsetParameters.length !== declarations.length ||
+    !encoding
+  ) {
     response.destroy();
     throw new RetrievalError("unsupported_encoding");
   }
@@ -122,7 +144,7 @@ export async function readPage(response: IncomingMessage) {
   }
   let text: string;
   try {
-    text = new TextDecoder("utf-8", { fatal: true }).decode(
+    text = new TextDecoder(encoding, { fatal: true }).decode(
       Buffer.concat(chunks),
     );
   } catch {
