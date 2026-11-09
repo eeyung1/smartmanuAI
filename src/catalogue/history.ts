@@ -137,15 +137,16 @@ export async function auditHistory(
   return {
     record,
     items,
-    sourceAliases: aliases
-      .slice(0, 100)
-      .map((row) => ({
-        id: String(row.id),
-        name: String(row.name),
-        url: row.synthetic ? null : String(row.url),
-        synthetic: row.synthetic === true,
-        recordedAt: new Date(String(row.recorded_at)).toISOString(),
-      })),
+    sourceAliases: aliases.slice(0, 100).map((row) => ({
+      id: String(row.id),
+      name: String(row.name),
+      url: row.synthetic ? null : String(row.url),
+      synthetic: row.synthetic === true,
+      recordedAt:
+        row.recorded_at instanceof Date
+          ? row.recorded_at.toISOString()
+          : new Date(String(row.recorded_at)).toISOString(),
+    })),
     aliasesTruncated: aliases.length > 100,
     pageSize,
     nextBefore: rows.length > pageSize ? items.at(-1)!.revision : null,
