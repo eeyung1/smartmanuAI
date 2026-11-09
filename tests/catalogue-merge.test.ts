@@ -11,6 +11,7 @@ import {
   createDraft,
   createSource,
   reviewOpportunity,
+  publicOpportunity,
 } from "../src/catalogue/service";
 import {
   fixtureDetails,
@@ -256,6 +257,20 @@ for (const kind of ["pglite", "postgres"])
         });
         const chain = await auditHistory(db.sql, actor, third.id);
         assert.equal(chain.sourceAliases.length, 2);
+        const publicRecord = await publicOpportunity(db.sql, third.id);
+        assert.equal(publicRecord?.sourceAliases.length, 2);
+        assert.ok(
+          publicRecord?.sourceAliases.some(
+            (source) => source.url === "https://example.test/duplicate-source",
+          ),
+        );
+        assert.ok(
+          publicRecord?.sourceAliases.some(
+            (source) => source.synthetic && source.url === null,
+          ),
+        );
+        assert.equal(await publicOpportunity(db.sql, targetId), null);
+
         assert.ok(
           chain.sourceAliases.some(
             (source) => source.synthetic && source.url === null,

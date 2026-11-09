@@ -100,3 +100,8 @@ Add constrained `source_collection_policies.schedule_mode` (default fixed), null
 ## Migration 026: merged source provenance
 
 Create private `opportunity_source_aliases(opportunity_id,source_id,recorded_at)` with catalogue foreign keys, a composite primary key, source lookup index and RLS. Revoke all public/anon/authenticated/reader access; no reader policy or grant is added. Record `026_merged_source_aliases.sql` in the app ledger. Health requires 26 migrations and smartmanuai contains 41 RLS tables. Existing records are not backfilled from free-text notes. The table stores shared provenance without actor/account identifiers. Apply only to the private smartmanuai schema; keep hosted accounts/workers disabled.
+
+
+## Migration 027: reviewed public provenance
+
+Add the bounded provenance lookup index and record `027_public_source_provenance.sql`. Grant SELECT on aliases only to smartmanuai_reader with a policy requiring a published/closed canonical opportunity. Expand the source SELECT policy only for sources referenced by those readable aliases. No anon/authenticated grant, writer access, private opportunity access or audit-note access is added. Health requires 27 migrations; 41 RLS tables remain. Apply the state-scoped policies in the private smartmanuai schema before deploying the new detail query. This intentionally supersedes migration 026's reader denial for reviewed aliases only.

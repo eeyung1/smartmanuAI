@@ -11,7 +11,11 @@ import {
   fixtureDetails,
   fixtureEvidence,
 } from "../src/catalogue/fixtures";
-import { createDraft, reviewOpportunity } from "../src/catalogue/service";
+import {
+  createDraft,
+  reviewOpportunity,
+  publicOpportunity,
+} from "../src/catalogue/service";
 import {
   auditHistory,
   historyChanges,
@@ -207,6 +211,28 @@ for (const kind of ["pglite", "postgres"])
         const aliased = await auditHistory(db.sql, actor, draft.id);
         assert.equal(aliased.sourceAliases.length, 100);
         assert.equal(aliased.aliasesTruncated, true);
+        assert.equal(await publicOpportunity(db.sql, draft.id), null);
+        await db.sql.query(
+          "UPDATE opportunities SET state='published',verified_at=NOW() WHERE id=$1",
+          [draft.id],
+        );
+        const publicRecord = await publicOpportunity(db.sql, draft.id);
+        assert.equal(publicRecord?.sourceAliases.length, 10);
+        assert.equal(publicRecord?.sourceAliasesTruncated, true);
+        await db.sql.query(
+          "UPDATE opportunities SET state='closed' WHERE id=$1",
+          [draft.id],
+        );
+        assert.equal(
+          (await publicOpportunity(db.sql, draft.id))?.sourceAliases.length,
+          10,
+        );
+        await db.sql.query(
+          "UPDATE opportunities SET state='archived' WHERE id=$1",
+          [draft.id],
+        );
+        assert.equal(await publicOpportunity(db.sql, draft.id), null);
+
         assert.equal(
           Number(
             (

@@ -41,9 +41,10 @@ export async function stagingSchemaSQL(
     `REVOKE ALL ON ALL FUNCTIONS IN SCHEMA "${schema}" FROM PUBLIC;`,
     `ALTER DEFAULT PRIVILEGES IN SCHEMA "${schema}" REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;`,
     `GRANT USAGE ON SCHEMA "${schema}" TO "${reader}";`,
-    `GRANT SELECT ON opportunities,sources,schema_migrations TO "${reader}";`,
+    `GRANT SELECT ON opportunities,sources,schema_migrations,opportunity_source_aliases TO "${reader}";`,
     `CREATE POLICY staging_public_opportunities ON opportunities FOR SELECT TO "${reader}" USING(state IN ('published','closed'));`,
-    `CREATE POLICY staging_public_sources ON sources FOR SELECT TO "${reader}" USING(EXISTS(SELECT 1 FROM "${schema}".opportunities o WHERE o.source_id=sources.id AND o.state IN ('published','closed')));`,
+    `CREATE POLICY staging_public_sources ON sources FOR SELECT TO "${reader}" USING(EXISTS(SELECT 1 FROM "${schema}".opportunities o WHERE o.source_id=sources.id AND o.state IN ('published','closed')) OR EXISTS(SELECT 1 FROM "${schema}".opportunity_source_aliases a JOIN "${schema}".opportunities o ON o.id=a.opportunity_id WHERE a.source_id=sources.id AND o.state IN ('published','closed')));`,
+    `CREATE POLICY staging_public_source_aliases ON opportunity_source_aliases FOR SELECT TO "${reader}" USING(EXISTS(SELECT 1 FROM "${schema}".opportunities o WHERE o.id=opportunity_source_aliases.opportunity_id AND o.state IN ('published','closed')));`,
     `CREATE POLICY staging_migration_status ON schema_migrations FOR SELECT TO "${reader}" USING(true);`,
     "RESET ROLE;",
   );

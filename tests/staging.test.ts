@@ -109,10 +109,13 @@ for (const kind of ["pglite", "postgres"])
             "INSERT INTO auth_user(id,name,email,created_at,updated_at) VALUES('reviewer','Private reviewer','reviewer@example.test',NOW(),NOW())",
           );
           await tx.query(
-            "INSERT INTO sources(id,name,url,synthetic,created_by) VALUES('source','Public source','https://example.test/source',true,'reviewer'),('private-source','Private source','https://example.test/private',true,'reviewer')",
+            "INSERT INTO sources(id,name,url,synthetic,created_by) VALUES('source','Public source','https://example.test/source',true,'reviewer'),('private-source','Private source','https://example.test/private',true,'reviewer'),('alias-source','Historical source','https://example.test/historical',false,'reviewer')",
           );
           await tx.query(
             "INSERT INTO opportunities(id,source_id,revision,state,details,evidence,verified_at) VALUES('published','source',1,'published','{}','{}',NOW()),('private-draft','private-source',1,'draft','{}','{}',NULL),('archived','private-source',2,'archived','{}','{}',NULL)",
+          );
+          await tx.query(
+            "INSERT INTO opportunity_source_aliases(opportunity_id,source_id) VALUES('published','alias-source'),('private-draft','private-source'),('archived','private-source')",
           );
         });
         await db.sql.transaction(async (tx) => {
@@ -124,7 +127,7 @@ for (const kind of ["pglite", "postgres"])
               (await tx.query("SELECT COUNT(*) AS n FROM schema_migrations"))
                 .rows[0].n,
             ),
-            26,
+            27,
           );
           assert.deepEqual(
             (await tx.query("SELECT id FROM opportunities")).rows.map(
@@ -134,13 +137,26 @@ for (const kind of ["pglite", "postgres"])
           );
           assert.deepEqual(
             (await tx.query("SELECT id FROM sources")).rows.map((x) => x.id),
-            ["source"],
+            ["source", "alias-source"],
+          );
+        });
+        await db.sql.transaction(async (tx) => {
+          await tx.exec(
+            `SET LOCAL ROLE "${reader}"; SET LOCAL search_path="${schema}",pg_catalog;`,
+          );
+          assert.deepEqual(
+            (
+              await tx.query(
+                "SELECT opportunity_id,source_id FROM opportunity_source_aliases",
+              )
+            ).rows,
+            [{ opportunity_id: "published", source_id: "alias-source" }],
           );
         });
         for (const query of [
           `SELECT * FROM "${schema}".auth_user`,
           `SELECT * FROM "${schema}".collection_host_locks`,
-          `SELECT * FROM "${schema}".opportunity_source_aliases`,
+          `INSERT INTO "${schema}".opportunity_source_aliases(opportunity_id,source_id) VALUES('published','private-source')`,
           `INSERT INTO "${schema}".sources(id,name,url,created_by) VALUES('bad','bad','https://example.test','reviewer')`,
           `CREATE TABLE "${schema}".bad(id text)`,
           `SELECT * FROM public.auth_user`,
@@ -167,7 +183,7 @@ for (const kind of ["pglite", "postgres"])
                   )
                 ).rows[0].n,
               ),
-              26,
+              27,
             );
             assert.equal(
               (await scoped.sql.query("SELECT current_schema() AS name"))
