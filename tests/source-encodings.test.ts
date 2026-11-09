@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { Readable } from "node:stream";
 import type { IncomingMessage } from "node:http";
-import { readPage } from "../src/research/retrieval";
+import { readPage, earlyMetaCharset } from "../src/research/retrieval";
 function response(bytes: Buffer, type: string) {
   return Object.assign(
     Readable.from([bytes.subarray(0, 7), bytes.subarray(7)]),
@@ -83,5 +83,91 @@ test("unknown, conflicting, malformed and oversized source encodings fail closed
         response(Buffer.alloc(256001, 0x61), "text/plain; charset=gb18030"),
       ),
     /source_too_large/,
+  );
+});
+
+test("early direct HTML charset fallback is bounded and ignores inactive markup", async () => {
+  const declared = Buffer.concat([
+    Buffer.from(
+      '<html><head><META data-note="charset=big5" CHARSET = "GBK"></head>',
+    ),
+    simplified,
+  ]);
+  assert.equal(
+    await readPage(response(declared, "text/html")),
+    "智能制造奖学金与免费课程 工业自动化活动",
+  );
+  assert.equal(
+    earlyMetaCharset(
+      Buffer.from("<!-- <meta charset=big5> --><meta charset=gb2312>"),
+    ),
+    "gb2312",
+  );
+  for (const prefix of [
+    "<!-- <meta charset=gbk>",
+    '<script>"<meta charset=gbk>"</script>',
+    "<style><meta charset=gbk></style>",
+    "<body><meta charset=gbk>",
+    "<template><meta charset=gbk>",
+  ])
+    assert.equal(earlyMetaCharset(Buffer.from(prefix)), null);
+  assert.equal(
+    earlyMetaCharset(Buffer.from('<div title="<meta charset=big5>"></div>')),
+    null,
+  );
+  assert.equal(
+    earlyMetaCharset(Buffer.from("<title><meta charset=gbk></title>")),
+    null,
+  );
+  assert.equal(
+    earlyMetaCharset(Buffer.from(" ".repeat(1024) + "<meta charset=gbk>")),
+    null,
+  );
+  assert.equal(
+    earlyMetaCharset(
+      Buffer.from(" ".repeat(1010) + '<meta charset="gb18030">'),
+    ),
+    null,
+  );
+  for (const markup of [
+    '<meta charset="">',
+    "<meta charset>",
+    "<meta charset=gbk charset=utf8>",
+    "<meta charset=gbk><meta charset=gbk>",
+  ])
+    assert.throws(
+      () => earlyMetaCharset(Buffer.from(markup)),
+      /unsupported_encoding/,
+    );
+  await assert.rejects(
+    () =>
+      readPage(
+        response(
+          Buffer.concat([Buffer.from("<meta charset=unknown>"), simplified]),
+          "text/html",
+        ),
+      ),
+    /unsupported_encoding/,
+  );
+  await assert.rejects(
+    () => readPage(response(declared, "text/plain")),
+    /unsupported_encoding/,
+  );
+  // An authoritative HTTP charset and UTF-8 BOM do not use conflicting HTML hints.
+  const utf8 = Buffer.from(
+    "<meta charset=unknown><p>A reviewed smart manufacturing course announcement.</p>",
+  );
+  assert.match(
+    await readPage(response(utf8, "text/html; charset=utf-8")),
+    /smart manufacturing/,
+  );
+  assert.match(
+    await readPage(
+      response(
+        Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), utf8]),
+        "text/html",
+      ),
+    ),
+    /smart manufacturing/,
   );
 });
