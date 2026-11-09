@@ -1,4 +1,11 @@
 export const adminChinese: Record<string, string> = {
+  "Repeated collection failures": "连续采集失败",
+  "Sources whose latest two terminal jobs failed: {count}":
+    "最近两条终态任务均失败的来源：{count}",
+  "Showing the first 10 affected sources. Inspect the research browser for more retained jobs.":
+    "此处显示前 10 个受影响来源。可在研究浏览器中查看其他已保留任务。",
+  "This read-only indicator checks retained done, failed and cancelled job records ordered by creation time and ID. Queued/running jobs do not reset it; a later done or cancelled record does. It is not an attempt count, a measured run-success rate or an external alert.":
+    "此只读指标按创建时间和标识检查已保留的完成、失败及取消任务。排队或运行中的任务不会重置该指标；后续完成或取消记录会重置。它不是尝试次数、实测运行成功率或外部通知。",
   "Merged source provenance": "合并来源记录",
   "Historical source links retained by reviewed duplicate merges. These are current registry labels, not new source verification or permission to collect. Only future merges populate this list.":
     "这些历史来源链接由已审核的重复记录合并保留。名称来自当前来源登记，不代表重新核实来源或获得采集许可。仅后续合并会填充此列表。",

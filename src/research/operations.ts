@@ -24,13 +24,24 @@ type OverviewRow = {
     oldestPendingAgeSeconds: string | null;
   };
   budget: { limitMicros: string; reservedMicros: string } | null;
+  failureWarnings: {
+    total: string;
+    items: { sourceId: string; sourceName: string }[];
+  };
   observedAt: string;
 };
-/** One statement gives the summary one database snapshot without returning source/user payloads. */
+/** One statement gives the summary one database snapshot without returning captured content or private account data. */
 export async function operationsOverview(sql: SQL, actor: string) {
   await requireAdmin(sql, actor);
   const row = (
-    await sql.query<OverviewRow>(`SELECT
+    await sql.query<OverviewRow>(`WITH terminal_jobs AS (
+ SELECT source_id,state,ROW_NUMBER() OVER(PARTITION BY source_id ORDER BY created_at DESC,id DESC) AS rank
+ FROM research_jobs WHERE state IN ('done','failed','cancelled') AND created_at<=NOW()
+), warning_sources AS (
+ SELECT source_id FROM terminal_jobs WHERE rank<=2 GROUP BY source_id HAVING COUNT(*)=2 AND BOOL_AND(state='failed')
+)
+SELECT
+ (SELECT jsonb_build_object('total',COUNT(*)::text,'items',COALESCE((SELECT jsonb_agg(jsonb_build_object('sourceId',source_id,'sourceName',name)) FROM (SELECT w.source_id,s.name FROM warning_sources w JOIN sources s ON s.id=w.source_id ORDER BY w.source_id LIMIT 10) bounded),'[]'::jsonb)) FROM warning_sources) AS "failureWarnings",
  (SELECT jsonb_build_object('total',COUNT(*)::text,'queued',(COUNT(*) FILTER(WHERE state='queued'))::text,'running',(COUNT(*) FILTER(WHERE state='running'))::text,'done',(COUNT(*) FILTER(WHERE state='done'))::text,'failed',(COUNT(*) FILTER(WHERE state='failed'))::text,'cancelled',(COUNT(*) FILTER(WHERE state='cancelled'))::text) FROM research_jobs) AS jobs,
  (SELECT jsonb_build_object('total',COUNT(*)::text,'pending',(COUNT(*) FILTER(WHERE state='pending'))::text,'drafted',(COUNT(*) FILTER(WHERE state='drafted'))::text,'rejected',(COUNT(*) FILTER(WHERE state='rejected'))::text) FROM research_candidates) AS candidates,
  (SELECT jsonb_build_object('total',COUNT(*)::text,'enabled',(COUNT(*) FILTER(WHERE p.enabled))::text,'paused',(COUNT(*) FILTER(WHERE NOT COALESCE(p.enabled,false)))::text,'reviewHolds',(COUNT(*) FILTER(WHERE r.requires_review))::text,'futureHolds',(COUNT(*) FILTER(WHERE r.retry_after_at>NOW()))::text,'due',(COUNT(*) FILTER(WHERE p.enabled AND ${sourceDueSQL}))::text) FROM sources s LEFT JOIN source_collection_policies p ON p.source_id=s.id LEFT JOIN source_retry_after r ON r.source_id=s.id) AS sources,
