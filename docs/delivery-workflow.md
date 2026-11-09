@@ -290,3 +290,8 @@ Shared digest preview, planning, local-sink dispatch and delivery-simulation rec
 ### Checkpoint 54 — declared Chinese source encodings (9 November 2026)
 
 Retrieval now accepts explicitly HTTP-declared GB18030, GBK/GB2312 and Big5/Big5-HKSCS using fatal TextDecoder conversion before existing HTML stripping and excerpt normalization. GBK/GB2312 map to GB18030; Big5-HKSCS maps to Big5. Missing charset remains UTF-8, and duplicate/unknown declarations or malformed sequences fail closed. Fixed byte fixtures cover simplified/traditional Chinese, GB18030 four-byte characters, split chunks and the existing raw/excerpt byte caps. No dependencies, migrations, source activation or browser execution are added. Full ICU support is required for these decoders; live source-specific interoperability, meta charset detection and remaining adapters stay open.
+
+
+### Checkpoint 55 — bounded HTML charset fallback (9 November 2026)
+
+HTML retrieval can use an early direct meta charset when the HTTP Content-Type omits it. The fallback scans only the first 1,024 raw bytes, ignores comments, stops before body/active/raw-text content and requires a complete direct declaration. Empty/multiple declarations and unknown encodings fail closed. Explicit HTTP charsets remain authoritative; UTF-8 BOMs without HTTP charset skip meta hints. Plain text never uses HTML hints. Fixed-byte tests cover successful GBK decoding, precedence, comments/scripts, incomplete/late tags and malformed declarations. The allowlist, fatal decoding, response cap and UTF-8 excerpt cap remain unchanged. No dependency, migration, source activation or full browser encoding detection is included; http-equiv and live interoperability remain open.

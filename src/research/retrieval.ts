@@ -79,6 +79,46 @@ export function validateAddresses(
     throw new RetrievalError("unsafe_dns");
   return records[0];
 }
+/** Conservative direct meta-charset subset: first 1,024 bytes, before active/body content. */
+export function earlyMetaCharset(bytes: Buffer): string | null {
+  const prefix = bytes.subarray(0, 1024).toString("latin1");
+  // Stop at an unclosed comment as well as removing complete comments.
+  const withoutComments = prefix.replace(/<!--[\s\S]*?(?:-->|$)/g, " ");
+  const declarations: string[] = [];
+  for (const tag of withoutComments.matchAll(
+    /<([a-z][a-z0-9:-]*)(?=[\s/>])(?:[^>"']|"[^"]*"|'[^']*')*>/gi,
+  )) {
+    const name = tag[1].toLowerCase();
+    if (
+      [
+        "body",
+        "script",
+        "style",
+        "noscript",
+        "template",
+        "title",
+        "textarea",
+      ].includes(name)
+    )
+      break;
+    if (name !== "meta") continue;
+    const attributes = tag[0].slice(5, -1);
+    for (const attribute of attributes.matchAll(
+      /([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g,
+    )) {
+      if (attribute[1].toLowerCase() === "charset")
+        declarations.push(
+          (attribute[2] ?? attribute[3] ?? attribute[4] ?? "")
+            .trim()
+            .toLowerCase(),
+        );
+    }
+  }
+  if (declarations.length > 1 || declarations.some((value) => !value))
+    throw new RetrievalError("unsupported_encoding");
+  return declarations[0] ?? null;
+}
+
 export async function readPage(response: IncomingMessage) {
   if (response.statusCode !== 200) {
     response.destroy();
@@ -111,7 +151,7 @@ export async function readPage(response: IncomingMessage) {
     .split(";")
     .slice(1)
     .filter((parameter) => /^\s*charset\b/i.test(parameter));
-  const charset = declarations[0]?.[1].toLowerCase() ?? "utf-8";
+  let charset = declarations[0]?.[1].toLowerCase() ?? "utf-8";
   const encodings: Record<string, string> = {
     "utf-8": "utf-8",
     utf8: "utf-8",
@@ -122,7 +162,7 @@ export async function readPage(response: IncomingMessage) {
     big5: "big5",
     "big5-hkscs": "big5",
   };
-  const encoding = encodings[charset];
+  let encoding = encodings[charset];
   if (
     declarations.length > 1 ||
     charsetParameters.length !== declarations.length ||
@@ -142,11 +182,19 @@ export async function readPage(response: IncomingMessage) {
     }
     chunks.push(part);
   }
+  const bytes = Buffer.concat(chunks);
+  if (
+    !declarations.length &&
+    type === "text/html" &&
+    !bytes.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf]))
+  ) {
+    charset = earlyMetaCharset(bytes) ?? "utf-8";
+    encoding = encodings[charset];
+    if (!encoding) throw new RetrievalError("unsupported_encoding");
+  }
   let text: string;
   try {
-    text = new TextDecoder(encoding, { fatal: true }).decode(
-      Buffer.concat(chunks),
-    );
+    text = new TextDecoder(encoding, { fatal: true }).decode(bytes);
   } catch {
     throw new RetrievalError("unsupported_encoding");
   }

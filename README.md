@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **9 November 2026**, through [implementation PR #62](https://github.com/eeyung1/smartmanuAI/pull/62). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **9 November 2026**, through [implementation PR #63](https://github.com/eeyung1/smartmanuAI/pull/63). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -155,8 +155,9 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Bilingual job detail pages expose availability, Retry-After waits and review-required pauses without lease tokens.
 - [ ] Open-web search provider integration and scheduled English/Chinese discovery queries.
 - [ ] Candidate-link discovery and official-source admission from search/aggregator leads.
-- [x] Declared Chinese-encoding adapters with strict decoding, duplicate-charset rejection and unchanged response/excerpt limits. Missing charset defaults to UTF-8; no encoding guessing.
-- [ ] Structured feed, PDF, browser-rendered page, meta-charset detection and other encoding adapters.
+- [x] Declared Chinese-encoding adapters with strict decoding, duplicate-charset rejection and unchanged response/excerpt limits. When HTTP omits charset, HTML can use an early direct meta declaration; otherwise UTF-8 defaults apply. No encoding guessing.
+- [x] Bounded direct HTML meta-charset fallback within the first 1,024 bytes, before body/active/raw-text content, with HTTP precedence and UTF-8 BOM handling.
+- [ ] Structured feed, PDF, browser-rendered page, http-equiv/full HTML encoding detection and other encoding adapters.
 - [ ] Multiple opportunity extraction from one page and cross-source semantic reconciliation.
 - [x] Persisted per-source collection-claim cooldown (0–3600 seconds), covering retries, lease recovery and subsequent jobs, with admin controls and aligned readiness metrics.
 - [x] Lease-backed single-active-claim coordination per normalized hostname across source URLs, with restart recovery, stale-worker fencing and aligned readiness metrics.
