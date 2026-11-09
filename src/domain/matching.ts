@@ -1,3 +1,4 @@
+import { offeringIdentityKey } from "./offering-identity";
 import { checkLanguageTest, languageTestKey } from "./language-tests";
 import { currentAgeRange } from "./age";
 import { createHash } from "node:crypto";
@@ -27,11 +28,7 @@ export function materialFingerprint(details: Details) {
         ...facts,
         ...(offeringIdentity
           ? {
-              offeringIdentity: offeringIdentity
-                .normalize("NFC")
-                .trim()
-                .replace(/\s+/g, " ")
-                .toLowerCase(),
+              offeringIdentity: offeringIdentityKey(offeringIdentity),
             }
           : {}),
         topics: [...new Set(details.topics.map(topicKey))].sort(),

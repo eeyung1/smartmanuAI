@@ -1,4 +1,6 @@
 export const errorChinese: Record<string, string> = {
+  "A reviewed intake or event edition cannot be replaced or cleared. Create a separate opportunity for a different edition.":
+    "已审核的入学批次或活动届次不能替换或清除。不同届次请创建独立机会记录。",
   "Different intake or event editions cannot be merged. Review both identities first.":
     "不同入学批次或活动届次不能合并。请先审核两条记录的标识。",
   "The intake or event edition must appear in the captured source.":

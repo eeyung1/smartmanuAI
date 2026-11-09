@@ -1,3 +1,4 @@
+import { offeringIdentityKey } from "../domain/offering-identity";
 import { randomUUID } from "node:crypto";
 import type { SQL } from "../db";
 import {
@@ -146,6 +147,23 @@ export async function reviewOpportunity(
         throw new CatalogueError(
           400,
           "Past or closing-today dates cannot be newly published under the conservative date-only policy.",
+        );
+    }
+    if (v.action === "revise") {
+      const publishedIdentity = (
+        await tx.query<{ identity: string }>(
+          "SELECT details->>'offeringIdentity' AS identity FROM opportunity_revisions WHERE opportunity_id=$1 AND state IN ('published','closed') AND details->>'offeringIdentity' IS NOT NULL ORDER BY revision DESC LIMIT 1",
+          [id],
+        )
+      ).rows[0];
+      const established = offeringIdentityKey(publishedIdentity?.identity);
+      if (
+        established &&
+        offeringIdentityKey(details.offeringIdentity) !== established
+      )
+        throw new CatalogueError(
+          409,
+          "A reviewed intake or event edition cannot be replaced or cleared. Create a separate opportunity for a different edition.",
         );
     }
     const revision = Number(record.revision) + 1;
