@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **9 November 2026**, through [implementation PR #66](https://github.com/eeyung1/smartmanuAI/pull/66). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **9 November 2026**, through [implementation PR #67](https://github.com/eeyung1/smartmanuAI/pull/67). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -116,7 +116,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Explicit distinctions between missing values, nulls, zero costs, type changes and unavailable predecessors.
 - [x] English/Simplified Chinese review, browse, editor and audit controls; original evidence/notes stay unchanged.
 - [x] Administrator duplicate merge with surviving opportunity identity, archived duplicate and source-URL audit notes.
-- [ ] Persistent source aliases and automatic reconciliation across different URLs/intakes.
+- [x] New reviewed duplicate merges retain structured source aliases, deduplicate provenance and transfer inherited links through merge chains; admin history shows up to 100 links without exposing private audit data publicly.
+- [ ] Historical-note alias backfill, public provenance display and automatic reconciliation across different URLs/intakes.
 - [x] Preserve each user's latest tracker status, saved/dismissed choice and exact timestamp when merging duplicates; ties keep the survivor and versions still advance.
 - [x] Optional source-stated intake/event-edition labels in reviewed details; conflicting explicit editions block duplicate merges. Known edition changes affect material fingerprints while absent/null labels preserve legacy fingerprints.
 - [x] Once an explicit edition has been published/reviewed, revisions cannot replace or clear it, even through an intermediate draft; formatting-only corrections remain allowed. Different editions require separate records.
@@ -334,7 +335,7 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] Pinned dependencies, lockfile, format/type/build checks and GitHub Actions validation.
 - [x] Read-only Vercel staging configuration, health endpoint and explicit disabled-account/channel UI.
 - [x] Additive private-schema bootstrap with RLS and a least-privilege catalogue reader, tested locally and in the PostgreSQL CI case.
-- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 8 November 2026; 40 RLS tables and 25 migrations in the shared l2e-studylink project.
+- [x] Verified protected Vercel staging with HTTP 200 health/database connection, catalogue and sign-in pages on 9 November 2026; 41 RLS tables and 26 migrations in the shared l2e-studylink project.
 - [ ] Full production/managed database validation, private-account database roles and development/staging/production separation.
 - [ ] Approve exact current hosting/search/model/email/backup prices and capacity before provisioning.
 - [ ] Monthly research budget periods, actual-cost/invoice reconciliation and provider spend overview.

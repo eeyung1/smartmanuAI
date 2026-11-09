@@ -196,6 +196,28 @@ for (const kind of ["pglite", "postgres"])
           (await auditHistory(db.sql, actor, draft.id)).items[0].comparison,
           "unavailable",
         );
+        await db.sql.query(
+          "INSERT INTO sources(id,name,url,created_by) SELECT 'alias-'||n,'Historical source '||n,'https://example.test/alias-'||n,$1 FROM generate_series(1,101) n",
+          [actor],
+        );
+        await db.sql.query(
+          "INSERT INTO opportunity_source_aliases(opportunity_id,source_id) SELECT $1,'alias-'||n FROM generate_series(1,101) n",
+          [draft.id],
+        );
+        const aliased = await auditHistory(db.sql, actor, draft.id);
+        assert.equal(aliased.sourceAliases.length, 100);
+        assert.equal(aliased.aliasesTruncated, true);
+        assert.equal(
+          Number(
+            (
+              await db.sql.query(
+                "SELECT count(*) AS n FROM opportunity_source_aliases WHERE opportunity_id=$1",
+                [draft.id],
+              )
+            ).rows[0].n,
+          ),
+          101,
+        );
       } finally {
         await db.close();
         if (pool) {

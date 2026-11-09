@@ -201,6 +201,17 @@ ALTER TABLE source_collection_policies
 CREATE INDEX opportunities_source_deadline ON opportunities(source_id,(details->>'deadline')) WHERE state='published';
 
 INSERT INTO schema_migrations(name) VALUES('025_deadline_aware_schedule.sql');
+CREATE TABLE opportunity_source_aliases (
+  opportunity_id text NOT NULL REFERENCES opportunities(id),
+  source_id text NOT NULL REFERENCES sources(id),
+  recorded_at timestamptz NOT NULL DEFAULT NOW(),
+  PRIMARY KEY(opportunity_id,source_id)
+);
+CREATE INDEX opportunity_source_aliases_source ON opportunity_source_aliases(source_id);
+ALTER TABLE opportunity_source_aliases ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON opportunity_source_aliases FROM PUBLIC;
+
+INSERT INTO schema_migrations(name) VALUES('026_merged_source_aliases.sql');
 DO $guard$ DECLARE item record; BEGIN FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='smartmanuai' LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY','smartmanuai',item.tablename); END LOOP; FOR item IN SELECT p.oid::regprocedure AS signature FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='smartmanuai' LOOP EXECUTE format('ALTER FUNCTION %s SET search_path=smartmanuai,pg_catalog',item.signature); END LOOP; END $guard$;
 REVOKE ALL ON SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "smartmanuai" FROM PUBLIC;

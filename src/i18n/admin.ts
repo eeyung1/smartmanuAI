@@ -1,4 +1,11 @@
 export const adminChinese: Record<string, string> = {
+  "Merged source provenance": "合并来源记录",
+  "Historical source links retained by reviewed duplicate merges. These are current registry labels, not new source verification or permission to collect. Only future merges populate this list.":
+    "这些历史来源链接由已审核的重复记录合并保留。名称来自当前来源登记，不代表重新核实来源或获得采集许可。仅后续合并会填充此列表。",
+  "No structured merged-source links recorded.":
+    "尚无结构化的合并来源链接记录。",
+  "Only the first 100 merged-source links are shown; all recorded links remain stored.":
+    "仅显示前 100 条合并来源链接；所有已记录链接仍完整保存。",
   "Reservations are below 70% of the configured limit.":
     "预留量低于已配置上限的 70%。",
   "Budget warning: reservations have reached 70% of the configured limit.":
