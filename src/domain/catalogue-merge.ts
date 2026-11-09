@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { SQL } from "../db";
+import { detailsSchema } from "../catalogue/schema";
 import { CatalogueError, requireAdmin } from "../catalogue/service";
 
 export const catalogueMergeSchema = z
@@ -99,6 +100,25 @@ export async function mergeDuplicateOpportunity(
       throw new CatalogueError(
         409,
         "An opportunity changed. Reload both records before merging.",
+      );
+
+    const identity = (details: unknown) =>
+      detailsSchema
+        .parse(details)
+        .offeringIdentity?.normalize("NFC")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+    const duplicateIdentity = identity(duplicate.details),
+      targetIdentity = identity(target.details);
+    if (
+      duplicateIdentity &&
+      targetIdentity &&
+      duplicateIdentity !== targetIdentity
+    )
+      throw new CatalogueError(
+        409,
+        "Different intake or event editions cannot be merged. Review both identities first.",
       );
 
     const rows = (

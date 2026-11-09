@@ -113,6 +113,21 @@ test("retrieval rejects unsafe DNS, redirects, binary, compression and oversized
     () =>
       validateExtraction(content, {
         ...modelValue,
+        details: { ...fixtureDetails, offeringIdentity: "Autumn 2099" },
+      }),
+    /must appear/,
+  );
+  assert.equal(
+    validateExtraction(content + " Autumn 2027", {
+      ...modelValue,
+      details: { ...fixtureDetails, offeringIdentity: "Autumn 2027" },
+    }).details?.offeringIdentity,
+    "Autumn 2027",
+  );
+  assert.throws(
+    () =>
+      validateExtraction(content, {
+        ...modelValue,
         evidence: {
           ...modelValue.evidence,
           funding: {

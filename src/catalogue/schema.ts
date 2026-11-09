@@ -56,6 +56,7 @@ export const eligibilityRulesSchema = z
   );
 export const detailsSchema = z
   .object({
+    offeringIdentity: z.string().trim().min(2).max(160).nullable().optional(),
     studyLevel: z
       .enum(["bachelor", "master", "doctorate"])
       .nullable()

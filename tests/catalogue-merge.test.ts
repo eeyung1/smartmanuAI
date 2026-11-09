@@ -101,6 +101,31 @@ for (const kind of ["pglite", "postgres"])
           expectedTargetRevision: 2,
           note: "The official source confirms these are duplicate listings.",
         };
+        await db.sql.query(
+          "UPDATE opportunities SET details=jsonb_set(details,'{offeringIdentity}',to_jsonb($2::text)) WHERE id=$1",
+          [duplicate.id, "Autumn 2027"],
+        );
+        await db.sql.query(
+          "UPDATE opportunities SET details=jsonb_set(details,'{offeringIdentity}',to_jsonb($2::text)) WHERE id=$1",
+          [targetId, "Autumn 2026"],
+        );
+        await assert.rejects(
+          () => mergeDuplicateOpportunity(db.sql, actor, duplicate.id, input),
+          /Different intake/,
+        );
+        assert.equal(
+          (
+            await db.sql.query("SELECT state FROM opportunities WHERE id=$1", [
+              duplicate.id,
+            ])
+          ).rows[0].state,
+          "published",
+        );
+        // Formatting-only differences identify the same edition; no date/title inference.
+        await db.sql.query(
+          "UPDATE opportunities SET details=jsonb_set(details,'{offeringIdentity}',to_jsonb($2::text)) WHERE id=$1",
+          [targetId, " autumn   2027 "],
+        );
         const outcomes = await Promise.allSettled([
           mergeDuplicateOpportunity(db.sql, actor, duplicate.id, input),
           mergeDuplicateOpportunity(db.sql, actor, duplicate.id, input),

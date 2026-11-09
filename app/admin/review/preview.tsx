@@ -239,6 +239,10 @@ export default function OpportunityPreview({
         <p className="intro" lang="">
           {details.organizer || t("Organizer")}
         </p>
+        <p>
+          {t("Intake / event edition:")}{" "}
+          <span lang="">{details.offeringIdentity ?? t("Not stated")}</span>
+        </p>
         {source?.synthetic ? (
           <div className="notice">
             {t(
@@ -283,6 +287,10 @@ export default function OpportunityPreview({
         <section>
           <h4>{t("Official source")}</h4>
           <p>{source?.name || t("Select a registered source")}</p>
+          <p>
+            {t("Intake / event edition:")}{" "}
+            <span lang="">{details.offeringIdentity ?? t("Not stated")}</span>
+          </p>
           {source?.synthetic ? (
             <p>
               {t(

@@ -344,3 +344,21 @@ for (const kind of ["pglite", "postgres"])
       }
     },
   );
+
+test("edition identity preserves legacy fingerprints and distinguishes explicit new intakes", () => {
+  assert.equal(
+    materialFingerprint(details),
+    materialFingerprint({ ...details, offeringIdentity: null }),
+  );
+  assert.equal(
+    materialFingerprint({ ...details, offeringIdentity: "Autumn 2027" }),
+    materialFingerprint({ ...details, offeringIdentity: " autumn   2027 " }),
+  );
+  assert.notEqual(
+    materialFingerprint({ ...details, offeringIdentity: "Autumn 2027" }),
+    materialFingerprint({ ...details, offeringIdentity: "Autumn 2026" }),
+  );
+  assert.throws(() =>
+    detailsSchema.parse({ ...details, offeringIdentity: "" }),
+  );
+});
