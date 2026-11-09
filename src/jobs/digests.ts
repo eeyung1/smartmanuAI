@@ -9,7 +9,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { SQL } from "../db";
 import { CatalogueError } from "../catalogue/service";
-import { materialFingerprint, matchesForUser } from "../domain/matching";
+import { materialFingerprint, allMatchesForUser } from "../domain/matching";
 import {
   nextDigestSlot,
   localSlotKey,
@@ -203,7 +203,7 @@ export async function planOneDigest(sql: SQL, now = new Date()) {
       );
       return "suppressed";
     }
-    const matches = await matchesForUser(tx, userId, 1, 1000);
+    const matches = await allMatchesForUser(tx, userId);
     const seen = new Set(
       (
         await tx.query(
@@ -301,7 +301,7 @@ export async function dispatchDigest(sql: SQL, now = new Date()) {
       [digest.id],
     );
     const matches = valid
-      ? await matchesForUser(tx, String(candidate.user_id), 1, 1000)
+      ? await allMatchesForUser(tx, String(candidate.user_id))
       : null;
     const byId = new Map(matches?.items.map((item) => [item.id, item]));
     const items = [];

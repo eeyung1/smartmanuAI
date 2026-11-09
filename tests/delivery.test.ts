@@ -229,7 +229,14 @@ for (const kind of ["pglite", "postgres"])
             ).rows,
           ).includes("delivery@example.test"),
         );
+        // Accepted digest items remain valid when new higher-ranked matches arrive.
+        await db.sql.query(
+          "INSERT INTO opportunities(id,source_id,revision,state,details,evidence,verified_at) SELECT '000-shadow-'||n,source_id,1,'published',details,evidence,NOW() FROM opportunities CROSS JOIN generate_series(1,1001) n WHERE id='synthetic-course'",
+        );
         let claim = await claimDelivery(db.sql, { daily: 10, monthly: 1 });
+        await db.sql.query(
+          "DELETE FROM opportunities WHERE id LIKE '000-shadow-%'",
+        );
         assert.ok(claim);
         const frozen = claim.request.body;
         assert.equal(

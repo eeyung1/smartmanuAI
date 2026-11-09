@@ -11,8 +11,11 @@ import {
   fixtureDetails,
   fixtureEvidence,
 } from "../src/catalogue/fixtures";
+import { detailsSchema } from "../src/catalogue/schema";
 import { createDraft, reviewOpportunity } from "../src/catalogue/service";
 import { updateTracker } from "../src/domain/tracker";
+import { materialFingerprint } from "../src/domain/matching";
+import { buildUpcomingDigestPreview } from "../src/jobs/digest-preview";
 import { saveProfile } from "../src/domain/profile";
 import { nextDigestSlot } from "../src/jobs/digest-schedule";
 import {
@@ -260,6 +263,51 @@ for (const kind of ["pglite", "postgres"])
           false,
         );
         assert.equal((await digestHistory(db.sql, admin)).length, 0);
+        // The only unseen item ranks after 1,000 previously accepted opportunities.
+        await db.sql.query(
+          "INSERT INTO opportunities(id,source_id,revision,state,details,evidence,verified_at) SELECT 'digest-wide-'||LPAD(n::text,4,'0'),$1,1,'published',$2::jsonb,$3::jsonb,NOW() FROM generate_series(1,1001) AS n",
+          [
+            sourceId,
+            JSON.stringify(fixtureDetails),
+            JSON.stringify(fixtureEvidence),
+          ],
+        );
+        const fingerprint = materialFingerprint(
+          detailsSchema.parse(fixtureDetails),
+        );
+        const seen = Array.from({ length: 1000 }, (_, i) => {
+          const id = "digest-wide-" + String(i + 1).padStart(4, "0");
+          return { id, key: JSON.stringify([id, fingerprint]) };
+        });
+        const accepted = (
+          await db.sql.query(
+            "SELECT id FROM notification_digests WHERE user_id=$1 AND state='accepted' LIMIT 1",
+            [user],
+          )
+        ).rows[0];
+        await db.sql.query(
+          "INSERT INTO notification_digest_events(user_id,event_key,opportunity_id,fingerprint,digest_id,state) SELECT $1,item->>'key',item->>'id',$2,$3,'accepted' FROM jsonb_array_elements($4::jsonb) item",
+          [user, fingerprint, accepted.id, JSON.stringify(seen)],
+        );
+        const preview = await buildUpcomingDigestPreview(db.sql, user);
+        assert.deepEqual(
+          preview.items.map((item) => item.id),
+          ["digest-wide-1001"],
+        );
+        assert.equal(
+          (await buildUpcomingDigestPreview(db.sql, admin)).items.length,
+          0,
+        );
+        await due(4);
+        assert.equal(await planOneDigest(db.sql), "queued");
+        assert.equal(await dispatchDigest(db.sql), "accepted");
+        const last = (
+          await db.sql.query(
+            "SELECT payload FROM sink_messages WHERE payload->'items' @> '[{\"id\":\"digest-wide-1001\"}]'::jsonb",
+          )
+        ).rows;
+        assert.equal(last.length, 1);
+        assert.equal((last[0].payload as { items: unknown[] }).items.length, 1);
       } finally {
         await db.close();
         if (pool) {

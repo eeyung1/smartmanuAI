@@ -213,12 +213,7 @@ export function evaluateMatch(
     eligibility: "needs_checking" as const,
   };
 }
-export async function matchesForUser(
-  sql: SQL,
-  userId: string,
-  page = 1,
-  pageSize = 12,
-) {
+export async function allMatchesForUser(sql: SQL, userId: string) {
   // One statement observes profile, candidate facts and dismissals in one database snapshot.
   const stored = (
     await sql.query<{
@@ -244,8 +239,6 @@ export async function matchesForUser(
       rulesVersion: MATCH_RULES_VERSION,
       items: [],
       total: 0,
-      page,
-      pageSize,
       truncated: false,
     };
   const profile = preferencesSchema.parse(stored.preferences);
@@ -279,10 +272,24 @@ export async function matchesForUser(
     profileRequired: false,
     profileVersion: Number(stored.version),
     rulesVersion: MATCH_RULES_VERSION,
-    items: ranked.slice((page - 1) * pageSize, page * pageSize),
+    items: ranked,
     total: ranked.length,
+    truncated: false,
+  };
+}
+
+/** Public callers receive a page; shared digest services consume the complete ranking. */
+export async function matchesForUser(
+  sql: SQL,
+  userId: string,
+  page = 1,
+  pageSize = 12,
+) {
+  const result = await allMatchesForUser(sql, userId);
+  return {
+    ...result,
+    items: result.items.slice((page - 1) * pageSize, page * pageSize),
     page,
     pageSize,
-    truncated: false,
   };
 }
