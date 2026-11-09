@@ -3,6 +3,11 @@ import { errorChinese } from "./errors";
 import { controlChinese } from "./controls";
 import type { Locale } from "./locale";
 export const screenChinese: Record<string, string> = {
+  "Additional source provenance": "其他历史来源",
+  "These historical links were retained during reviewed duplicate merges. They do not confirm current availability, funding or a fresh source check.":
+    "这些历史链接在已审核的重复记录合并时保留。它们不代表机会当前仍然开放、资助仍然有效或来源已重新核实。",
+  "Showing the first 10 historical source links. More provenance is available to reviewers.":
+    "此处显示前 10 条历史来源链接。审核人员可查看其他来源记录。",
   "Intake / event edition:": "入学批次／活动届次：",
   "Catalogue review status": "目录审核状态",
   "Last reviewed publication (UTC):": "最近一次已发布记录的审核时间（UTC）：",

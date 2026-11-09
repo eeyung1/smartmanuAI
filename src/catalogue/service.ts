@@ -228,7 +228,24 @@ export async function publicOpportunity(sql: SQL, id: string) {
       [id],
     )
   ).rows[0];
-  return row ? publicRecord(row) : null;
+  if (!row) return null;
+  const aliases = (
+    await sql.query(
+      "SELECT s.name,s.url,s.synthetic FROM opportunity_source_aliases a JOIN sources s ON s.id=a.source_id JOIN opportunities o ON o.id=a.opportunity_id WHERE o.id=$1 AND o.state IN ('published','closed') ORDER BY a.recorded_at,s.id LIMIT 11",
+      [id],
+    )
+  ).rows;
+  return {
+    ...publicRecord(row),
+    sourceAliases: aliases
+      .slice(0, 10)
+      .map((source) => ({
+        name: String(source.name),
+        url: source.synthetic ? null : String(source.url),
+        synthetic: source.synthetic === true,
+      })),
+    sourceAliasesTruncated: aliases.length > 10,
+  };
 }
 export type Filters = Partial<PublicFilters>;
 export async function listPublic(sql: SQL, input: Filters = {}) {

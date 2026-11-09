@@ -105,6 +105,41 @@ export default async function Detail({
         </p>
       </section>
       <section>
+        {item.sourceAliases.length ? (
+          <section>
+            <h2>{t("Additional source provenance")}</h2>
+            <p>
+              {t(
+                "These historical links were retained during reviewed duplicate merges. They do not confirm current availability, funding or a fresh source check.",
+              )}
+            </p>
+            <ul>
+              {item.sourceAliases.map((source, index) => (
+                <li key={index}>
+                  {source.url ? (
+                    <a
+                      href={source.url}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      <span lang="">{source.name}</span>
+                    </a>
+                  ) : (
+                    <span lang="">{source.name}</span>
+                  )}
+                  {source.synthetic ? " · " + t("Synthetic fixture") : ""}
+                </li>
+              ))}
+            </ul>
+            {item.sourceAliasesTruncated ? (
+              <p>
+                {t(
+                  "Showing the first 10 historical source links. More provenance is available to reviewers.",
+                )}
+              </p>
+            ) : null}
+          </section>
+        ) : null}
         <h2>{t("Official source")}</h2>
         <p>{item.source_name}</p>
         {!item.synthetic ? (

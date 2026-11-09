@@ -212,14 +212,20 @@ ALTER TABLE opportunity_source_aliases ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON opportunity_source_aliases FROM PUBLIC;
 
 INSERT INTO schema_migrations(name) VALUES('026_merged_source_aliases.sql');
+-- Hosted reader grants and state-scoped policies are managed by the staging bootstrap.
+CREATE INDEX opportunity_source_aliases_browse
+  ON opportunity_source_aliases(opportunity_id,recorded_at,source_id);
+
+INSERT INTO schema_migrations(name) VALUES('027_public_source_provenance.sql');
 DO $guard$ DECLARE item record; BEGIN FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='smartmanuai' LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY','smartmanuai',item.tablename); END LOOP; FOR item IN SELECT p.oid::regprocedure AS signature FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='smartmanuai' LOOP EXECUTE format('ALTER FUNCTION %s SET search_path=smartmanuai,pg_catalog',item.signature); END LOOP; END $guard$;
 REVOKE ALL ON SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA "smartmanuai" FROM PUBLIC;
 ALTER DEFAULT PRIVILEGES IN SCHEMA "smartmanuai" REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 GRANT USAGE ON SCHEMA "smartmanuai" TO "smartmanuai_reader";
-GRANT SELECT ON opportunities,sources,schema_migrations TO "smartmanuai_reader";
+GRANT SELECT ON opportunities,sources,schema_migrations,opportunity_source_aliases TO "smartmanuai_reader";
 CREATE POLICY staging_public_opportunities ON opportunities FOR SELECT TO "smartmanuai_reader" USING(state IN ('published','closed'));
-CREATE POLICY staging_public_sources ON sources FOR SELECT TO "smartmanuai_reader" USING(EXISTS(SELECT 1 FROM "smartmanuai".opportunities o WHERE o.source_id=sources.id AND o.state IN ('published','closed')));
+CREATE POLICY staging_public_sources ON sources FOR SELECT TO "smartmanuai_reader" USING(EXISTS(SELECT 1 FROM "smartmanuai".opportunities o WHERE o.source_id=sources.id AND o.state IN ('published','closed')) OR EXISTS(SELECT 1 FROM "smartmanuai".opportunity_source_aliases a JOIN "smartmanuai".opportunities o ON o.id=a.opportunity_id WHERE a.source_id=sources.id AND o.state IN ('published','closed')));
+CREATE POLICY staging_public_source_aliases ON opportunity_source_aliases FOR SELECT TO "smartmanuai_reader" USING(EXISTS(SELECT 1 FROM "smartmanuai".opportunities o WHERE o.id=opportunity_source_aliases.opportunity_id AND o.state IN ('published','closed')));
 CREATE POLICY staging_migration_status ON schema_migrations FOR SELECT TO "smartmanuai_reader" USING(true);
 RESET ROLE;
