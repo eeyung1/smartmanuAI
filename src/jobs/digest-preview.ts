@@ -1,4 +1,4 @@
-import { materialFingerprint, matchesForUser } from "@/src/domain/matching";
+import { materialFingerprint, allMatchesForUser } from "@/src/domain/matching";
 import { renderAlertText } from "@/src/i18n/alerts";
 import { resolveAlertLanguage } from "@/src/i18n/locale";
 import { LOCAL_CONSENT_VERSION } from "@/src/jobs/digests";
@@ -14,7 +14,7 @@ export async function buildUpcomingDigestPreview(
       "SELECT enabled,consent_version,channel FROM notification_preferences WHERE user_id=$1",
       [userId],
     ),
-    matchesForUser(sql, userId, 1, 1000),
+    allMatchesForUser(sql, userId),
     sql.query(
       "SELECT preferences->>'alertLanguage' AS language FROM profiles WHERE user_id=$1",
       [userId],

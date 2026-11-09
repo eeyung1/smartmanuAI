@@ -16,7 +16,7 @@ import {
   emailSuppression,
   recordEmailDigestAttempt,
 } from "../channels/email-controls";
-import { matchesForUser, materialFingerprint } from "../domain/matching";
+import { allMatchesForUser, materialFingerprint } from "../domain/matching";
 import {
   buildSimulationRequest,
   simulationPayloadSchema,
@@ -289,7 +289,7 @@ export async function claimDelivery(
         [job.digest_id],
       );
       const matches = valid
-        ? await matchesForUser(tx, String(job.user_id), 1, 1000)
+        ? await allMatchesForUser(tx, String(job.user_id))
         : null;
       const current = new Map(matches?.items.map((item) => [item.id, item]));
       for (const event of events) {
