@@ -85,6 +85,11 @@ test("notification commands run persisted local jobs once and refuse staging bef
         const output = JSON.parse((await run(script)).stdout);
         assert.equal(output.externalDelivery, false);
         assert.equal(output.deliveryMode, "local_sink");
+        if (script === "changes")
+          assert.equal(
+            output.result.dispatch,
+            attempt === 0 ? "accepted" : "empty",
+          );
         assert.equal(
           script === "reminders" ? output.result.sent : output.result.queued,
           attempt === 0 ? 1 : 0,
@@ -104,7 +109,7 @@ test("notification commands run persisted local jobs once and refuse staging bef
       assert.equal(
         (
           await db.sql.query(
-            "SELECT id FROM outbox WHERE user_id='command-user' AND state='queued'",
+            "SELECT id FROM outbox WHERE user_id='command-user' AND state='accepted'",
           )
         ).rows.length,
         1,

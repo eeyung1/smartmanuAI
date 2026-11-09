@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **9 November 2026**, through [implementation PR #63](https://github.com/eeyung1/smartmanuAI/pull/63). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **9 November 2026**, through [implementation PR #64](https://github.com/eeyung1/smartmanuAI/pull/64). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -247,7 +247,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [x] User choice to retain local deadline reminders for already-applied saved opportunities, with current consent/pause/preference rechecks.
 - [x] Separate default-off local opt-in for saved-item deadline/funding/closure updates outside the digest schedule, with master-pause/channel-change cancellation and no replay after re-enabling.
 - [x] Queue local closure, funding reduction and deadline-change alerts for active saved items outside normal discovery funding filters, using `npm run changes:once`.
-- [ ] Dispatch queued change alerts with current consent, destination, suppression and privacy rechecks.
+- [x] Dispatch one queued material-change alert to the transactional local sink with current opt-in/channel, saved status, latest revision/change-kind, 24-hour revision age, event ownership and email-suppression rechecks.
+- [ ] Real change-alert dispatch with verified destinations, live provider/privacy qualification and official-source rechecks.
 - [ ] Production consent version, verified destination/binding integration and real email/Telegram dispatch.
 - [x] User-facing preview of fresh, unseen digest content without scheduling or sending.
 - [x] Owner-only stored digest history with channel/state filters and timestamp/ID cursor pagination beyond 20 records.
@@ -425,7 +426,7 @@ Restart and visit `/admin/review`, `/admin/catalogue` or `/admin/research`. Role
 | `npm run setup:local`                                       | Generate/add missing local-only configuration                                                                     |
 | `npm run db:migrate` / `npm run seed:local`                 | Apply migrations / seed optional synthetic catalogue                                                              |
 | `npm run reminders:once` | Run due saved-item reminders into the local sink; hosted mode is refused |
-| `npm run changes:once` | Queue deduplicated material-change alerts locally; no external dispatch |
+| `npm run changes:once` | Queue material-change alerts and recheck/dispatch one to the local sink; no external delivery |
 | `npm run digest:once`                                       | Plan one due user and dispatch one queued local-sink digest                                                       |
 | `npm run delivery:test:once`                                | Process a synthetic outbound simulation with injected transport                                                   |
 | `npm run privacy:once`                                      | Process at most one queued local account purge                                                                    |
