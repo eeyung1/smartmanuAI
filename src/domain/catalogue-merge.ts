@@ -1,3 +1,4 @@
+import { offeringIdentityKey } from "./offering-identity";
 import { z } from "zod";
 import type { SQL } from "../db";
 import { detailsSchema } from "../catalogue/schema";
@@ -102,15 +103,12 @@ export async function mergeDuplicateOpportunity(
         "An opportunity changed. Reload both records before merging.",
       );
 
-    const identity = (details: unknown) =>
-      detailsSchema
-        .parse(details)
-        .offeringIdentity?.normalize("NFC")
-        .trim()
-        .replace(/\s+/g, " ")
-        .toLowerCase();
-    const duplicateIdentity = identity(duplicate.details),
-      targetIdentity = identity(target.details);
+    const duplicateIdentity = offeringIdentityKey(
+        detailsSchema.parse(duplicate.details).offeringIdentity,
+      ),
+      targetIdentity = offeringIdentityKey(
+        detailsSchema.parse(target.details).offeringIdentity,
+      );
     if (
       duplicateIdentity &&
       targetIdentity &&
