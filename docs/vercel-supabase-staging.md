@@ -95,3 +95,8 @@ Add `collection_host_locks.request_delay_seconds` (integer 0–3600, default 0),
 ## Application migration 025 (8 November 2026)
 
 Add constrained `source_collection_policies.schedule_mode` (default fixed), nullable `last_scheduled_at` and the partial `opportunities_source_deadline` index in smartmanuai. Record `025_deadline_aware_schedule.sql` in the app ledger; health requires 25 app migrations. There are still 40 RLS tables and no new runtime reader grants. Existing policies retain fixed intervals. Hosted scheduler/account enablement is unchanged.
+
+
+## Migration 026: merged source provenance
+
+Create private `opportunity_source_aliases(opportunity_id,source_id,recorded_at)` with catalogue foreign keys, a composite primary key, source lookup index and RLS. Revoke all public/anon/authenticated/reader access; no reader policy or grant is added. Record `026_merged_source_aliases.sql` in the app ledger. Health requires 26 migrations and smartmanuai contains 41 RLS tables. Existing records are not backfilled from free-text notes. The table stores shared provenance without actor/account identifiers. Apply only to the private smartmanuai schema; keep hosted accounts/workers disabled.

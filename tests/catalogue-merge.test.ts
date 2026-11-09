@@ -17,6 +17,7 @@ import {
   fixtureEvidence,
   seedLocalCatalogue,
 } from "../src/catalogue/fixtures";
+import { auditHistory } from "../src/catalogue/history";
 import { mergeDuplicateOpportunity } from "../src/domain/catalogue-merge";
 import { saveItem } from "../src/domain/profile";
 
@@ -61,7 +62,7 @@ for (const kind of ["pglite", "postgres"])
         const duplicateSource = await createSource(db.sql, actor, {
           name: "Duplicate opportunity source",
           url: "https://example.test/duplicate-source",
-          synthetic: true,
+          synthetic: false,
         });
         const duplicate = await createDraft(db.sql, actor, {
           sourceId: duplicateSource.id,
@@ -218,6 +219,56 @@ for (const kind of ["pglite", "postgres"])
         assert.match(
           String(targetRevision.note),
           /https:\/\/example\.test\/duplicate-source/,
+        );
+        const aliases = await auditHistory(db.sql, actor, targetId);
+        assert.equal(aliases.sourceAliases.length, 1);
+        assert.equal(
+          aliases.sourceAliases[0].url,
+          "https://example.test/duplicate-source",
+        );
+        assert.equal(aliases.aliasesTruncated, false);
+        await assert.rejects(
+          () => auditHistory(db.sql, "not-admin", targetId),
+          /Administrator/,
+        );
+        // A later merge transfers both its primary source and inherited aliases.
+        const thirdSource = await createSource(db.sql, actor, {
+          name: "Third canonical source",
+          url: "https://example.test/final-source",
+        });
+        const third = await createDraft(db.sql, actor, {
+          sourceId: thirdSource.id,
+          details: { ...fixtureDetails, offeringIdentity: "Autumn 2027" },
+          evidence: fixtureEvidence,
+          note: "Canonical chain fixture.",
+        });
+        await reviewOpportunity(db.sql, actor, third.id, {
+          action: "publish",
+          expectedRevision: 1,
+          verified: true,
+          note: "Approve canonical chain fixture.",
+        });
+        await mergeDuplicateOpportunity(db.sql, actor, targetId, {
+          targetOpportunityId: third.id,
+          expectedDuplicateRevision: 3,
+          expectedTargetRevision: 2,
+          note: "Reviewed duplicate chain source evidence.",
+        });
+        const chain = await auditHistory(db.sql, actor, third.id);
+        assert.equal(chain.sourceAliases.length, 2);
+        assert.ok(
+          chain.sourceAliases.some(
+            (source) => source.synthetic && source.url === null,
+          ),
+        );
+        assert.ok(
+          chain.sourceAliases.some(
+            (source) => source.url === "https://example.test/duplicate-source",
+          ),
+        );
+        assert.equal(
+          (await auditHistory(db.sql, actor, targetId)).sourceAliases.length,
+          0,
         );
         await assert.rejects(
           () =>

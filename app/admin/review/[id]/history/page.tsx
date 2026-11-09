@@ -61,6 +61,40 @@ export default async function History({
           "Read-only history. Source wording and reviewer notes are shown unchanged. Times below are UTC audit timestamps, not source deadlines.",
         )}
       </p>
+      <section>
+        <h2>{t("Merged source provenance")}</h2>
+        <p>
+          {t(
+            "Historical source links retained by reviewed duplicate merges. These are current registry labels, not new source verification or permission to collect. Only future merges populate this list.",
+          )}
+        </p>
+        {data.sourceAliases.length ? (
+          <ul>
+            {data.sourceAliases.map((source) => (
+              <li key={source.id}>
+                {source.url ? (
+                  <a href={source.url} rel="noreferrer" target="_blank">
+                    <span lang="">{source.name}</span>
+                  </a>
+                ) : (
+                  <span lang="">{source.name}</span>
+                )}
+                {source.synthetic ? " · " + t("Synthetic fixture") : ""} ·{" "}
+                <time dateTime={source.recordedAt}>{source.recordedAt}</time>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>{t("No structured merged-source links recorded.")}</p>
+        )}
+        {data.aliasesTruncated ? (
+          <p>
+            {t(
+              "Only the first 100 merged-source links are shown; all recorded links remain stored.",
+            )}
+          </p>
+        ) : null}
+      </section>
       {data.items.length ? (
         data.items.map((item) => (
           <article key={item.revision}>

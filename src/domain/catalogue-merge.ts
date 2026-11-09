@@ -119,6 +119,21 @@ export async function mergeDuplicateOpportunity(
         "Different intake or event editions cannot be merged. Review both identities first.",
       );
 
+    // Alias writes follow the same locked opportunity pair and roll back with the merge.
+    await tx.query(
+      `INSERT INTO opportunity_source_aliases(opportunity_id,source_id,recorded_at)
+       SELECT $1,source_id,MIN(recorded_at) FROM (
+         SELECT $2::text AS source_id,NOW() AS recorded_at
+         UNION ALL SELECT source_id,recorded_at FROM opportunity_source_aliases WHERE opportunity_id=$3
+       ) origins WHERE source_id<>$4 GROUP BY source_id
+       ON CONFLICT(opportunity_id,source_id) DO UPDATE SET recorded_at=LEAST(opportunity_source_aliases.recorded_at,EXCLUDED.recorded_at)`,
+      [targetId, duplicate.source_id, duplicateId, target.source_id],
+    );
+    await tx.query(
+      "DELETE FROM opportunity_source_aliases WHERE opportunity_id=$1",
+      [duplicateId],
+    );
+
     const rows = (
       await tx.query(
         "SELECT user_id,opportunity_id,status,saved,dismissed_fingerprint,version,updated_at::text AS updated_at FROM saved_items WHERE opportunity_id=ANY($1::text[]) ORDER BY user_id,saved_items.updated_at DESC,(opportunity_id=$2) DESC,opportunity_id FOR UPDATE",

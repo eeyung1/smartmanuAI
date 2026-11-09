@@ -128,9 +128,25 @@ export async function auditHistory(
         comparison === "compared" ? historyChanges(current, previous!) : [],
     };
   });
+  const aliases = (
+    await sql.query(
+      "SELECT s.id,s.name,s.url,s.synthetic,a.recorded_at FROM opportunity_source_aliases a JOIN sources s ON s.id=a.source_id WHERE a.opportunity_id=$1 ORDER BY a.recorded_at,s.id LIMIT 101",
+      [opportunityId],
+    )
+  ).rows;
   return {
     record,
     items,
+    sourceAliases: aliases
+      .slice(0, 100)
+      .map((row) => ({
+        id: String(row.id),
+        name: String(row.name),
+        url: row.synthetic ? null : String(row.url),
+        synthetic: row.synthetic === true,
+        recordedAt: new Date(String(row.recorded_at)).toISOString(),
+      })),
+    aliasesTruncated: aliases.length > 100,
     pageSize,
     nextBefore: rows.length > pageSize ? items.at(-1)!.revision : null,
   };
