@@ -1,3 +1,4 @@
+import { currentMaterialChange } from "./material-change-dispatch";
 import { randomUUID } from "node:crypto";
 import type { SQL } from "../db";
 export async function reserveBudget(sql: SQL, micros: number) {
@@ -30,10 +31,11 @@ export async function queueNotification(
     ],
   );
 }
-export async function dispatchOne(sql: SQL) {
+export async function dispatchOne(sql: SQL, kind?: "material_change") {
   const candidate = (
     await sql.query(
-      "SELECT id,user_id FROM outbox WHERE state='queued' ORDER BY id LIMIT 1",
+      "SELECT id,user_id FROM outbox WHERE state='queued' AND ($1::text IS NULL OR payload->>'type'=$1) ORDER BY id LIMIT 1",
+      [kind ?? null],
     )
   ).rows[0];
   if (!candidate) return "empty";
@@ -65,6 +67,20 @@ export async function dispatchOne(sql: SQL) {
         (!pref.material_changes_enabled ||
           pref.consent_version !== "local-sink-v1" ||
           item.payload.channel !== pref.channel))
+    ) {
+      await tx.query("UPDATE outbox SET state='suppressed' WHERE id=$1", [
+        item.id,
+      ]);
+      return "suppressed";
+    }
+    if (
+      item.payload.type === "material_change" &&
+      !(await currentMaterialChange(
+        tx,
+        item.user_id,
+        item.event_key,
+        item.payload,
+      ))
     ) {
       await tx.query("UPDATE outbox SET state='suppressed' WHERE id=$1", [
         item.id,
