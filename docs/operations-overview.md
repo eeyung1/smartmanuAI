@@ -28,3 +28,8 @@ The effective source due target includes optional deadline-aware daily accelerat
 ## Reservation warnings
 
 The shared budget shows normal (below 70%), warning (70% to below 90%), critical (90% to below full capacity) and full-capacity states. Exact integer ratios determine the state; displayed percentages truncate to two decimals. A zero limit always has no available capacity and no defined utilization percentage. These are current reservation indicators, not monthly spending or invoice figures. The read-only page neither sends alerts nor reduces optional work or changes the existing reservation guard.
+
+
+## Repeated collection failures
+
+The snapshot counts sources whose latest two retained terminal job records are both failed. Terminal means done, failed or cancelled; creation time descending and ID descending break ties, and future-created records are ignored. Queued/running jobs do not reset the signal, while a later done/cancelled terminal record does. Fewer than two terminal records never trigger it. Counts cover all affected sources; at most ten names/links appear, ordered by source ID. This is a read-only record-state warning, not an attempt-level failure streak, completion-time ordering, measured run-success percentage or external message. Clearing/recovering jobs changes the next snapshot; no automatic retry is triggered.

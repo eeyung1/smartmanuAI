@@ -6,7 +6,7 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 **Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
 
-Feature audit: **9 November 2026**, through [implementation PR #68](https://github.com/eeyung1/smartmanuAI/pull/68). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **9 November 2026**, through [implementation PR #69](https://github.com/eeyung1/smartmanuAI/pull/69). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
 ## How to read this checklist
 
@@ -344,7 +344,8 @@ The detailed checklist below is the implementation inventory. The [original PRD]
 - [ ] External budget alerts, automatic optional-work reduction at 90%, and production hard-cap/reserved essential capacity behavior.
 - [x] Read-only workload-age indicators for queued records and pending candidates, stored-gate readiness, expired leases and scheduled-due sources, with exact UTC age semantics.
 - [ ] Live source-success, actual execution-duration, quota and delivery telemetry with secret/token redaction.
-- [ ] Alert administrators after two consecutive failed runs and show last successful shared refresh.
+- [x] Private operations warnings for sources whose latest two retained terminal collection jobs failed, with exact affected-source totals and up to ten source-job links. Later done/cancelled records clear the signal; queued/running records do not.
+- [ ] External administrator failure alerts, measured run outcomes and last successful complete shared refresh.
 - [ ] Measure the proposed 99% scheduled-run success target and feed p95 below two seconds under an agreed load.
 - [ ] Production backups, restore drill, migration/worker-upgrade procedure and rollback validation.
 - [ ] Durable hosted workflow storage, recurring workers, health/incident monitoring and operational support ownership.

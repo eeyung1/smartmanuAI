@@ -33,6 +33,43 @@ export default function OperationsSummary({
         {t("Snapshot time")}: <time dateTime={data.observedAt}>{date} UTC</time>
       </p>
       <section>
+        <h2>{t("Repeated collection failures")}</h2>
+        <p role="status">
+          {t("Sources whose latest two terminal jobs failed: {count}", {
+            count: data.failureWarnings.total,
+          })}
+        </p>
+        {data.failureWarnings.items.length ? (
+          <ul>
+            {data.failureWarnings.items.map((source) => (
+              <li key={source.sourceId}>
+                <Link
+                  href={
+                    "/admin/research/browse?kind=jobs&source=" +
+                    encodeURIComponent(source.sourceId)
+                  }
+                >
+                  <span lang="">{source.sourceName}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {BigInt(data.failureWarnings.total) >
+        BigInt(data.failureWarnings.items.length) ? (
+          <p>
+            {t(
+              "Showing the first 10 affected sources. Inspect the research browser for more retained jobs.",
+            )}
+          </p>
+        ) : null}
+        <p>
+          {t(
+            "This read-only indicator checks retained done, failed and cancelled job records ordered by creation time and ID. Queued/running jobs do not reset it; a later done or cancelled record does. It is not an attempt count, a measured run-success rate or an external alert.",
+          )}
+        </p>
+      </section>
+      <section>
         <h2>{t("Workload age and scheduling")}</h2>
         <dl>
           <div>

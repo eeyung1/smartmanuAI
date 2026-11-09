@@ -41,6 +41,7 @@ for (const kind of ["pglite", "postgres"])
         );
         const empty = await operationsOverview(db.sql, actor);
         assert.equal(empty.jobs.total, "0");
+        assert.deepEqual(empty.failureWarnings, { total: "0", items: [] });
         assert.equal(empty.candidates.total, "0");
         assert.equal(empty.usage.total, "0");
         assert.equal(empty.budget?.limitMicros, "3000000");
@@ -203,6 +204,63 @@ for (const kind of ["pglite", "postgres"])
             createElement(OperationsSummary, { data: exceeded, locale: "en" }),
           ),
           /Reservations exceed/,
+        );
+        const affected: string[] = [];
+        for (let n = 0; n < 11; n++) {
+          const failing = await createSource(db.sql, actor, {
+            name: "Failure source " + n,
+            url: `https://failure${n}.example.edu/page`,
+          });
+          affected.push(failing.id);
+          await db.sql.query(
+            "INSERT INTO research_jobs(id,source_id,state,created_at) VALUES($1,$3,'failed',NOW()-INTERVAL '2 hours'),($2,$3,'failed',NOW()-INTERVAL '1 hour')",
+            [`warning-${n}-old`, `warning-${n}-new`, failing.id],
+          );
+          await db.sql.query(
+            "INSERT INTO research_jobs(id,source_id,state) VALUES($1,$2,'queued')",
+            [`warning-${n}-queued`, failing.id],
+          );
+        }
+        const warnings = await operationsOverview(db.sql, actor);
+        assert.equal(warnings.failureWarnings.total, "11");
+        assert.equal(warnings.failureWarnings.items.length, 10);
+        for (const locale of ["en", "zh-Hans"] as const) {
+          const html = renderToStaticMarkup(
+            createElement(OperationsSummary, { data: warnings, locale }),
+          );
+          assert.match(
+            html,
+            locale === "en"
+              ? /first 10 affected sources/
+              : /前 10 个受影响来源/,
+          );
+          assert.match(html, /kind=jobs&amp;source=/);
+        }
+        await db.sql.query(
+          "INSERT INTO research_jobs(id,source_id,state) VALUES('warning-cancelled',$1,'cancelled'),('warning-recovered',$2,'done')",
+          [affected[0], affected[1]],
+        );
+        assert.equal(
+          (await operationsOverview(db.sql, actor)).failureWarnings.total,
+          "9",
+        );
+        await db.sql.query(
+          "DELETE FROM research_jobs WHERE id='warning-2-old'",
+        );
+        assert.equal(
+          (await operationsOverview(db.sql, actor)).failureWarnings.total,
+          "8",
+        );
+        // Future creation timestamps cannot create a failure signal.
+        await db.sql.query(
+          "UPDATE research_jobs SET created_at=NOW()+INTERVAL '1 day' WHERE source_id=$1 AND state='failed'",
+          [affected[3]],
+        );
+        const stable = await operationsOverview(db.sql, actor);
+        assert.equal(stable.failureWarnings.total, "7");
+        assert.deepEqual(
+          (await operationsOverview(db.sql, actor)).failureWarnings,
+          stable.failureWarnings,
         );
       } finally {
         await db.close();
