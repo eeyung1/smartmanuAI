@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 60,
+    "generation": 61,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -109,6 +109,11 @@
       "id": "milestone-4-pipeline-freshness",
       "description": "Milestone 4: Source Pipeline Freshness and Access Control",
       "status": "APPROVED"
+    },
+    "milestone-5-discovery-pacing-scoring": {
+      "id": "milestone-5-discovery-pacing-scoring",
+      "description": "Milestone 5: Candidate Discovery, Host Pacing and Language Scoring",
+      "status": "ACTIVE"
     }
   },
   "tasks": {
@@ -424,6 +429,72 @@
       "capability": "coding",
       "branch": "agent/feature-source-robots-policy-142692c5",
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-source-robots-policy-142692c5",
+      "base_sha": "main"
+    },
+    "milestone-5-discovery-pacing-scoring::feature-source-rss-adapter": {
+      "id": "feature-source-rss-adapter",
+      "objective_id": "milestone-5-discovery-pacing-scoring",
+      "feature": "feature-source-rss-adapter",
+      "scope": "src/research/rss-feed.ts,tests/rss-feed.test.ts",
+      "priority": 10,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement RSS 2.0 and Atom XML source feed adapter for official admissions and scholarship feed collection, extracting item title, canonical link URL, publication date, GUID/id, and sanitized summary text within bounded payload limits.",
+      "acceptance_criteria": [
+        "parseRssOrAtomFeed(xmlText) parses standard RSS 2.0 and Atom XML feed payloads into structured feed items",
+        "Extracts title, link URL, publication date (RFC 822 / ISO 8601), and unique identifier (guid or id)",
+        "Safely strips/sanitizes HTML from summary/description and normalizes relative links against optional feed root URL",
+        "Enforces maximum payload size and maximum item count limits to prevent memory exhaustion",
+        "Handles invalid XML, namespaces, CDATA, and missing fields gracefully with safe fallbacks"
+      ],
+      "validation": [
+        "node --import tsx --test tests/rss-feed.test.ts && npm run typecheck"
+      ],
+      "capability": "coding",
+      "base_sha": "main"
+    },
+    "milestone-5-discovery-pacing-scoring::feature-host-rate-limiter": {
+      "id": "feature-host-rate-limiter",
+      "objective_id": "milestone-5-discovery-pacing-scoring",
+      "feature": "feature-host-rate-limiter",
+      "scope": "src/research/host-pacer.ts,tests/host-pacer.test.ts",
+      "priority": 9,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement coordinated host-wide collection rate limiter and pacing service to track per-host request intervals, enforce minimum delays derived from host robots crawl-delay or default minimum cadence, and prevent concurrent request bursts against the same university domain.",
+      "acceptance_criteria": [
+        "createHostPacer(options) tracks per-host timestamps and schedules or evaluates next eligible request time",
+        "Enforces host-level minimum intervals respecting parsed crawlDelaySeconds and minimum floor",
+        "Binds host keys by normalized origin hostname (lowercased, default ports removed)",
+        "Provides concurrency limiting per host to prevent parallel fetches against a single origin",
+        "Operates in-memory with deterministic clock injection in unit tests"
+      ],
+      "validation": [
+        "node --import tsx --test tests/host-pacer.test.ts && npm run typecheck"
+      ],
+      "capability": "coding",
+      "base_sha": "main"
+    },
+    "milestone-5-discovery-pacing-scoring::feature-language-score-matching": {
+      "id": "feature-language-score-matching",
+      "objective_id": "milestone-5-discovery-pacing-scoring",
+      "feature": "feature-language-score-matching",
+      "scope": "src/domain/language-scoring.ts,tests/language-scoring.test.ts",
+      "priority": 8,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement deterministic language proficiency score evaluation and qualification matching service for applicant profiles against scholarship requirement criteria, supporting IELTS (0–9), TOEFL iBT (0–120), and Chinese HSK (Levels 1–6) score comparisons.",
+      "acceptance_criteria": [
+        "evaluateLanguageRequirement(profileScores, requirement) deterministically checks applicant eligibility against opportunity language criteria",
+        "Supports IELTS band scores (including overall and sub-band minimums), TOEFL iBT total scores, and HSK level + total score rules",
+        "Evaluates test score validity window / freshness relative to opportunity deadline",
+        "Returns structured match result with boolean eligible, deficit details, and human-readable explanation keys",
+        "Handles missing or exempt applicant test scores with safe fallback semantics"
+      ],
+      "validation": [
+        "node --import tsx --test tests/language-scoring.test.ts && npm run typecheck"
+      ],
+      "capability": "coding",
       "base_sha": "main"
     }
   },
@@ -1138,6 +1209,13 @@
       "operation": "review-decision",
       "generation": 60,
       "utc": "2026-11-10T15:28:55Z"
+    },
+    {
+      "id": "61-adopt-milestone-5",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "adopt-objective",
+      "generation": 61,
+      "utc": "2026-11-10T15:43:45.952Z"
     }
   ]
 }

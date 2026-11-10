@@ -63,3 +63,11 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - **2026-11-10 15:02 UTC**: Planner merged PR #72 (`feat/source-robots-policy`) into `main` (merge commit `69f18fc1c3926d1ba91e30cb9cf0d2644e7b6bd8`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 11 marked Complete.
 - **2026-11-10 15:27 UTC**: Planner merged PR #73 (`feat/reminder-source-recheck`) into `main` (merge commit `9e9b55cfa0d16bc6724b609e39d8fc8958236a69`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 12 marked Complete.
 - **2026-11-10 15:28 UTC**: Milestone 4 review package approved (`decision: APPROVED`). Milestone 4 is 100% COMPLETE! Primary checkout on `main` synchronized.
+
+## Milestone 5 Formulation & Decomposition — 2026-11-10T15:43:00Z
+- Human operator authorized Milestone 5 ("Candidate Discovery, Host Pacing and Language Scoring").
+- Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
+  13. `feature-source-rss-adapter`: RSS 2.0 and Atom XML source feed adapter for official admissions and scholarship feed collection within bounded payload limits (`src/research/rss-feed.ts`, `tests/rss-feed.test.ts`).
+  14. `feature-host-rate-limiter`: Coordinated host-wide collection rate limiter and pacing service to track per-host request intervals and prevent bursts (`src/research/host-pacer.ts`, `tests/host-pacer.test.ts`).
+  15. `feature-language-score-matching`: Deterministic language proficiency score evaluation and qualification matching service for applicant profiles (IELTS, TOEFL, HSK) (`src/domain/language-scoring.ts`, `tests/language-scoring.test.ts`).
+- Structured authority reconciled in `state.json` (generation 61) and `plan.json`. All 3 tasks initialized with `PENDING` status for immediate worker claims via `orchestrator --acquire-next`.

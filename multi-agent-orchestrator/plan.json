@@ -1,64 +1,67 @@
 {
-  "id": "milestone-4-pipeline-freshness",
-  "objective": "Milestone 4: Source Pipeline Freshness and Access Control",
+  "id": "milestone-5-discovery-pacing-scoring",
+  "objective": "Milestone 5: Candidate Discovery, Host Pacing and Language Scoring",
   "tasks": [
     {
-      "id": "feature-source-refresh-indicator",
-      "objective_id": "milestone-4-pipeline-freshness",
-      "feature": "feature-source-refresh-indicator",
-      "scope": "src/research/refresh-tracker.ts,app/admin/operations/summary.tsx,tests/refresh-tracker.test.ts",
+      "id": "feature-source-rss-adapter",
+      "objective_id": "milestone-5-discovery-pacing-scoring",
+      "feature": "feature-source-rss-adapter",
+      "scope": "src/research/rss-feed.ts,tests/rss-feed.test.ts",
       "priority": 10,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement shared source-refresh tracking service and UI indicator to record and display when all active enabled sources have completed their collection cycles, surfacing refresh status, completion timestamps, and outstanding overdue counts in the admin operations summary.",
+      "description": "Implement RSS 2.0 and Atom XML source feed adapter for official admissions and scholarship feed collection, extracting item title, canonical link URL, publication date, GUID/id, and sanitized summary text within bounded payload limits.",
       "acceptance_criteria": [
-        "trackSourceRefreshCycle(sql) calculates or records completion metrics across all enabled non-synthetic sources",
-        "Exposes lastCompleteRefreshAt, totalSources, completedSources, and overdueCount",
-        "Admin operations summary at /admin/operations displays the shared refresh status card with bilingual labels",
-        "Zero private user data or raw request credentials exposed"
+        "parseRssOrAtomFeed(xmlText) parses standard RSS 2.0 and Atom XML feed payloads into structured feed items",
+        "Extracts title, link URL, publication date (RFC 822 / ISO 8601), and unique identifier (guid or id)",
+        "Safely strips/sanitizes HTML from summary/description and normalizes relative links against optional feed root URL",
+        "Enforces maximum payload size and maximum item count limits to prevent memory exhaustion",
+        "Handles invalid XML, namespaces, CDATA, and missing fields gracefully with safe fallbacks"
       ],
       "validation": [
-        "node --import tsx --test tests/refresh-tracker.test.ts && npm run typecheck"
+        "node --import tsx --test tests/rss-feed.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-source-robots-policy",
-      "objective_id": "milestone-4-pipeline-freshness",
-      "feature": "feature-source-robots-policy",
-      "scope": "src/research/robots-policy.ts,tests/robots-policy.test.ts",
+      "id": "feature-host-rate-limiter",
+      "objective_id": "milestone-5-discovery-pacing-scoring",
+      "feature": "feature-host-rate-limiter",
+      "scope": "src/research/host-pacer.ts,tests/host-pacer.test.ts",
       "priority": 9,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement automated robots.txt access policy parser and validator to evaluate candidate official source URLs against host access rules before collection scheduling.",
+      "description": "Implement coordinated host-wide collection rate limiter and pacing service to track per-host request intervals, enforce minimum delays derived from host robots crawl-delay or default minimum cadence, and prevent concurrent request bursts against the same university domain.",
       "acceptance_criteria": [
-        "parseRobotsTxt(content) parses User-agent, Allow, Disallow, and Crawl-delay directives",
-        "isUrlAllowed(robotsRules, url, userAgent) correctly determines path allowance with standard wildcard and prefix matching rules",
-        "Extracts host crawl-delay in seconds and enforces maximum bounded limits",
-        "Handles malformed content, empty files, comments, and missing directives gracefully with safe defaults (allow if not explicitly disallowed)"
+        "createHostPacer(options) tracks per-host timestamps and schedules or evaluates next eligible request time",
+        "Enforces host-level minimum intervals respecting parsed crawlDelaySeconds and minimum floor",
+        "Binds host keys by normalized origin hostname (lowercased, default ports removed)",
+        "Provides concurrency limiting per host to prevent parallel fetches against a single origin",
+        "Operates in-memory with deterministic clock injection in unit tests"
       ],
       "validation": [
-        "node --import tsx --test tests/robots-policy.test.ts && npm run typecheck"
+        "node --import tsx --test tests/host-pacer.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-reminder-source-recheck",
-      "objective_id": "milestone-4-pipeline-freshness",
-      "feature": "feature-reminder-source-recheck",
-      "scope": "src/jobs/reminder-recheck.ts,src/jobs/deadline-reminders.ts,tests/reminder-recheck.test.ts",
+      "id": "feature-language-score-matching",
+      "objective_id": "milestone-5-discovery-pacing-scoring",
+      "feature": "feature-language-score-matching",
+      "scope": "src/domain/language-scoring.ts,tests/language-scoring.test.ts",
       "priority": 8,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement pre-reminder official source freshness verification workflow to validate that opportunities are not withdrawn or 404 before dispatching urgent deadline reminders.",
+      "description": "Implement deterministic language proficiency score evaluation and qualification matching service for applicant profiles against scholarship requirement criteria, supporting IELTS (0–9), TOEFL iBT (0–120), and Chinese HSK (Levels 1–6) score comparisons.",
       "acceptance_criteria": [
-        "verifyReminderCandidateFreshness(sql, candidate) verifies source freshness within 24h of reminder due time",
-        "Detects withdrawn/missing opportunities (HTTP 404/410 or explicit withdrawal state) and suppresses scheduled reminder dispatch",
-        "Preserves idempotency and prevents duplicate reminder attempts for verified or suppressed candidates",
-        "Retains local-sink isolation; no live external requests without injected/mocked transport in tests"
+        "evaluateLanguageRequirement(profileScores, requirement) deterministically checks applicant eligibility against opportunity language criteria",
+        "Supports IELTS band scores (including overall and sub-band minimums), TOEFL iBT total scores, and HSK level + total score rules",
+        "Evaluates test score validity window / freshness relative to opportunity deadline",
+        "Returns structured match result with boolean eligible, deficit details, and human-readable explanation keys",
+        "Handles missing or exempt applicant test scores with safe fallback semantics"
       ],
       "validation": [
-        "node --import tsx --test tests/reminder-recheck.test.ts && npm run typecheck"
+        "node --import tsx --test tests/language-scoring.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }
