@@ -1,65 +1,64 @@
 {
-  "id": "milestone-3-admin-moderation",
-  "objective": "Milestone 3: Administrative Review and Opportunity Moderation",
+  "id": "milestone-4-pipeline-freshness",
+  "objective": "Milestone 4: Source Pipeline Freshness and Access Control",
   "tasks": [
     {
-      "id": "feature-admin-publication-preview",
-      "objective_id": "milestone-3-admin-moderation",
-      "feature": "feature-admin-publication-preview",
-      "scope": "app/admin/review/workspace.tsx,app/admin/review/preview.tsx,tests/admin-preview.test.ts",
+      "id": "feature-source-refresh-indicator",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "feature": "feature-source-refresh-indicator",
+      "scope": "src/research/refresh-tracker.ts,app/admin/operations/summary.tsx,tests/refresh-tracker.test.ts",
       "priority": 10,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Add live user-facing opportunity card and detail preview with policy validation warnings directly inside the admin review workspace (/admin/review)",
+      "description": "Implement shared source-refresh tracking service and UI indicator to record and display when all active enabled sources have completed their collection cycles, surfacing refresh status, completion timestamps, and outstanding overdue counts in the admin operations summary.",
       "acceptance_criteria": [
-        "Live rendered opportunity card and detail view preview in /admin/review matching public visitor view",
-        "Interactive validation warnings for conservative date-only policy, funding prerequisites, and source verification",
-        "Bilingual labels in English and Simplified Chinese"
+        "trackSourceRefreshCycle(sql) calculates or records completion metrics across all enabled non-synthetic sources",
+        "Exposes lastCompleteRefreshAt, totalSources, completedSources, and overdueCount",
+        "Admin operations summary at /admin/operations displays the shared refresh status card with bilingual labels",
+        "Zero private user data or raw request credentials exposed"
       ],
       "validation": [
-        "node --import tsx --test tests/admin-preview.test.ts && npm run typecheck"
+        "node --import tsx --test tests/refresh-tracker.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-opportunity-lifecycle-archive",
-      "objective_id": "milestone-3-admin-moderation",
-      "feature": "feature-opportunity-lifecycle-archive",
-      "scope": "src/catalogue/schema.ts,src/catalogue/service.ts,src/catalogue/admin-browse.ts,src/i18n/admin.ts,app/admin/catalogue/page.tsx,db/migrations/,db/staging/bootstrap.sql,tests/staging.test.ts,tests/lifecycle-archive.test.ts",
+      "id": "feature-source-robots-policy",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "feature": "feature-source-robots-policy",
+      "scope": "src/research/robots-policy.ts,tests/robots-policy.test.ts",
       "priority": 9,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Extend opportunity lifecycle with explicit archived state, review action archive for closed/rejected records with audited revision history, and admin catalogue filtering",
+      "description": "Implement automated robots.txt access policy parser and validator to evaluate candidate official source URLs against host access rules before collection scheduling.",
       "acceptance_criteria": [
-        "opportunities.state check constraint expanded to include archived",
-        "reviewSchema action enum accepts archive for closed or rejected records",
-        "reviewOpportunity transitions state to archived and records audit note in opportunity_revisions",
-        "/admin/catalogue includes archived state filter",
-        "Migration 015 with updated staging schema bootstrap and staging test assertion (15 migrations)"
+        "parseRobotsTxt(content) parses User-agent, Allow, Disallow, and Crawl-delay directives",
+        "isUrlAllowed(robotsRules, url, userAgent) correctly determines path allowance with standard wildcard and prefix matching rules",
+        "Extracts host crawl-delay in seconds and enforces maximum bounded limits",
+        "Handles malformed content, empty files, comments, and missing directives gracefully with safe defaults (allow if not explicitly disallowed)"
       ],
       "validation": [
-        "node --import tsx --test tests/lifecycle-archive.test.ts tests/staging.test.ts && npm run typecheck"
+        "node --import tsx --test tests/robots-policy.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-opportunity-duplicate-merge",
-      "objective_id": "milestone-3-admin-moderation",
-      "feature": "feature-opportunity-duplicate-merge",
-      "scope": "src/domain/catalogue-merge.ts,app/api/admin/opportunities/[id]/merge/route.ts,tests/catalogue-merge.test.ts",
+      "id": "feature-reminder-source-recheck",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "feature": "feature-reminder-source-recheck",
+      "scope": "src/jobs/reminder-recheck.ts,src/jobs/deadline-reminders.ts,tests/reminder-recheck.test.ts",
       "priority": 8,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement administrative duplicate opportunity merge service and API endpoint to consolidate duplicate candidate opportunities into a single surviving record, preserving source URL provenance and mapping user saved tracker items without losing progression status",
+      "description": "Implement pre-reminder official source freshness verification workflow to validate that opportunities are not withdrawn or 404 before dispatching urgent deadline reminders.",
       "acceptance_criteria": [
-        "Admin endpoint POST /api/admin/opportunities/[id]/merge requiring admin authentication and CSRF check",
-        "Repoints saved_items from duplicate opportunity to surviving target opportunity, preserving highest status progression (applied > applying > interested > dismissed) on collision",
-        "Transitions duplicate opportunity state to archived with merge explanation in opportunity_revisions",
-        "Records an audited revision on target opportunity linking to the merged duplicate ID",
-        "Idempotent and transactionally safe against concurrent saves"
+        "verifyReminderCandidateFreshness(sql, candidate) verifies source freshness within 24h of reminder due time",
+        "Detects withdrawn/missing opportunities (HTTP 404/410 or explicit withdrawal state) and suppresses scheduled reminder dispatch",
+        "Preserves idempotency and prevents duplicate reminder attempts for verified or suppressed candidates",
+        "Retains local-sink isolation; no live external requests without injected/mocked transport in tests"
       ],
       "validation": [
-        "node --import tsx --test tests/catalogue-merge.test.ts && npm run typecheck"
+        "node --import tsx --test tests/reminder-recheck.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }

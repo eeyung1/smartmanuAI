@@ -50,8 +50,10 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 ## Automated Actions
 - Continuous publication pipeline complete for Milestone 3. All 9 tasks across Milestones 1, 2, and 3 are integrated, tested, and green in CI.
 
-## Milestone 3 Completion Summary — 2026-11-04T15:45:00Z
-- Task 7 (`feature-admin-publication-preview`): Merged via PR #35 (`3eda398`).
-- Task 8 (`feature-opportunity-lifecycle-archive`): Merged via PR #33 (`c0b4a22`).
-- Task 9 (`feature-opportunity-duplicate-merge`): Merged via PR #34 (`e0d4401`).
-- All 76 test suites passing in GitHub Actions CI with zero errors. All isolated worktrees and feature branches cleaned up. Primary checkout on `main` up to date.
+## Milestone 4 Formulation & Decomposition — 2026-11-10T13:42:00Z
+- Human operator authorized Milestone 4 ("Source Pipeline Freshness and Access Control").
+- Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
+  10. `feature-source-refresh-indicator`: Shared source-refresh tracking service and UI indicator (`src/research/refresh-tracker.ts`, `app/admin/operations/summary.tsx`, `tests/refresh-tracker.test.ts`).
+  11. `feature-source-robots-policy`: Automated robots.txt access policy parser and validator (`src/research/robots-policy.ts`, `tests/robots-policy.test.ts`).
+  12. `feature-reminder-source-recheck`: Pre-reminder official source freshness verification workflow (`src/jobs/reminder-recheck.ts`, `src/jobs/deadline-reminders.ts`, `tests/reminder-recheck.test.ts`).
+- Structured authority reconciled in `state.json` (generation 47) and `plan.json`. All 3 tasks initialized with `PENDING` status for immediate worker claims via `orchestrator --acquire-next`.
