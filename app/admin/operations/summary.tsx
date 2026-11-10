@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { getDatabase } from "@/src/db";
 import type { Locale } from "@/src/i18n/locale";
 import { screenText, researchState } from "@/src/i18n/screens";
 import {
@@ -6,12 +8,90 @@ import {
   durationParts,
   type operationsOverview,
 } from "@/src/research/operations";
+import {
+  trackSourceRefreshCycle,
+  type SourceRefreshCycle,
+} from "@/src/research/refresh-tracker";
+
+function SourceRefreshSummary({
+  refresh,
+  locale,
+}: {
+  refresh: SourceRefreshCycle;
+  locale: Locale;
+}) {
+  const dates = new Intl.DateTimeFormat(locale === "zh-Hans" ? "zh-CN" : "en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  });
+  return (
+    <section>
+      <h2>{locale === "zh-Hans" ? "共享来源刷新" : "Shared source refresh"}</h2>
+      <dl>
+        <div>
+          <dt>
+            {locale === "zh-Hans"
+              ? "最近一次完整共享刷新"
+              : "Last complete shared refresh"}
+          </dt>
+          <dd>
+            {refresh.lastCompleteRefreshAt ? (
+              <time dateTime={refresh.lastCompleteRefreshAt}>
+                {dates.format(new Date(refresh.lastCompleteRefreshAt))} UTC
+              </time>
+            ) : locale === "zh-Hans" ? (
+              "尚未记录完整共享刷新"
+            ) : (
+              "No complete shared refresh recorded"
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>
+            {locale === "zh-Hans"
+              ? "已启用的非模拟来源"
+              : "Enabled non-synthetic sources"}
+          </dt>
+          <dd>{refresh.totalSources}</dd>
+        </div>
+        <div>
+          <dt>
+            {locale === "zh-Hans"
+              ? "已有成功观测的来源"
+              : "Sources with a successful observation"}
+          </dt>
+          <dd>{refresh.completedSources}</dd>
+        </div>
+        <div>
+          <dt>
+            {locale === "zh-Hans" ? "逾期来源检查" : "Overdue source checks"}
+          </dt>
+          <dd>{refresh.overdueCount}</dd>
+        </div>
+      </dl>
+      <p>
+        {locale === "zh-Hans"
+          ? "完整时间采用每个当前来源最近一次成功观测中的最早时间。逾期数量依据已保存的检查计划；这些指标不包含抓取内容、请求凭据或私人账户数据。"
+          : "The completion time is the earliest of each current source’s latest successful observations. The overdue count follows stored check schedules; these metrics contain no captured content, request credentials or private account data."}
+      </p>
+    </section>
+  );
+}
+
+async function LoadedSourceRefreshSummary({ locale }: { locale: Locale }) {
+  const refresh = await trackSourceRefreshCycle((await getDatabase()).sql);
+  return <SourceRefreshSummary refresh={refresh} locale={locale} />;
+}
+
 export default function OperationsSummary({
   data,
   locale,
+  refresh,
 }: {
   data: Awaited<ReturnType<typeof operationsOverview>>;
   locale: Locale;
+  refresh?: SourceRefreshCycle;
 }) {
   const t = (key: string, values?: Record<string, string | number>) =>
     screenText(locale, key, values);
@@ -32,6 +112,21 @@ export default function OperationsSummary({
       <p>
         {t("Snapshot time")}: <time dateTime={data.observedAt}>{date} UTC</time>
       </p>
+      {refresh ? (
+        <SourceRefreshSummary refresh={refresh} locale={locale} />
+      ) : (
+        <Suspense
+          fallback={
+            <p role="status">
+              {locale === "zh-Hans"
+                ? "正在加载共享来源刷新状态…"
+                : "Loading shared source refresh status…"}
+            </p>
+          }
+        >
+          <LoadedSourceRefreshSummary locale={locale} />
+        </Suspense>
+      )}
       <section>
         <h2>{t("Repeated collection failures")}</h2>
         <p role="status">
