@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 89,
+    "generation": 102,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -117,6 +117,24 @@
       "state": "ACTIVE",
       "generation": 85
     },
+    "opencode-gpt56sol-20261110-j175fa-20261110-543c6c61": {
+      "id": "opencode-gpt56sol-20261110-j175fa-20261110-543c6c61",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 91
+    },
+    "opencode-gpt56sol-20261110-k2860b-20261110-71f9cc3b": {
+      "id": "opencode-gpt56sol-20261110-k2860b-20261110-71f9cc3b",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 95
+    },
+    "opencode-gpt56sol-20261110-l3971c-20261110-f8ba6453": {
+      "id": "opencode-gpt56sol-20261110-l3971c-20261110-f8ba6453",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 99
+    },
     "planner-antigravity-20261104-b9e2894a": {
       "id": "planner-antigravity-20261104-b9e2894a",
       "role": "planner",
@@ -159,7 +177,7 @@
     "milestone-7-discovery-multi-retention": {
       "id": "milestone-7-discovery-multi-retention",
       "description": "Milestone 7: Discovery Queries, Multi-Opportunity Extraction and Data Retention Sweeper",
-      "status": "ACTIVE"
+      "status": "APPROVED"
     }
   },
   "tasks": {
@@ -644,27 +662,33 @@
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-reviewer-anonymization-ff846ef5",
       "base_sha": "main"
     },
-    "milestone-7-discovery-multi-retention::feature-search-query-generator": {
-      "id": "feature-search-query-generator",
+    "milestone-7-discovery-multi-retention::feature-data-retention-sweeper": {
+      "id": "feature-data-retention-sweeper",
       "objective_id": "milestone-7-discovery-multi-retention",
-      "feature": "feature-search-query-generator",
-      "scope": "src/research/discovery-queries.ts,tests/discovery-queries.test.ts",
-      "priority": 10,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement automated bilingual (EN/ZH) scholarship discovery query generator for target academic institutions, degree tiers, and disciplines (smart manufacturing, robotics) with negative-term filtering and syntax formatting.",
+      "feature": "feature-data-retention-sweeper",
+      "scope": "src/privacy/retention-sweeper.ts,tests/retention-sweeper.test.ts",
+      "priority": 8,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 98,
+      "session_id": "opencode-gpt56sol-20261110-l3971c-20261110-f8ba6453",
+      "result_id": "milestone-7-discovery-multi-retention::feature-data-retention-sweeper::98",
+      "description": "Implement automated data lifecycle retention sweeper to enforce GDPR and operational storage retention policies (FR09), purging delivery logs older than 90 days, evidence snapshots older than 180 days, and expired ephemeral tokens, operating transactionally with audit logging.",
       "acceptance_criteria": [
-        "generateDiscoveryQueries(options) builds structured search query strings across targeted dimensions (institution, degree, discipline, intake year)",
-        "Generates bilingual queries supporting English and Chinese terms (e.g. 'smart manufacturing', '智能制造', 'robotics', '机器人', 'scholarship', '奖学金')",
-        "Applies negative search filters to prune noise (e.g. -consultancy, -agents, -commercial, -recruitment)",
-        "Supports operator-configurable search provider targets (Google, Bing, Baidu) with appropriate syntax modifiers (e.g. site:edu.cn, filetype:html)",
-        "Returns structured query objects with unique ID, query text, intended search engine target, priority weight, and metadata tags",
-        "Enforces bounded query list sizing and input parameter validation"
+        "executeRetentionSweep(sql, options) identifies and purges expired records according to configured retention windows (delivery logs \u003e 90d, evidence snapshots \u003e 180d, expired session/auth tokens \u003e 30d)",
+        "Executes deletions transactionally (or in bounded batches) to prevent table locks and database degradation",
+        "Generates a structured sweep report detailing record counts deleted per table and duration",
+        "Preserves referential integrity and avoids breaking active foreign keys",
+        "Dry-run mode (dryRun: true) supported to inspect candidates without mutating the database",
+        "Verifies operator authority or automated job authentication before execution"
       ],
       "validation": [
-        "node --import tsx --test tests/discovery-queries.test.ts && npm run typecheck"
+        "node --import tsx --test tests/retention-sweeper.test.ts \u0026\u0026 npm run typecheck"
       ],
-      "capability": "coding"
+      "capability": "coding",
+      "branch": "agent/feature-data-retention-sweeper-402c9c7a",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-data-retention-sweeper-402c9c7a",
+      "base_sha": "main"
     },
     "milestone-7-discovery-multi-retention::feature-multi-opportunity-extractor": {
       "id": "feature-multi-opportunity-extractor",
@@ -672,8 +696,11 @@
       "feature": "feature-multi-opportunity-extractor",
       "scope": "src/research/multi-extractor.ts,tests/multi-extractor.test.ts",
       "priority": 9,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 94,
+      "session_id": "opencode-gpt56sol-20261110-k2860b-20261110-71f9cc3b",
+      "result_id": "milestone-7-discovery-multi-retention::feature-multi-opportunity-extractor::94",
       "description": "Implement multi-opportunity listing and table parser for aggregated directory and listing HTML pages, extracting individual opportunity records, deadlines, and direct apply links without row cross-contamination.",
       "acceptance_criteria": [
         "extractMultipleOpportunities(html, baseUrl, options) parses aggregated HTML tables, lists, or card layouts containing multiple scholarship programs or degree offerings",
@@ -684,31 +711,40 @@
         "Enforces bounded limits for input length and max extracted opportunities per document"
       ],
       "validation": [
-        "node --import tsx --test tests/multi-extractor.test.ts && npm run typecheck"
+        "node --import tsx --test tests/multi-extractor.test.ts \u0026\u0026 npm run typecheck"
       ],
-      "capability": "coding"
+      "capability": "coding",
+      "branch": "agent/feature-multi-opportunity-extractor-4ca2de7a",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-multi-opportunity-extractor-4ca2de7a",
+      "base_sha": "main"
     },
-    "milestone-7-discovery-multi-retention::feature-data-retention-sweeper": {
-      "id": "feature-data-retention-sweeper",
+    "milestone-7-discovery-multi-retention::feature-search-query-generator": {
+      "id": "feature-search-query-generator",
       "objective_id": "milestone-7-discovery-multi-retention",
-      "feature": "feature-data-retention-sweeper",
-      "scope": "src/privacy/retention-sweeper.ts,tests/retention-sweeper.test.ts",
-      "priority": 8,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement automated data lifecycle retention sweeper to enforce GDPR and operational storage retention policies (FR09), purging delivery logs older than 90 days, evidence snapshots older than 180 days, and expired ephemeral tokens, operating transactionally with audit logging.",
+      "feature": "feature-search-query-generator",
+      "scope": "src/research/discovery-queries.ts,tests/discovery-queries.test.ts",
+      "priority": 10,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 90,
+      "session_id": "opencode-gpt56sol-20261110-j175fa-20261110-543c6c61",
+      "result_id": "milestone-7-discovery-multi-retention::feature-search-query-generator::90",
+      "description": "Implement automated bilingual (EN/ZH) scholarship discovery query generator for target academic institutions, degree tiers, and disciplines (smart manufacturing, robotics) with negative-term filtering and syntax formatting.",
       "acceptance_criteria": [
-        "executeRetentionSweep(sql, options) identifies and purges expired records according to configured retention windows (delivery logs > 90d, evidence snapshots > 180d, expired session/auth tokens > 30d)",
-        "Executes deletions transactionally (or in bounded batches) to prevent table locks and database degradation",
-        "Generates a structured sweep report detailing record counts deleted per table and duration",
-        "Preserves referential integrity and avoids breaking active foreign keys",
-        "Dry-run mode (dryRun: true) supported to inspect candidates without mutating the database",
-        "Verifies operator authority or automated job authentication before execution"
+        "generateDiscoveryQueries(options) builds structured search query strings across targeted dimensions (institution, degree, discipline, intake year)",
+        "Generates bilingual queries supporting English and Chinese terms (e.g. 'smart manufacturing', '智能制造', 'robotics', '机器人', 'scholarship', '奖学金')",
+        "Applies negative search filters to prune noise (e.g. -consultancy, -agents, -commercial, -recruitment)",
+        "Supports operator-configurable search provider targets (Google, Bing, Baidu) with appropriate syntax modifiers (e.g. site:edu.cn, filetype:html)",
+        "Returns structured query objects with unique ID, query text, intended search engine target, priority weight, and metadata tags",
+        "Enforces bounded query list sizing and input parameter validation"
       ],
       "validation": [
-        "node --import tsx --test tests/retention-sweeper.test.ts && npm run typecheck"
+        "node --import tsx --test tests/discovery-queries.test.ts \u0026\u0026 npm run typecheck"
       ],
-      "capability": "coding"
+      "capability": "coding",
+      "branch": "agent/feature-search-query-generator-ed2f5478",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-search-query-generator-ed2f5478",
+      "base_sha": "main"
     }
   },
   "results": {
@@ -924,6 +960,57 @@
       ],
       "recorded_utc": "2026-11-10T19:15:10Z"
     },
+    "milestone-7-discovery-multi-retention::feature-data-retention-sweeper::98": {
+      "id": "milestone-7-discovery-multi-retention::feature-data-retention-sweeper::98",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "task_id": "feature-data-retention-sweeper",
+      "session_id": "opencode-gpt56sol-20261110-l3971c-20261110-f8ba6453",
+      "assignment_generation": 98,
+      "branch": "agent/feature-data-retention-sweeper-402c9c7a",
+      "head_sha": "84ab86748b6b398ca63c4e704cc5d583b3aab9f7",
+      "validation": "retention sweeper tests pass (2/2); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "84ab867"
+      ],
+      "limitations": [
+        "Sweep reports through its returned report and an optional audit sink because no generic administrative audit table was in the approved scope"
+      ],
+      "recorded_utc": "2026-11-10T20:14:27Z"
+    },
+    "milestone-7-discovery-multi-retention::feature-multi-opportunity-extractor::94": {
+      "id": "milestone-7-discovery-multi-retention::feature-multi-opportunity-extractor::94",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "task_id": "feature-multi-opportunity-extractor",
+      "session_id": "opencode-gpt56sol-20261110-k2860b-20261110-71f9cc3b",
+      "assignment_generation": 94,
+      "branch": "agent/feature-multi-opportunity-extractor-4ca2de7a",
+      "head_sha": "6a32caabf19dd444c333bdcbd55800cd066a159a",
+      "validation": "multi-opportunity extractor tests pass (3/3); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "6a32caa"
+      ],
+      "limitations": [
+        "Extractor returns review candidates only; draft creation remains in the existing single-opportunity review flow"
+      ],
+      "recorded_utc": "2026-11-10T20:09:23Z"
+    },
+    "milestone-7-discovery-multi-retention::feature-search-query-generator::90": {
+      "id": "milestone-7-discovery-multi-retention::feature-search-query-generator::90",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "task_id": "feature-search-query-generator",
+      "session_id": "opencode-gpt56sol-20261110-j175fa-20261110-543c6c61",
+      "assignment_generation": 90,
+      "branch": "agent/feature-search-query-generator-ed2f5478",
+      "head_sha": "d36eab5556ba383e0dc44d1cbe3e3d9d0a0ab8bf",
+      "validation": "discovery query tests pass (3/3); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "d36eab5"
+      ],
+      "limitations": [
+        "Generator produces operator-reviewable query text only and never contacts a search provider"
+      ],
+      "recorded_utc": "2026-11-10T20:04:42Z"
+    },
     "result-pr-27": {
       "id": "result-pr-27",
       "objective_id": "milestone-1-application-flow",
@@ -1108,7 +1195,7 @@
       "assignment_generation": 76,
       "branch": "agent/feature-candidate-link-extractor-31121668",
       "head_sha": "29dd8d62a57906d8839d1f627b3a3effcf4e74b4",
-      "validation": "node --import tsx --test tests/candidate-extractor.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/candidate-extractor.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T19:11:00Z"
     },
     "result-pr-78": {
@@ -1119,7 +1206,7 @@
       "assignment_generation": 80,
       "branch": "agent/feature-deadline-semantics-924446b9",
       "head_sha": "7c04fbed64f285d84d6c21f8b8ceaf191500fcb9",
-      "validation": "node --import tsx --test tests/deadline-semantics.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/deadline-semantics.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T19:22:30Z"
     },
     "result-pr-79": {
@@ -1132,6 +1219,42 @@
       "head_sha": "87c037b8da6d2a6e23f87cd93db74aef35f73d6a",
       "validation": "node --import tsx --test tests/operator-anonymization.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T19:40:04Z"
+    },
+    "result-pr-80": {
+      "id": "result-pr-80",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "task_id": "feature-search-query-generator",
+      "session_id": "opencode-gpt56sol-20261110-j175fa-20261110-543c6c61",
+      "assignment_generation": 90,
+      "branch": "agent/feature-search-query-generator-ed2f5478",
+      "head_sha": "d36eab5556ba383e0dc44d1cbe3e3d9d0a0ab8bf",
+      "merge_commit": "e1a69faa3cfac373ea96b5f82103d93919a56fb3",
+      "validation": "node --import tsx --test tests/discovery-queries.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
+      "recorded_utc": "2026-11-10T20:05:40Z"
+    },
+    "result-pr-81": {
+      "id": "result-pr-81",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "task_id": "feature-multi-opportunity-extractor",
+      "session_id": "opencode-gpt56sol-20261110-k2860b-20261110-71f9cc3b",
+      "assignment_generation": 94,
+      "branch": "agent/feature-multi-opportunity-extractor-4ca2de7a",
+      "head_sha": "6a32caabf19dd444c333bdcbd55800cd066a159a",
+      "merge_commit": "5a2fc787e397f01845a8193f41a917fe9119b0fc",
+      "validation": "node --import tsx --test tests/multi-extractor.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
+      "recorded_utc": "2026-11-10T20:10:20Z"
+    },
+    "result-pr-82": {
+      "id": "result-pr-82",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "task_id": "feature-data-retention-sweeper",
+      "session_id": "opencode-gpt56sol-20261110-l3971c-20261110-f8ba6453",
+      "assignment_generation": 98,
+      "branch": "agent/feature-data-retention-sweeper-402c9c7a",
+      "head_sha": "1c6b0a8948795b119a078d969ab964e499aa03b2",
+      "merge_commit": "2c4a2bb21299389d924eaab69a7d615d4754c0b6",
+      "validation": "node --import tsx --test tests/retention-sweeper.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
+      "recorded_utc": "2026-11-10T20:36:18Z"
     }
   },
   "reviews": {
@@ -1200,6 +1323,18 @@
       "decision": "APPROVED",
       "decided_by": "planner-antigravity-20261104-b9e2894a",
       "decided_utc": "2026-11-10T19:40:33Z"
+    },
+    "milestone-7-discovery-multi-retention": {
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "status": "APPROVED",
+      "result_ids": [
+        "milestone-7-discovery-multi-retention::feature-data-retention-sweeper::98",
+        "milestone-7-discovery-multi-retention::feature-multi-opportunity-extractor::94",
+        "milestone-7-discovery-multi-retention::feature-search-query-generator::90"
+      ],
+      "decision": "APPROVED",
+      "decided_by": "planner-antigravity-20261104-b9e2894a",
+      "decided_utc": "2026-11-10T20:36:36Z"
     }
   },
   "events": [
@@ -1818,6 +1953,97 @@
       "operation": "adopt-objective",
       "generation": 89,
       "utc": "2026-11-10T19:50:00Z"
+    },
+    {
+      "id": "90-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 90,
+      "utc": "2026-11-10T19:54:43Z"
+    },
+    {
+      "id": "91-register-session",
+      "actor": "opencode-gpt56sol-20261110-j175fa-20261110-543c6c61",
+      "operation": "register-session",
+      "generation": 91,
+      "utc": "2026-11-10T19:54:43Z"
+    },
+    {
+      "id": "92-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 92,
+      "utc": "2026-11-10T19:54:43Z"
+    },
+    {
+      "id": "93-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 93,
+      "utc": "2026-11-10T20:04:42Z"
+    },
+    {
+      "id": "94-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 94,
+      "utc": "2026-11-10T20:04:47Z"
+    },
+    {
+      "id": "95-register-session",
+      "actor": "opencode-gpt56sol-20261110-k2860b-20261110-71f9cc3b",
+      "operation": "register-session",
+      "generation": 95,
+      "utc": "2026-11-10T20:04:47Z"
+    },
+    {
+      "id": "96-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 96,
+      "utc": "2026-11-10T20:04:47Z"
+    },
+    {
+      "id": "97-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 97,
+      "utc": "2026-11-10T20:09:23Z"
+    },
+    {
+      "id": "98-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 98,
+      "utc": "2026-11-10T20:09:29Z"
+    },
+    {
+      "id": "99-register-session",
+      "actor": "opencode-gpt56sol-20261110-l3971c-20261110-f8ba6453",
+      "operation": "register-session",
+      "generation": 99,
+      "utc": "2026-11-10T20:09:29Z"
+    },
+    {
+      "id": "100-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 100,
+      "utc": "2026-11-10T20:09:30Z"
+    },
+    {
+      "id": "101-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 101,
+      "utc": "2026-11-10T20:14:27Z"
+    },
+    {
+      "id": "102-review-decision",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "review-decision",
+      "generation": 102,
+      "utc": "2026-11-10T20:36:36Z"
     }
   ]
 }

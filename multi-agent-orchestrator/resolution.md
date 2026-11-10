@@ -432,3 +432,55 @@ Append-only completed-work evidence.
   - Task 17: `feature-deadline-semantics` (PR #78, merge commit `a6c5553db80d8e8a3c323bb68215cd6bf15be3ea`)
   - Task 18: `feature-reviewer-anonymization` (PR #79, merge commit `ccb5d64a2411e5cd6cfaafd5c6ed2574407bae26`)
 - Milestone 6 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 16, 17, 18) merged, CI green, and validated in `main`.
+
+## feature-search-query-generator — claim-0377d459d2d706c34563f09ded2f5478
+- Session: opencode-gpt56sol-20261110-j175fa-20261110-543c6c61
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/discovery-queries.test.ts && npm run typecheck
+- Evidence: ✔ discovery queries span bounded bilingual dimensions with provider syntax (5.763642ms); ✔ query generation is deterministic, configurable and stops at its cap (2.892564ms); ✔ invalid discovery inputs are rejected before expansion (0.919959ms); ℹ tests 3; ℹ suites 0; ℹ pass 3; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 248.943324; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T20:04:36Z
+
+## feature-multi-opportunity-extractor — claim-c4d1ef09c3435f5bd4967a234ca2de7a
+- Session: opencode-gpt56sol-20261110-k2860b-20261110-71f9cc3b
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/multi-extractor.test.ts && npm run typecheck
+- Evidence: ✔ table rows extract independent records without cross-contamination (22.178748ms); ✔ list items and cards parse fields with safe fallbacks (4.845274ms); ✔ unsafe hosts, duplicates, limits and malformed input are handled safely (12.749561ms); ℹ tests 3; ℹ suites 0; ℹ pass 3; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 778.632747; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T20:09:15Z
+
+## feature-data-retention-sweeper — claim-4c3c1e5450d3a3f97eebacb4402c9c7a
+- Session: opencode-gpt56sol-20261110-l3971c-20261110-f8ba6453
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/retention-sweeper.test.ts && npm run typecheck
+- Evidence: ✔ retention sweep purges expired operational records and keeps live evidence (9766.284304ms); ✔ retention sweep accepts an authorized job key and audits the report (6159.995838ms); ℹ tests 2; ℹ suites 0; ℹ pass 2; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 18735.854519; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T20:14:21Z
+
+## feature-search-query-generator — PR #80 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/80
+- Merge Commit: `e1a69faa3cfac373ea96b5f82103d93919a56fb3`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-10T20:05:40Z
+
+## feature-multi-opportunity-extractor — PR #81 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/81
+- Merge Commit: `5a2fc787e397f01845a8193f41a917fe9119b0fc`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-10T20:10:20Z
+
+## feature-data-retention-sweeper — PR #82 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/82
+- Merge Commit: `2c4a2bb21299389d924eaab69a7d615d4754c0b6`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-10T20:36:18Z
+
+## milestone-7-discovery-multi-retention — Review Decision: APPROVED
+- Review Decision: APPROVED
+- Decided by: `planner-antigravity-20261104-b9e2894a`
+- Decided UTC: 2026-11-10T20:36:36Z
+- Evaluated Tasks:
+  - Task 19: `feature-search-query-generator` (PR #80, merge commit `e1a69faa3cfac373ea96b5f82103d93919a56fb3`)
+  - Task 20: `feature-multi-opportunity-extractor` (PR #81, merge commit `5a2fc787e397f01845a8193f41a917fe9119b0fc`)
+  - Task 21: `feature-data-retention-sweeper` (PR #82, merge commit `2c4a2bb21299389d924eaab69a7d615d4754c0b6`)
+- Milestone 7 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 19, 20, 21) merged, CI green, and validated in `main`.
