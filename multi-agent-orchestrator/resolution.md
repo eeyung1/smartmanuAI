@@ -256,3 +256,35 @@ Append-only completed-work evidence.
 - Merge Commit: `f3b623db0eadedc724aab6345ceb527f0236fd56`
 - CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`, 77/77 tests pass); Vercel preview checks passed (`conclusion=success`).
 - Integration Outcome: Merged into `main`, fast-forward synced to local workspace, remote branch `feat/json-feed-source-adapter` deleted.
+
+## feature-source-refresh-indicator — claim-5d8705bf19c9fe550d73e74e748cc7e8
+- Session: opencode-gpt56sol-20261110-a91f7c-20261110-50f79909
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/refresh-tracker.test.ts && npm run typecheck
+- Evidence: ✔ pglite: shared refresh tracking covers enabled non-synthetic sources without exposing source or account data (7777.387169ms); ﹣ postgres: shared refresh tracking covers enabled non-synthetic sources without exposing source or account data (2.215439ms) # SKIP; ℹ tests 2; ℹ suites 0; ℹ pass 1; ℹ fail 0; ℹ cancelled 0; ℹ skipped 1; ℹ todo 0; ℹ duration_ms 10001.859639; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T14:40:36Z
+
+## feature-source-refresh-indicator — PR #71 publication & merge
+- Recorded UTC: 2026-11-10T14:54:47Z
+- Integrator: `planner-antigravity-20261104-b9e2894a`
+- Pull Request: [#71 (feat: shared source refresh indicator (Task 10))](https://github.com/eeyung1/smartmanuAI/pull/71)
+- Head Commit: `e8f52407ff7874bb801af6c10a67ace4b3f66aa4`
+- Merge Commit: `1e8a6d6457db938e7dbc4decaa7274111533babf`
+- CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`, 78/78 tests pass); Vercel preview comments passed.
+- Integration Outcome: Merged into `main`, fast-forward synced to local workspace, feature branch `feat/source-refresh-indicator` and worktree deleted.
+
+## feature-source-robots-policy — claim-cae407859249668ad18d7bc8142692c5
+- Session: opencode-gpt56sol-20261110-b73c2d-20261110-5f7f7c12
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/robots-policy.test.ts && npm run typecheck
+- Evidence: ✔ robots policies select the most specific user-agent groups and path rules (4.298077ms); ✔ robots parsing bounds delays and handles comments, BOM, casing and malformed records (2.034976ms); ✔ robots matching normalizes percent octets and keeps fragments out of policy paths (1.498273ms); ℹ tests 3; ℹ suites 0; ℹ pass 3; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 273.970126; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T14:51:13Z
+
+## feature-source-robots-policy — PR #72 publication & merge
+- Recorded UTC: 2026-11-10T15:02:07Z
+- Integrator: `planner-antigravity-20261104-b9e2894a`
+- Pull Request: [#72 (feat: robots access policy parser (Task 11))](https://github.com/eeyung1/smartmanuAI/pull/72)
+- Head Commit: `37eb615e8509394b1593e85247cffa83ad944a1a`
+- Merge Commit: `69f18fc1c3926d1ba91e30cb9cf0d2644e7b6bd8`
+- CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`, 78/78 tests pass); Vercel preview comments passed.
+- Integration Outcome: Merged into `main`, fast-forward synced to local workspace, feature branch `feat/source-robots-policy` and worktree deleted.

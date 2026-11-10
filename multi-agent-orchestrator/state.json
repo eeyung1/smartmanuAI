@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 47,
+    "generation": 58,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -62,6 +62,24 @@
       "role": "worker",
       "state": "COMPLETE",
       "generation": 9
+    },
+    "opencode-gpt56sol-20261110-a91f7c-20261110-50f79909": {
+      "id": "opencode-gpt56sol-20261110-a91f7c-20261110-50f79909",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 49
+    },
+    "opencode-gpt56sol-20261110-b73c2d-20261110-5f7f7c12": {
+      "id": "opencode-gpt56sol-20261110-b73c2d-20261110-5f7f7c12",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 53
+    },
+    "opencode-gpt56sol-20261110-c84e1a-20261110-78c1c94c": {
+      "id": "opencode-gpt56sol-20261110-c84e1a-20261110-78c1c94c",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 57
     },
     "planner-antigravity-20261104-b9e2894a": {
       "id": "planner-antigravity-20261104-b9e2894a",
@@ -330,56 +348,17 @@
       "validated_head": "6607fd77103b262b21a60122dbc808ac79d962c5",
       "validation_evidence": "PR #33 merged to main (merge commit c0b4a2205ad307d259c6427e157dcb3d3cab0f7e; CI green)"
     },
-    "milestone-4-pipeline-freshness::feature-source-refresh-indicator": {
-      "id": "feature-source-refresh-indicator",
-      "objective_id": "milestone-4-pipeline-freshness",
-      "feature": "feature-source-refresh-indicator",
-      "scope": "src/research/refresh-tracker.ts,app/admin/operations/summary.tsx,tests/refresh-tracker.test.ts",
-      "priority": 10,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement shared source-refresh tracking service and UI indicator to record and display when all active enabled sources have completed their collection cycles, surfacing refresh status, completion timestamps, and outstanding overdue counts in the admin operations summary.",
-      "acceptance_criteria": [
-        "trackSourceRefreshCycle(sql) calculates or records completion metrics across all enabled non-synthetic sources",
-        "Exposes lastCompleteRefreshAt, totalSources, completedSources, and overdueCount",
-        "Admin operations summary at /admin/operations displays the shared refresh status card with bilingual labels",
-        "Zero private user data or raw request credentials exposed"
-      ],
-      "validation": [
-        "node --import tsx --test tests/refresh-tracker.test.ts && npm run typecheck"
-      ],
-      "capability": "coding",
-      "base_sha": "main"
-    },
-    "milestone-4-pipeline-freshness::feature-source-robots-policy": {
-      "id": "feature-source-robots-policy",
-      "objective_id": "milestone-4-pipeline-freshness",
-      "feature": "feature-source-robots-policy",
-      "scope": "src/research/robots-policy.ts,tests/robots-policy.test.ts",
-      "priority": 9,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement automated robots.txt access policy parser and validator to evaluate candidate official source URLs against host access rules before collection scheduling.",
-      "acceptance_criteria": [
-        "parseRobotsTxt(content) parses User-agent, Allow, Disallow, and Crawl-delay directives",
-        "isUrlAllowed(robotsRules, url, userAgent) correctly determines path allowance with standard wildcard and prefix matching rules",
-        "Extracts host crawl-delay in seconds and enforces maximum bounded limits",
-        "Handles malformed content, empty files, comments, and missing directives gracefully with safe defaults (allow if not explicitly disallowed)"
-      ],
-      "validation": [
-        "node --import tsx --test tests/robots-policy.test.ts && npm run typecheck"
-      ],
-      "capability": "coding",
-      "base_sha": "main"
-    },
     "milestone-4-pipeline-freshness::feature-reminder-source-recheck": {
       "id": "feature-reminder-source-recheck",
       "objective_id": "milestone-4-pipeline-freshness",
       "feature": "feature-reminder-source-recheck",
       "scope": "src/jobs/reminder-recheck.ts,src/jobs/deadline-reminders.ts,tests/reminder-recheck.test.ts",
       "priority": 8,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "ASSIGNED",
+      "attempt": 1,
+      "assignment_generation": 56,
+      "token": "claim-8c4d0f8cf9211ac188b348d44e99dc4d",
+      "session_id": "opencode-gpt56sol-20261110-c84e1a-20261110-78c1c94c",
       "description": "Implement pre-reminder official source freshness verification workflow to validate that opportunities are not withdrawn or 404 before dispatching urgent deadline reminders.",
       "acceptance_criteria": [
         "verifyReminderCandidateFreshness(sql, candidate) verifies source freshness within 24h of reminder due time",
@@ -391,6 +370,60 @@
         "node --import tsx --test tests/reminder-recheck.test.ts && npm run typecheck"
       ],
       "capability": "coding",
+      "branch": "agent/feature-reminder-source-recheck-4e99dc4d",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-reminder-source-recheck-4e99dc4d",
+      "base_sha": "main"
+    },
+    "milestone-4-pipeline-freshness::feature-source-refresh-indicator": {
+      "id": "feature-source-refresh-indicator",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "feature": "feature-source-refresh-indicator",
+      "scope": "src/research/refresh-tracker.ts,app/admin/operations/summary.tsx,tests/refresh-tracker.test.ts",
+      "priority": 10,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 48,
+      "session_id": "opencode-gpt56sol-20261110-a91f7c-20261110-50f79909",
+      "result_id": "milestone-4-pipeline-freshness::feature-source-refresh-indicator::48",
+      "description": "Implement shared source-refresh tracking service and UI indicator to record and display when all active enabled sources have completed their collection cycles, surfacing refresh status, completion timestamps, and outstanding overdue counts in the admin operations summary.",
+      "acceptance_criteria": [
+        "trackSourceRefreshCycle(sql) calculates or records completion metrics across all enabled non-synthetic sources",
+        "Exposes lastCompleteRefreshAt, totalSources, completedSources, and overdueCount",
+        "Admin operations summary at /admin/operations displays the shared refresh status card with bilingual labels",
+        "Zero private user data or raw request credentials exposed"
+      ],
+      "validation": [
+        "node --import tsx --test tests/refresh-tracker.test.ts && npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-source-refresh-indicator-748cc7e8",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-source-refresh-indicator-748cc7e8",
+      "base_sha": "main"
+    },
+    "milestone-4-pipeline-freshness::feature-source-robots-policy": {
+      "id": "feature-source-robots-policy",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "feature": "feature-source-robots-policy",
+      "scope": "src/research/robots-policy.ts,tests/robots-policy.test.ts",
+      "priority": 9,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 52,
+      "session_id": "opencode-gpt56sol-20261110-b73c2d-20261110-5f7f7c12",
+      "result_id": "milestone-4-pipeline-freshness::feature-source-robots-policy::52",
+      "description": "Implement automated robots.txt access policy parser and validator to evaluate candidate official source URLs against host access rules before collection scheduling.",
+      "acceptance_criteria": [
+        "parseRobotsTxt(content) parses User-agent, Allow, Disallow, and Crawl-delay directives",
+        "isUrlAllowed(robotsRules, url, userAgent) correctly determines path allowance with standard wildcard and prefix matching rules",
+        "Extracts host crawl-delay in seconds and enforces maximum bounded limits",
+        "Handles malformed content, empty files, comments, and missing directives gracefully with safe defaults (allow if not explicitly disallowed)"
+      ],
+      "validation": [
+        "node --import tsx --test tests/robots-policy.test.ts && npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-source-robots-policy-142692c5",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-source-robots-policy-142692c5",
       "base_sha": "main"
     }
   },
@@ -450,6 +483,41 @@
         "8bf9b13ee82a8a6cd57970d9daf83a2e131e01ad"
       ],
       "recorded_utc": "2026-11-04T15:37:14Z"
+    },
+    "milestone-4-pipeline-freshness::feature-source-refresh-indicator::48": {
+      "id": "milestone-4-pipeline-freshness::feature-source-refresh-indicator::48",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "task_id": "feature-source-refresh-indicator",
+      "session_id": "opencode-gpt56sol-20261110-a91f7c-20261110-50f79909",
+      "assignment_generation": 48,
+      "branch": "agent/feature-source-refresh-indicator-748cc7e8",
+      "head_sha": "e8f52407ff7874bb801af6c10a67ace4b3f66aa4",
+      "validation": "focused and operations regression tests pass; typecheck, format check, and production build pass; full serial suite reached 64 passes before 10-minute timeout, and its one reported audit failure passed on isolated rerun",
+      "artifacts": [
+        "e8f52407ff7874bb801af6c10a67ace4b3f66aa4"
+      ],
+      "limitations": [
+        "PostgreSQL test case skipped because TEST_DATABASE_URL is unavailable",
+        "Full npm test exceeded the 10-minute command limit; focused, related regressions and isolated audit rerun pass"
+      ],
+      "recorded_utc": "2026-11-10T14:41:55Z"
+    },
+    "milestone-4-pipeline-freshness::feature-source-robots-policy::52": {
+      "id": "milestone-4-pipeline-freshness::feature-source-robots-policy::52",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "task_id": "feature-source-robots-policy",
+      "session_id": "opencode-gpt56sol-20261110-b73c2d-20261110-5f7f7c12",
+      "assignment_generation": 52,
+      "branch": "agent/feature-source-robots-policy-142692c5",
+      "head_sha": "37eb615e8509394b1593e85247cffa83ad944a1a",
+      "validation": "robots policy tests pass (3/3); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "37eb615"
+      ],
+      "limitations": [
+        "Policy parser is implemented as a standalone service; network retrieval integration was outside the approved scope"
+      ],
+      "recorded_utc": "2026-11-10T14:52:07Z"
     },
     "result-pr-27": {
       "id": "result-pr-27",
@@ -552,12 +620,36 @@
     },
     "result-pr-70": {
       "id": "result-pr-70",
+      "objective_id": "",
       "task_id": "feature-json-feed-source-adapter",
       "session_id": "codex-pr-70",
+      "assignment_generation": 0,
       "branch": "feat/json-feed-source-adapter",
       "head_sha": "13647726daba646c634a9d6eb1d24b2a8703e809",
       "validation": "node --import tsx --test tests/json-feed.test.ts && npm run typecheck (pass; CI local-spike green 77/77 tests)",
       "recorded_utc": "2026-11-10T13:35:09Z"
+    },
+    "result-pr-71": {
+      "id": "result-pr-71",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "task_id": "feature-source-refresh-indicator",
+      "session_id": "opencode-gpt56sol-20261110-a91f7c-20261110-50f79909",
+      "assignment_generation": 48,
+      "branch": "agent/feature-source-refresh-indicator-748cc7e8",
+      "head_sha": "e8f52407ff7874bb801af6c10a67ace4b3f66aa4",
+      "validation": "node --import tsx --test tests/refresh-tracker.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 78/78 tests)",
+      "recorded_utc": "2026-11-10T14:54:47Z"
+    },
+    "result-pr-72": {
+      "id": "result-pr-72",
+      "objective_id": "milestone-4-pipeline-freshness",
+      "task_id": "feature-source-robots-policy",
+      "session_id": "opencode-gpt56sol-20261110-b73c2d-20261110-5f7f7c12",
+      "assignment_generation": 52,
+      "branch": "agent/feature-source-robots-policy-142692c5",
+      "head_sha": "37eb615e8509394b1593e85247cffa83ad944a1a",
+      "validation": "node --import tsx --test tests/robots-policy.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 78/78 tests)",
+      "recorded_utc": "2026-11-10T15:02:07Z"
     }
   },
   "reviews": {
@@ -914,6 +1006,83 @@
       "operation": "adopt-objective",
       "generation": 47,
       "utc": "2026-11-10T13:41:00Z"
+    },
+    {
+      "id": "48-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 48,
+      "utc": "2026-11-10T13:49:37Z"
+    },
+    {
+      "id": "49-register-session",
+      "actor": "opencode-gpt56sol-20261110-a91f7c-20261110-50f79909",
+      "operation": "register-session",
+      "generation": 49,
+      "utc": "2026-11-10T13:49:37Z"
+    },
+    {
+      "id": "50-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 50,
+      "utc": "2026-11-10T13:49:37Z"
+    },
+    {
+      "id": "51-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 51,
+      "utc": "2026-11-10T14:41:55Z"
+    },
+    {
+      "id": "52-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 52,
+      "utc": "2026-11-10T14:42:30Z"
+    },
+    {
+      "id": "53-register-session",
+      "actor": "opencode-gpt56sol-20261110-b73c2d-20261110-5f7f7c12",
+      "operation": "register-session",
+      "generation": 53,
+      "utc": "2026-11-10T14:42:30Z"
+    },
+    {
+      "id": "54-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 54,
+      "utc": "2026-11-10T14:42:30Z"
+    },
+    {
+      "id": "55-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 55,
+      "utc": "2026-11-10T14:52:07Z"
+    },
+    {
+      "id": "56-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 56,
+      "utc": "2026-11-10T14:52:38Z"
+    },
+    {
+      "id": "57-register-session",
+      "actor": "opencode-gpt56sol-20261110-c84e1a-20261110-78c1c94c",
+      "operation": "register-session",
+      "generation": 57,
+      "utc": "2026-11-10T14:52:38Z"
+    },
+    {
+      "id": "58-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 58,
+      "utc": "2026-11-10T14:52:39Z"
     }
   ]
 }

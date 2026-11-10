@@ -53,7 +53,11 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 ## Milestone 4 Formulation & Decomposition — 2026-11-10T13:42:00Z
 - Human operator authorized Milestone 4 ("Source Pipeline Freshness and Access Control").
 - Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
-  10. `feature-source-refresh-indicator`: Shared source-refresh tracking service and UI indicator (`src/research/refresh-tracker.ts`, `app/admin/operations/summary.tsx`, `tests/refresh-tracker.test.ts`).
-  11. `feature-source-robots-policy`: Automated robots.txt access policy parser and validator (`src/research/robots-policy.ts`, `tests/robots-policy.test.ts`).
-  12. `feature-reminder-source-recheck`: Pre-reminder official source freshness verification workflow (`src/jobs/reminder-recheck.ts`, `src/jobs/deadline-reminders.ts`, `tests/reminder-recheck.test.ts`).
-- Structured authority reconciled in `state.json` (generation 47) and `plan.json`. All 3 tasks initialized with `PENDING` status for immediate worker claims via `orchestrator --acquire-next`.
+  10. `feature-source-refresh-indicator`: Shared source-refresh tracking service and UI indicator (`src/research/refresh-tracker.ts`, `app/admin/operations/summary.tsx`, `tests/refresh-tracker.test.ts`). **MERGED** via PR #71 (`1e8a6d6457db938e7dbc4decaa7274111533babf`).
+  11. `feature-source-robots-policy`: Automated robots.txt access policy parser and validator (`src/research/robots-policy.ts`, `tests/robots-policy.test.ts`). **MERGED** via PR #72 (`69f18fc1c3926d1ba91e30cb9cf0d2644e7b6bd8`).
+  12. `feature-reminder-source-recheck`: Pre-reminder official source freshness verification workflow (`src/jobs/reminder-recheck.ts`, `src/jobs/deadline-reminders.ts`, `tests/reminder-recheck.test.ts`). **IN PROGRESS** by worker `opencode-gpt56sol-20261110-c84e1a-20261110-78c1c94c` (claim `claim-8c4d0f8cf9211ac188b348d44e99dc4d`).
+- Structured authority reconciled in `state.json` and `plan.json`.
+
+## Milestone 4 Publication Progress
+- **2026-11-10 14:54 UTC**: Planner merged PR #71 (`feat/source-refresh-indicator`) into `main` (merge commit `1e8a6d6457db938e7dbc4decaa7274111533babf`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 10 marked Complete.
+- **2026-11-10 15:02 UTC**: Planner merged PR #72 (`feat/source-robots-policy`) into `main` (merge commit `69f18fc1c3926d1ba91e30cb9cf0d2644e7b6bd8`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 11 marked Complete. Primary checkout on `main` synchronized.
