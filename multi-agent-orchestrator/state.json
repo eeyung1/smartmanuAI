@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 88,
+    "generation": 89,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -155,6 +155,11 @@
       "id": "milestone-6-extraction-deadlines-anonymization",
       "description": "Milestone 6: Candidate Extraction, Deadline Semantics and Reviewer Anonymization",
       "status": "APPROVED"
+    },
+    "milestone-7-discovery-multi-retention": {
+      "id": "milestone-7-discovery-multi-retention",
+      "description": "Milestone 7: Discovery Queries, Multi-Opportunity Extraction and Data Retention Sweeper",
+      "status": "ACTIVE"
     }
   },
   "tasks": {
@@ -638,6 +643,72 @@
       "branch": "agent/feature-reviewer-anonymization-ff846ef5",
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-reviewer-anonymization-ff846ef5",
       "base_sha": "main"
+    },
+    "milestone-7-discovery-multi-retention::feature-search-query-generator": {
+      "id": "feature-search-query-generator",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "feature": "feature-search-query-generator",
+      "scope": "src/research/discovery-queries.ts,tests/discovery-queries.test.ts",
+      "priority": 10,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement automated bilingual (EN/ZH) scholarship discovery query generator for target academic institutions, degree tiers, and disciplines (smart manufacturing, robotics) with negative-term filtering and syntax formatting.",
+      "acceptance_criteria": [
+        "generateDiscoveryQueries(options) builds structured search query strings across targeted dimensions (institution, degree, discipline, intake year)",
+        "Generates bilingual queries supporting English and Chinese terms (e.g. 'smart manufacturing', '智能制造', 'robotics', '机器人', 'scholarship', '奖学金')",
+        "Applies negative search filters to prune noise (e.g. -consultancy, -agents, -commercial, -recruitment)",
+        "Supports operator-configurable search provider targets (Google, Bing, Baidu) with appropriate syntax modifiers (e.g. site:edu.cn, filetype:html)",
+        "Returns structured query objects with unique ID, query text, intended search engine target, priority weight, and metadata tags",
+        "Enforces bounded query list sizing and input parameter validation"
+      ],
+      "validation": [
+        "node --import tsx --test tests/discovery-queries.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-7-discovery-multi-retention::feature-multi-opportunity-extractor": {
+      "id": "feature-multi-opportunity-extractor",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "feature": "feature-multi-opportunity-extractor",
+      "scope": "src/research/multi-extractor.ts,tests/multi-extractor.test.ts",
+      "priority": 9,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement multi-opportunity listing and table parser for aggregated directory and listing HTML pages, extracting individual opportunity records, deadlines, and direct apply links without row cross-contamination.",
+      "acceptance_criteria": [
+        "extractMultipleOpportunities(html, baseUrl, options) parses aggregated HTML tables, lists, or card layouts containing multiple scholarship programs or degree offerings",
+        "Extracts structured candidate records with title, deadline text, funding level/type, host university, and resolved absolute URL",
+        "Prevents cross-contamination across adjacent table rows or sibling card elements",
+        "Enforces URL normalization and same-host or academic subdomain validation against baseUrl",
+        "Handles missing or partial fields gracefully with fallbacks and extraction confidence scoring",
+        "Enforces bounded limits for input length and max extracted opportunities per document"
+      ],
+      "validation": [
+        "node --import tsx --test tests/multi-extractor.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-7-discovery-multi-retention::feature-data-retention-sweeper": {
+      "id": "feature-data-retention-sweeper",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "feature": "feature-data-retention-sweeper",
+      "scope": "src/privacy/retention-sweeper.ts,tests/retention-sweeper.test.ts",
+      "priority": 8,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement automated data lifecycle retention sweeper to enforce GDPR and operational storage retention policies (FR09), purging delivery logs older than 90 days, evidence snapshots older than 180 days, and expired ephemeral tokens, operating transactionally with audit logging.",
+      "acceptance_criteria": [
+        "executeRetentionSweep(sql, options) identifies and purges expired records according to configured retention windows (delivery logs > 90d, evidence snapshots > 180d, expired session/auth tokens > 30d)",
+        "Executes deletions transactionally (or in bounded batches) to prevent table locks and database degradation",
+        "Generates a structured sweep report detailing record counts deleted per table and duration",
+        "Preserves referential integrity and avoids breaking active foreign keys",
+        "Dry-run mode (dryRun: true) supported to inspect candidates without mutating the database",
+        "Verifies operator authority or automated job authentication before execution"
+      ],
+      "validation": [
+        "node --import tsx --test tests/retention-sweeper.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
     }
   },
   "results": {
@@ -1740,6 +1811,13 @@
       "operation": "review-decision",
       "generation": 88,
       "utc": "2026-11-10T19:40:33Z"
+    },
+    {
+      "id": "89-adopt-milestone-7",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "adopt-objective",
+      "generation": 89,
+      "utc": "2026-11-10T19:50:00Z"
     }
   ]
 }

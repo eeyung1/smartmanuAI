@@ -1,72 +1,70 @@
 {
-  "id": "milestone-6-extraction-deadlines-anonymization",
-  "objective": "Milestone 6: Candidate Extraction, Deadline Semantics and Reviewer Anonymization",
+  "id": "milestone-7-discovery-multi-retention",
+  "objective": "Milestone 7: Discovery Queries, Multi-Opportunity Extraction and Data Retention Sweeper",
   "tasks": [
     {
-      "id": "feature-candidate-link-extractor",
-      "objective_id": "milestone-6-extraction-deadlines-anonymization",
-      "feature": "feature-candidate-link-extractor",
-      "scope": "src/research/candidate-extractor.ts,tests/candidate-extractor.test.ts",
+      "id": "feature-search-query-generator",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "feature": "feature-search-query-generator",
+      "scope": "src/research/discovery-queries.ts,tests/discovery-queries.test.ts",
       "priority": 10,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement automated candidate link discovery and URL extractor for official university admissions and scholarship directory/listing HTML pages, parsing anchors, resolving relative paths against parent base URL, enforcing same-origin or permitted academic subdomain policies, filtering by scholarship/admission keywords, excluding non-html assets, and deduplicating canonical candidate URLs.",
+      "description": "Implement automated bilingual (EN/ZH) scholarship discovery query generator for target academic institutions, degree tiers, and disciplines (smart manufacturing, robotics) with negative-term filtering and syntax formatting.",
       "acceptance_criteria": [
-        "extractCandidateLinks(html, baseUrl, options) extracts candidate opportunity links from HTML anchor tags",
-        "Resolves relative URLs to absolute URLs against baseUrl using standard URL normalization",
-        "Filters candidate links to same host or academic subdomains while excluding third-party links, social media, and tracking URLs",
-        "Applies scholarship and admission heuristics matching terms like scholarship, admissions, international, apply, bursary, fellowship, 奖学金, 招生, 留学生 in URL paths and anchor text",
-        "Excludes binary assets, documents, and fragments (e.g., .pdf, .zip, .docx, .png, .jpg, #hash, mailto:, javascript:)",
-        "Enforces bounded limits (max candidate count, max HTML length) and canonical URL deduplication",
-        "Handles malformed HTML safely without throwing unexpected exceptions"
+        "generateDiscoveryQueries(options) builds structured search query strings across targeted dimensions (institution, degree, discipline, intake year)",
+        "Generates bilingual queries supporting English and Chinese terms (e.g. 'smart manufacturing', '智能制造', 'robotics', '机器人', 'scholarship', '奖学金')",
+        "Applies negative search filters to prune noise (e.g. -consultancy, -agents, -commercial, -recruitment)",
+        "Supports operator-configurable search provider targets (Google, Bing, Baidu) with appropriate syntax modifiers (e.g. site:edu.cn, filetype:html)",
+        "Returns structured query objects with unique ID, query text, intended search engine target, priority weight, and metadata tags",
+        "Enforces bounded query list sizing and input parameter validation"
       ],
       "validation": [
-        "node --import tsx --test tests/candidate-extractor.test.ts && npm run typecheck"
+        "node --import tsx --test tests/discovery-queries.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-deadline-semantics",
-      "objective_id": "milestone-6-extraction-deadlines-anonymization",
-      "feature": "feature-deadline-semantics",
-      "scope": "src/domain/deadline-semantics.ts,tests/deadline-semantics.test.ts",
+      "id": "feature-multi-opportunity-extractor",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "feature": "feature-multi-opportunity-extractor",
+      "scope": "src/research/multi-extractor.ts,tests/multi-extractor.test.ts",
       "priority": 9,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement precise deadline semantics, timezone parsing, and rolling admission status evaluation for opportunities, supporting date-only deadlines, precise closing timestamps (with timezone offsets such as China Standard Time UTC+8), rolling admissions, and multiple intake rounds.",
+      "description": "Implement multi-opportunity listing and table parser for aggregated directory and listing HTML pages, extracting individual opportunity records, deadlines, and direct apply links without row cross-contamination.",
       "acceptance_criteria": [
-        "parseDeadline(input, options) parses diverse deadline strings and formats into a structured ParsedDeadline object (kind: 'date' | 'timestamp' | 'rolling' | 'rounds' | 'unknown')",
-        "For date-only deadlines (YYYY-MM-DD), resolves to end-of-day in China Standard Time (UTC+8 / Asia/Shanghai) by default, or an explicitly supplied timezone",
-        "For precise timestamps (YYYY-MM-DD HH:mm with timezone like CST, UTC, GMT+8, etc.), resolves exact ISO UTC instant",
-        "Recognizes rolling admissions indicators ('rolling', 'until filled', '滚动录取', '额满为止') with isRolling: true",
-        "Supports structured multiple intake rounds (e.g. Round 1, Round 2) and identifies the next upcoming round deadline",
-        "evaluateDeadlineStatus(parsed, now) returns boolean isClosed, daysRemaining, isUrgent (<= 7 days), and human-readable status badge key",
-        "Rejects invalid formats gracefully with safe fallback semantics"
+        "extractMultipleOpportunities(html, baseUrl, options) parses aggregated HTML tables, lists, or card layouts containing multiple scholarship programs or degree offerings",
+        "Extracts structured candidate records with title, deadline text, funding level/type, host university, and resolved absolute URL",
+        "Prevents cross-contamination across adjacent table rows or sibling card elements",
+        "Enforces URL normalization and same-host or academic subdomain validation against baseUrl",
+        "Handles missing or partial fields gracefully with fallbacks and extraction confidence scoring",
+        "Enforces bounded limits for input length and max extracted opportunities per document"
       ],
       "validation": [
-        "node --import tsx --test tests/deadline-semantics.test.ts && npm run typecheck"
+        "node --import tsx --test tests/multi-extractor.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-reviewer-anonymization",
-      "objective_id": "milestone-6-extraction-deadlines-anonymization",
-      "feature": "feature-reviewer-anonymization",
-      "scope": "src/privacy/operator-anonymization.ts,tests/operator-anonymization.test.ts",
+      "id": "feature-data-retention-sweeper",
+      "objective_id": "milestone-7-discovery-multi-retention",
+      "feature": "feature-data-retention-sweeper",
+      "scope": "src/privacy/retention-sweeper.ts,tests/retention-sweeper.test.ts",
       "priority": 8,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement operator-assisted reviewer account anonymization service to enable GDPR/privacy deletion compliance for administrator and reviewer accounts with existing catalogue edits, source creations, or audit trail records without compromising audit history integrity.",
+      "description": "Implement automated data lifecycle retention sweeper to enforce GDPR and operational storage retention policies (FR09), purging delivery logs older than 90 days, evidence snapshots older than 180 days, and expired ephemeral tokens, operating transactionally with audit logging.",
       "acceptance_criteria": [
-        "anonymizeReviewerContributions(sql, operatorId, targetUserId, reason) safely decouples reviewer personal identity from published audit history",
-        "Verifies operator authority (enforces admin privilege for the acting operator)",
-        "Reassigns all reviewer contributions (sources.created_by, opportunity_revisions.actor_id, source_collection_policies.actor_id, research_job_actions.actor_id) to a deterministic redacted pseudonym (anonymized-reviewer-<hash>)",
-        "Records an immutable administrative audit action in the database documenting the anonymization event with timestamp and justification",
-        "After anonymization, unblocks requestAccountDeletion for the targeted user so their account, sessions, and personal profile can be purged",
-        "Operates transactionally to prevent partial or corrupted anonymization state"
+        "executeRetentionSweep(sql, options) identifies and purges expired records according to configured retention windows (delivery logs > 90d, evidence snapshots > 180d, expired session/auth tokens > 30d)",
+        "Executes deletions transactionally (or in bounded batches) to prevent table locks and database degradation",
+        "Generates a structured sweep report detailing record counts deleted per table and duration",
+        "Preserves referential integrity and avoids breaking active foreign keys",
+        "Dry-run mode (dryRun: true) supported to inspect candidates without mutating the database",
+        "Verifies operator authority or automated job authentication before execution"
       ],
       "validation": [
-        "node --import tsx --test tests/operator-anonymization.test.ts && npm run typecheck"
+        "node --import tsx --test tests/retention-sweeper.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }

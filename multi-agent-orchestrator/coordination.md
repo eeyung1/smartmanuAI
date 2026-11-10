@@ -91,3 +91,11 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - **2026-11-10 19:22 UTC**: Planner merged PR #78 (`feat/deadline-semantics`) into `main` (merge commit `a6c5553db80d8e8a3c323bb68215cd6bf15be3ea`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 17 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-10 19:40 UTC**: Planner merged PR #79 (`feat/reviewer-anonymization`) into `main` (merge commit `ccb5d64a2411e5cd6cfaafd5c6ed2574407bae26`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 18 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-10 19:40 UTC**: Planner completed formal objective review for Milestone 6 (`milestone-6-extraction-deadlines-anonymization`) with decision `APPROVED` (Gen 88). Milestone 6 is 100% COMPLETE & APPROVED. Primary checkout on `main` synchronized.
+
+## Milestone 7 Formulation & Decomposition — 2026-11-10T19:50:00Z
+- Human operator authorized Milestone 7 ("Discovery Queries, Multi-Opportunity Extraction and Data Retention Sweeper").
+- Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
+  19. `feature-search-query-generator`: Automated bilingual (EN/ZH) scholarship discovery query generator for target academic institutions, degree tiers, and disciplines (`src/research/discovery-queries.ts`, `tests/discovery-queries.test.ts`). Status: **PENDING**.
+  20. `feature-multi-opportunity-extractor`: Multi-opportunity listing and table parser for aggregated directory and listing HTML pages (`src/research/multi-extractor.ts`, `tests/multi-extractor.test.ts`). Status: **PENDING**.
+  21. `feature-data-retention-sweeper`: Automated data lifecycle retention sweeper to enforce GDPR and operational storage retention policies (FR09) (`src/privacy/retention-sweeper.ts`, `tests/retention-sweeper.test.ts`). Status: **PENDING**.
+- Structured authority reconciled in `state.json` (Gen 89) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.
