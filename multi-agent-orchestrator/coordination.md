@@ -42,6 +42,7 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - **2026-11-04**: Planner merged PR #34 (`feat/opportunity-duplicate-merge`) into `main` (merge commit `e0d4401a0949d206ba9d156fc2381075b1cb6c10`) following verified GitHub Actions CI run (`local-spike` success, 75/75 tests pass). Worktree deleted and task 9 marked `Done`. Reconciled in `state.json` (generation 41). Task 7 (`feature-admin-publication-preview`) blocker cleared and status reset to `PENDING` for autonomous worker claims. Primary checkout on `main` synchronized.
 
 - **2026-11-04**: Planner merged PR #35 (`feat/admin-publication-preview`) into `main` (merge commit `3eda3983e10be006b06965ddcede5690fa9254e7`) following verified GitHub Actions CI run (`local-spike` success, 76/76 tests pass). Worktree deleted and task 7 marked `Done`. Reconciled in `state.json` (generation 44). Milestone 3 (Administrative Review & Opportunity Moderation) is 100% COMPLETE! Primary checkout on `main` synchronized.
+- **2026-11-10**: Planner merged PR #70 (`feat/json-feed-source-adapter`) into `main` (merge commit `f3b623db0eadedc724aab6345ceb527f0236fd56`) following verified GitHub Actions CI run (`local-spike` success, 77/77 tests pass). JSON Feed source adapter integrated. Primary checkout on `main` synchronized.
 
 ## Blockers and Proposed Decisions
 - None. Milestone 1, Milestone 2, and Milestone 3 are 100% complete and fully merged into `main`.
