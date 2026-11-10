@@ -315,3 +315,42 @@ Append-only completed-work evidence.
   - Task 11: `feature-source-robots-policy` (PR #72, commit `69f18fc1c3926d1ba91e30cb9cf0d2644e7b6bd8`)
   - Task 12: `feature-reminder-source-recheck` (PR #73, commit `9e9b55cfa0d16bc6724b609e39d8fc8958236a69`)
 - Milestone 4 Status: **100% COMPLETE**. All 3 tasks (Tasks 10, 11, 12) merged and validated in `main`.
+
+## feature-source-rss-adapter — claim-3110dd309c721363d7bef93c7720c696
+- Session: opencode-gpt56sol-20261110-d592af-20261110-2b628adf
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/rss-feed.test.ts && npm run typecheck
+- Evidence: ✔ RSS 2.0 feeds expose bounded normalized items and sanitized summaries (16.800254ms); ✔ Atom feeds handle namespaces, HTML text, canonical links and ISO dates (2.023479ms); ✔ feed limits and malformed XML fail closed without resolving unsafe links (5.899563ms); ℹ tests 3; ℹ suites 0; ℹ pass 3; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 574.074156; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T18:20:16Z
+
+## feature-source-rss-adapter — PR #74 publication & merge
+- Recorded UTC: 2026-11-10T18:27:10Z
+- Integrator: `planner-antigravity-20261104-b9e2894a`
+- Pull Request: [#74 (feat: bounded RSS and Atom feed adapter (Task 13))](https://github.com/eeyung1/smartmanuAI/pull/74)
+- Head Commit: `abdf64b512f7f147d05e3c8c590de01d7200ca91`
+- Merge Commit: `0cf7b767056de226a68d5e27cdd8c6def4b87fb3`
+- CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`, 78/78 tests pass); Vercel preview comments passed.
+- Integration Outcome: Merged into `main`, fast-forward synced to local workspace, feature branch `feat/source-rss-adapter` and worktree deleted.
+
+## feature-host-rate-limiter — claim-42c5083a7a1dcf8821c741427fddf847
+- Session: opencode-gpt56sol-20261110-e6a41c-20261110-8eed7a10
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/host-pacer.test.ts && npm run typecheck
+- Evidence: ✔ host pacer normalizes host keys and enforces floor and robots delays (5.830138ms); ✔ host pacer serializes one host while independent hosts progress (1.116887ms); ✔ manual leases are idempotently released after deterministic pacing (0.628834ms); ℹ tests 3; ℹ suites 0; ℹ pass 3; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 691.241019; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T18:27:07Z
+
+## feature-host-rate-limiter — PR #75 publication & merge
+- Recorded UTC: 2026-11-10T18:34:42Z
+- Integrator: `planner-antigravity-20261104-b9e2894a`
+- Pull Request: [#75 (feat: in-memory host request pacer (Task 14))](https://github.com/eeyung1/smartmanuAI/pull/75)
+- Head Commit: `affdc7b4cbfc896256ec096dfafa8baa5efcb5a3`
+- Merge Commit: `8efb94fb9268e47a9de985376569d3bb3474cda8`
+- CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`, 78/78 tests pass); Vercel preview comments passed.
+- Integration Outcome: Merged into `main`, fast-forward synced to local workspace, feature branch `feat/host-rate-limiter` and worktree deleted.
+
+## feature-language-score-matching — claim-1f62137d99d43c58b78b7269f638372e
+- Session: opencode-gpt56sol-20261110-f7b30e-20261110-b9209f4e
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/language-scoring.test.ts && npm run typecheck
+- Evidence: ✔ IELTS evaluation checks overall, sub-bands and deadline-relative validity (6.021721ms); ✔ TOEFL iBT and HSK use their native scales without conversion (1.125648ms); ✔ missing, invalid, multiple and exempt results use conservative deterministic outcomes (1.3805ms); ℹ tests 3; ℹ suites 0; ℹ pass 3; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 395.895084; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T18:36:54Z
