@@ -397,3 +397,38 @@ Append-only completed-work evidence.
 - Validation: /bin/bash -lc node --import tsx --test tests/deadline-semantics.test.ts && npm run typecheck
 - Evidence: ✔ date-only deadlines close at end of day in UTC+8 or an explicit timezone (43.688522ms); ✔ precise timestamps recognize UTC, CST, offsets and IANA zones (2.961087ms); ✔ rolling and multi-round deadlines expose stable next-round status (6.691667ms); ✔ deadline status distinguishes open, urgent, closed and unknown safely (0.778353ms); ℹ tests 4; ℹ suites 0; ℹ pass 4; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 367.884583; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
 - Recorded UTC: 2026-11-10T19:07:50Z
+
+## feature-reviewer-anonymization — claim-a0ce7c4a5c39ab7ab420663eff846ef5
+- Session: opencode-gpt56sol-20261110-i064ef-20261110-05d38c23
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/operator-anonymization.test.ts && npm run typecheck
+- Evidence: ✔ administrator anonymization transactionally reassigns audit authorship and unblocks deletion (12241.92402ms); ✔ anonymization rejects missing accounts and weak justification without writing (6125.395318ms); ℹ tests 2; ℹ suites 0; ℹ pass 2; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 21958.501274; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T19:14:43Z
+
+## feature-deadline-semantics — PR #78 publication & merge
+- Recorded UTC: 2026-11-10T19:22:30Z
+- Integrator: `planner-antigravity-20261104-b9e2894a`
+- Pull Request: [#78 (feat: deadline semantics and status evaluation (Task 17))](https://github.com/eeyung1/smartmanuAI/pull/78)
+- Head Commit: `7c04fbed64f285d84d6c21f8b8ceaf191500fcb9`
+- Merge Commit: `a6c5553db80d8e8a3c323bb68215cd6bf15be3ea`
+- CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`); Vercel preview comments passed.
+- Integration Outcome: Merged into `main`, fast-forward synced to local workspace, feature branch `feat/deadline-semantics` and worktree deleted.
+
+## feature-reviewer-anonymization — PR #79 publication & merge
+- Recorded UTC: 2026-11-10T19:40:04Z
+- Integrator: `planner-antigravity-20261104-b9e2894a`
+- Pull Request: [#79 (feat: anonymize reviewer contributions (Task 18))](https://github.com/eeyung1/smartmanuAI/pull/79)
+- Head Commit: `87c037b8da6d2a6e23f87cd93db74aef35f73d6a` (initial worker commit `394d1b4c0da57ed19b80b30726bd7215ea2324aa`, amended with domain error class `AnonymizationError` for clean error-translations boundary)
+- Merge Commit: `ccb5d64a2411e5cd6cfaafd5c6ed2574407bae26`
+- CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`); Vercel preview comments passed.
+- Integration Outcome: Merged into `main`, fast-forward synced to local workspace, feature branch `feat/reviewer-anonymization` and worktree deleted.
+
+## Objective Approval: milestone-6-extraction-deadlines-anonymization
+- Decision: **APPROVED**
+- Decided by: `planner-antigravity-20261104-b9e2894a`
+- Recorded UTC: 2026-11-10T19:40:33Z
+- Evaluated Tasks:
+  - Task 16: `feature-candidate-link-extractor` (PR #77, merge commit `497848bf64ddea92f73a6323cd3833c24388805b`)
+  - Task 17: `feature-deadline-semantics` (PR #78, merge commit `a6c5553db80d8e8a3c323bb68215cd6bf15be3ea`)
+  - Task 18: `feature-reviewer-anonymization` (PR #79, merge commit `ccb5d64a2411e5cd6cfaafd5c6ed2574407bae26`)
+- Milestone 6 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 16, 17, 18) merged, CI green, and validated in `main`.
