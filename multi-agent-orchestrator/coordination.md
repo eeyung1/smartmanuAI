@@ -55,9 +55,11 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
   10. `feature-source-refresh-indicator`: Shared source-refresh tracking service and UI indicator (`src/research/refresh-tracker.ts`, `app/admin/operations/summary.tsx`, `tests/refresh-tracker.test.ts`). **MERGED** via PR #71 (`1e8a6d6457db938e7dbc4decaa7274111533babf`).
   11. `feature-source-robots-policy`: Automated robots.txt access policy parser and validator (`src/research/robots-policy.ts`, `tests/robots-policy.test.ts`). **MERGED** via PR #72 (`69f18fc1c3926d1ba91e30cb9cf0d2644e7b6bd8`).
-  12. `feature-reminder-source-recheck`: Pre-reminder official source freshness verification workflow (`src/jobs/reminder-recheck.ts`, `src/jobs/deadline-reminders.ts`, `tests/reminder-recheck.test.ts`). **IN PROGRESS** by worker `opencode-gpt56sol-20261110-c84e1a-20261110-78c1c94c` (claim `claim-8c4d0f8cf9211ac188b348d44e99dc4d`).
+  12. `feature-reminder-source-recheck`: Pre-reminder official source freshness verification workflow (`src/jobs/reminder-recheck.ts`, `src/jobs/deadline-reminders.ts`, `tests/reminder-recheck.test.ts`). **MERGED** via PR #73 (`9e9b55cfa0d16bc6724b609e39d8fc8958236a69`).
 - Structured authority reconciled in `state.json` and `plan.json`.
 
 ## Milestone 4 Publication Progress
 - **2026-11-10 14:54 UTC**: Planner merged PR #71 (`feat/source-refresh-indicator`) into `main` (merge commit `1e8a6d6457db938e7dbc4decaa7274111533babf`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 10 marked Complete.
-- **2026-11-10 15:02 UTC**: Planner merged PR #72 (`feat/source-robots-policy`) into `main` (merge commit `69f18fc1c3926d1ba91e30cb9cf0d2644e7b6bd8`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 11 marked Complete. Primary checkout on `main` synchronized.
+- **2026-11-10 15:02 UTC**: Planner merged PR #72 (`feat/source-robots-policy`) into `main` (merge commit `69f18fc1c3926d1ba91e30cb9cf0d2644e7b6bd8`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 11 marked Complete.
+- **2026-11-10 15:27 UTC**: Planner merged PR #73 (`feat/reminder-source-recheck`) into `main` (merge commit `9e9b55cfa0d16bc6724b609e39d8fc8958236a69`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 12 marked Complete.
+- **2026-11-10 15:28 UTC**: Milestone 4 review package approved (`decision: APPROVED`). Milestone 4 is 100% COMPLETE! Primary checkout on `main` synchronized.
