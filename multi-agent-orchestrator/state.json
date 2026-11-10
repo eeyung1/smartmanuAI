@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 74,
+    "generation": 75,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -132,6 +132,11 @@
       "id": "milestone-5-discovery-pacing-scoring",
       "description": "Milestone 5: Candidate Discovery, Host Pacing and Language Scoring",
       "status": "APPROVED"
+    },
+    "milestone-6-extraction-deadlines-anonymization": {
+      "id": "milestone-6-extraction-deadlines-anonymization",
+      "description": "Milestone 6: Candidate Extraction, Deadline Semantics and Reviewer Anonymization",
+      "status": "ACTIVE"
     }
   },
   "tasks": {
@@ -529,6 +534,74 @@
       "branch": "agent/feature-source-rss-adapter-7720c696",
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-source-rss-adapter-7720c696",
       "base_sha": "main"
+    },
+    "milestone-6-extraction-deadlines-anonymization::feature-candidate-link-extractor": {
+      "id": "feature-candidate-link-extractor",
+      "objective_id": "milestone-6-extraction-deadlines-anonymization",
+      "feature": "feature-candidate-link-extractor",
+      "scope": "src/research/candidate-extractor.ts,tests/candidate-extractor.test.ts",
+      "priority": 10,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement automated candidate link discovery and URL extractor for official university admissions and scholarship directory/listing HTML pages, parsing anchors, resolving relative paths against parent base URL, enforcing same-origin or permitted academic subdomain policies, filtering by scholarship/admission keywords, excluding non-html assets, and deduplicating canonical candidate URLs.",
+      "acceptance_criteria": [
+        "extractCandidateLinks(html, baseUrl, options) extracts candidate opportunity links from HTML anchor tags",
+        "Resolves relative URLs to absolute URLs against baseUrl using standard URL normalization",
+        "Filters candidate links to same host or academic subdomains while excluding third-party links, social media, and tracking URLs",
+        "Applies scholarship and admission heuristics matching terms like scholarship, admissions, international, apply, bursary, fellowship, 奖学金, 招生, 留学生 in URL paths and anchor text",
+        "Excludes binary assets, documents, and fragments (e.g., .pdf, .zip, .docx, .png, .jpg, #hash, mailto:, javascript:)",
+        "Enforces bounded limits (max candidate count, max HTML length) and canonical URL deduplication",
+        "Handles malformed HTML safely without throwing unexpected exceptions"
+      ],
+      "validation": [
+        "node --import tsx --test tests/candidate-extractor.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-6-extraction-deadlines-anonymization::feature-deadline-semantics": {
+      "id": "feature-deadline-semantics",
+      "objective_id": "milestone-6-extraction-deadlines-anonymization",
+      "feature": "feature-deadline-semantics",
+      "scope": "src/domain/deadline-semantics.ts,tests/deadline-semantics.test.ts",
+      "priority": 9,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement precise deadline semantics, timezone parsing, and rolling admission status evaluation for opportunities, supporting date-only deadlines, precise closing timestamps (with timezone offsets such as China Standard Time UTC+8), rolling admissions, and multiple intake rounds.",
+      "acceptance_criteria": [
+        "parseDeadline(input, options) parses diverse deadline strings and formats into a structured ParsedDeadline object (kind: 'date' | 'timestamp' | 'rolling' | 'rounds' | 'unknown')",
+        "For date-only deadlines (YYYY-MM-DD), resolves to end-of-day in China Standard Time (UTC+8 / Asia/Shanghai) by default, or an explicitly supplied timezone",
+        "For precise timestamps (YYYY-MM-DD HH:mm with timezone like CST, UTC, GMT+8, etc.), resolves exact ISO UTC instant",
+        "Recognizes rolling admissions indicators ('rolling', 'until filled', '滚动录取', '额满为止') with isRolling: true",
+        "Supports structured multiple intake rounds (e.g. Round 1, Round 2) and identifies the next upcoming round deadline",
+        "evaluateDeadlineStatus(parsed, now) returns boolean isClosed, daysRemaining, isUrgent (<= 7 days), and human-readable status badge key",
+        "Rejects invalid formats gracefully with safe fallback semantics"
+      ],
+      "validation": [
+        "node --import tsx --test tests/deadline-semantics.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-6-extraction-deadlines-anonymization::feature-reviewer-anonymization": {
+      "id": "feature-reviewer-anonymization",
+      "objective_id": "milestone-6-extraction-deadlines-anonymization",
+      "feature": "feature-reviewer-anonymization",
+      "scope": "src/privacy/operator-anonymization.ts,tests/operator-anonymization.test.ts",
+      "priority": 8,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement operator-assisted reviewer account anonymization service to enable GDPR/privacy deletion compliance for administrator and reviewer accounts with existing catalogue edits, source creations, or audit trail records without compromising audit history integrity.",
+      "acceptance_criteria": [
+        "anonymizeReviewerContributions(sql, operatorId, targetUserId, reason) safely decouples reviewer personal identity from published audit history",
+        "Verifies operator authority (enforces admin privilege for the acting operator)",
+        "Reassigns all reviewer contributions (sources.created_by, opportunity_revisions.actor_id, source_collection_policies.actor_id, research_job_actions.actor_id) to a deterministic redacted pseudonym (anonymized-reviewer-<hash>)",
+        "Records an immutable administrative audit action in the database documenting the anonymization event with timestamp and justification",
+        "After anonymization, unblocks requestAccountDeletion for the targeted user so their account, sessions, and personal profile can be purged",
+        "Operates transactionally to prevent partial or corrupted anonymization state"
+      ],
+      "validation": [
+        "node --import tsx --test tests/operator-anonymization.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
     }
   },
   "results": {
@@ -1436,6 +1509,13 @@
       "operation": "review-decision",
       "generation": 74,
       "utc": "2026-11-10T18:46:41Z"
+    },
+    {
+      "id": "75-adopt-milestone-6",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "adopt-objective",
+      "generation": 75,
+      "utc": "2026-11-10T18:55:00Z"
     }
   ]
 }

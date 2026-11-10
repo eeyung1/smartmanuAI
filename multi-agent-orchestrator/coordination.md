@@ -77,3 +77,11 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - **2026-11-10 18:34 UTC**: Planner merged PR #75 (`feat/host-rate-limiter`) into `main` (merge commit `8efb94fb9268e47a9de985376569d3bb3474cda8`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 14 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-10 18:45 UTC**: Planner merged PR #76 (`feat/language-score-matching`) into `main` (merge commit `3cbddecbdfe8a252dd6e648908c2723d407407f5`) following verified GitHub Actions CI run (`local-spike` green, 78/78 tests pass). Worktree deleted, Task 15 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-10 18:46 UTC**: Planner completed formal objective review for Milestone 5 (`milestone-5-discovery-pacing-scoring`) with decision `APPROVED` (Gen 74). Milestone 5 is 100% COMPLETE.
+
+## Milestone 6 Formulation & Decomposition — 2026-11-10T18:55:00Z
+- Human operator authorized Milestone 6 ("Candidate Extraction, Deadline Semantics and Reviewer Anonymization").
+- Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
+  16. `feature-candidate-link-extractor`: Automated candidate link discovery and URL extractor for official university admissions and scholarship directory/listing HTML pages (`src/research/candidate-extractor.ts`, `tests/candidate-extractor.test.ts`). Status: **PENDING**.
+  17. `feature-deadline-semantics`: Precise deadline semantics, timezone parsing, and rolling admission status evaluation for opportunities (`src/domain/deadline-semantics.ts`, `tests/deadline-semantics.test.ts`). Status: **PENDING**.
+  18. `feature-reviewer-anonymization`: Operator-assisted reviewer account anonymization service to enable GDPR/privacy deletion compliance for administrator accounts (`src/privacy/operator-anonymization.ts`, `tests/operator-anonymization.test.ts`). Status: **PENDING**.
+- Structured authority reconciled in `state.json` (Gen 75) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.
