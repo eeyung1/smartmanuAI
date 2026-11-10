@@ -2,6 +2,16 @@ import { createHash } from "node:crypto";
 import type { SQL } from "../db";
 import { CatalogueError } from "../catalogue/service";
 
+export class AnonymizationError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "AnonymizationError";
+  }
+}
+
 const reference = (kind: string, value: string) =>
   createHash("sha256").update(`smartmanu:${kind}:v1:${value}`).digest("hex");
 
@@ -47,13 +57,13 @@ export async function anonymizeReviewerContributions(
 ) {
   const justification = reason.trim().replace(/\s+/g, " ");
   if (justification.length < 10 || justification.length > 1000)
-    throw new CatalogueError(
+    throw new AnonymizationError(
       400,
       "An anonymization justification between 10 and 1000 characters is required.",
     );
   const pseudonymId = anonymizedReviewerId(targetUserId);
   if (pseudonymId === operatorId)
-    throw new CatalogueError(400, "Invalid anonymization identities.");
+    throw new AnonymizationError(400, "Invalid anonymization identities.");
 
   return sql.transaction(async (tx) => {
     const users = (
@@ -92,7 +102,7 @@ export async function anonymizeReviewerContributions(
         audit.reason !== justification ||
         String(existing.email) !== `${pseudonymId}@redacted.invalid`)
     )
-      throw new CatalogueError(
+      throw new AnonymizationError(
         409,
         "An anonymization audit record already exists with different metadata.",
       );
