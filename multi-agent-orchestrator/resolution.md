@@ -354,3 +354,23 @@ Append-only completed-work evidence.
 - Validation: /bin/bash -lc node --import tsx --test tests/language-scoring.test.ts && npm run typecheck
 - Evidence: ✔ IELTS evaluation checks overall, sub-bands and deadline-relative validity (6.021721ms); ✔ TOEFL iBT and HSK use their native scales without conversion (1.125648ms); ✔ missing, invalid, multiple and exempt results use conservative deterministic outcomes (1.3805ms); ℹ tests 3; ℹ suites 0; ℹ pass 3; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 395.895084; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
 - Recorded UTC: 2026-11-10T18:36:54Z
+
+## feature-language-score-matching — PR #76 publication & merge
+- Recorded UTC: 2026-11-10T18:45:43Z
+- Integrator: `planner-antigravity-20261104-b9e2894a`
+- Pull Request: [#76 (feat: evaluate standardized language scores (Task 15))](https://github.com/eeyung1/smartmanuAI/pull/76)
+- Head Commit: `9146191796cecfd56c0f4b1c11a2959ff72cea9d`
+- Merge Commit: `3cbddecbdfe8a252dd6e648908c2723d407407f5`
+- CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`, 78/78 tests pass); Vercel preview comments passed.
+- Integration Outcome: Merged into `main`, fast-forward synced to local workspace, feature branch `feat/language-score-matching` and worktree deleted.
+
+## Milestone 5 Review & Objective Approval
+- Recorded UTC: 2026-11-10T18:46:41Z
+- Objective ID: `milestone-5-discovery-pacing-scoring`
+- Reviewer: `planner-antigravity-20261104-b9e2894a`
+- Decision: `APPROVED`
+- Evaluated Tasks:
+  - Task 13: `feature-source-rss-adapter` (PR #74, commit `0cf7b767056de226a68d5e27cdd8c6def4b87fb3`)
+  - Task 14: `feature-host-rate-limiter` (PR #75, commit `8efb94fb9268e47a9de985376569d3bb3474cda8`)
+  - Task 15: `feature-language-score-matching` (PR #76, commit `3cbddecbdfe8a252dd6e648908c2723d407407f5`)
+- Milestone 5 Status: **100% COMPLETE**. All 3 tasks (Tasks 13, 14, 15) merged and validated in `main`.
