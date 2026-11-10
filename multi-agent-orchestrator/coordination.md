@@ -81,7 +81,10 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 ## Milestone 6 Formulation & Decomposition — 2026-11-10T18:55:00Z
 - Human operator authorized Milestone 6 ("Candidate Extraction, Deadline Semantics and Reviewer Anonymization").
 - Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
-  16. `feature-candidate-link-extractor`: Automated candidate link discovery and URL extractor for official university admissions and scholarship directory/listing HTML pages (`src/research/candidate-extractor.ts`, `tests/candidate-extractor.test.ts`). Status: **PENDING**.
+  16. `feature-candidate-link-extractor`: Automated candidate link discovery and URL extractor for official university admissions and scholarship directory/listing HTML pages (`src/research/candidate-extractor.ts`, `tests/candidate-extractor.test.ts`). **MERGED** via PR #77 (`497848bf64ddea92f73a6323cd3833c24388805b`).
   17. `feature-deadline-semantics`: Precise deadline semantics, timezone parsing, and rolling admission status evaluation for opportunities (`src/domain/deadline-semantics.ts`, `tests/deadline-semantics.test.ts`). Status: **PENDING**.
   18. `feature-reviewer-anonymization`: Operator-assisted reviewer account anonymization service to enable GDPR/privacy deletion compliance for administrator accounts (`src/privacy/operator-anonymization.ts`, `tests/operator-anonymization.test.ts`). Status: **PENDING**.
 - Structured authority reconciled in `state.json` (Gen 75) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.
+
+## Milestone 6 Publication Progress
+- **2026-11-10 19:11 UTC**: Planner merged PR #77 (`feat/candidate-link-extractor`) into `main` (merge commit `497848bf64ddea92f73a6323cd3833c24388805b`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 16 marked Complete. Primary checkout on `main` synchronized.

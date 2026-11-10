@@ -374,3 +374,26 @@ Append-only completed-work evidence.
   - Task 14: `feature-host-rate-limiter` (PR #75, commit `8efb94fb9268e47a9de985376569d3bb3474cda8`)
   - Task 15: `feature-language-score-matching` (PR #76, commit `3cbddecbdfe8a252dd6e648908c2723d407407f5`)
 - Milestone 5 Status: **100% COMPLETE**. All 3 tasks (Tasks 13, 14, 15) merged and validated in `main`.
+
+## feature-candidate-link-extractor — claim-93a95b86303abe7cce1fcc4d31121668
+- Session: opencode-gpt56sol-20261110-g842cd-20261110-1d643eec
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/candidate-extractor.test.ts && npm run typecheck
+- Evidence: ✔ candidate extraction resolves, filters and canonically deduplicates opportunity links (16.400712ms); ✔ candidate options enforce explicit host, subdomain and result policies (2.706896ms); ✔ malformed and oversized inputs fail safely without widening URL admission (1.956271ms); ℹ tests 3; ℹ suites 0; ℹ pass 3; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 285.758747; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T19:02:55Z
+
+## feature-candidate-link-extractor — PR #77 publication & merge
+- Recorded UTC: 2026-11-10T19:11:00Z
+- Integrator: `planner-antigravity-20261104-b9e2894a`
+- Pull Request: [#77 (feat: candidate opportunity link extractor (Task 16))](https://github.com/eeyung1/smartmanuAI/pull/77)
+- Head Commit: `29dd8d62a57906d8839d1f627b3a3effcf4e74b4`
+- Merge Commit: `497848bf64ddea92f73a6323cd3833c24388805b`
+- CI Verification: GitHub Actions workflow `local-spike` passed (`conclusion=success`); Vercel preview comments passed.
+- Integration Outcome: Merged into `main`, fast-forward synced to local workspace, feature branch `feat/candidate-link-extractor` and worktree deleted.
+
+## feature-deadline-semantics — claim-922118e03c03ba48b08934fe924446b9
+- Session: opencode-gpt56sol-20261110-h953de-20261110-e4342050
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/deadline-semantics.test.ts && npm run typecheck
+- Evidence: ✔ date-only deadlines close at end of day in UTC+8 or an explicit timezone (43.688522ms); ✔ precise timestamps recognize UTC, CST, offsets and IANA zones (2.961087ms); ✔ rolling and multi-round deadlines expose stable next-round status (6.691667ms); ✔ deadline status distinguishes open, urgent, closed and unknown safely (0.778353ms); ℹ tests 4; ℹ suites 0; ℹ pass 4; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 367.884583; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-10T19:07:50Z
