@@ -1,6 +1,16 @@
 import { timingSafeEqual } from "node:crypto";
 import type { SQL } from "../db";
-import { CatalogueError, requireAdmin } from "../catalogue/service";
+import { requireAdmin } from "../catalogue/service";
+
+export class RetentionError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "RetentionError";
+  }
+}
 
 export const RETENTION_DEFAULTS = {
   deliveryLogsDays: 90,
@@ -50,7 +60,7 @@ function windowValue(
 ) {
   if (value === undefined) return fallback;
   if (!Number.isInteger(value) || value < 1 || value > 3650)
-    throw new CatalogueError(400, `${label} retention window is invalid.`);
+    throw new RetentionError(400, `${label} retention window is invalid.`);
   return value;
 }
 
@@ -74,11 +84,11 @@ export async function executeRetentionSweep(
 ) {
   const started = options.now ?? new Date();
   if (!Number.isFinite(started.getTime()))
-    throw new CatalogueError(400, "Invalid retention sweep time.");
+    throw new RetentionError(400, "Invalid retention sweep time.");
   const dryRun = options.dryRun === true;
   const batchSize = options.batchSize === undefined ? 500 : options.batchSize;
   if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 10_000)
-    throw new CatalogueError(400, "Retention batch size is invalid.");
+    throw new RetentionError(400, "Retention batch size is invalid.");
   const windows = {
     deliveryLogsDays: windowValue(
       options.windows?.deliveryLogsDays,
@@ -108,7 +118,7 @@ export async function executeRetentionSweep(
   )
     authorizedAs = "job";
   if (!authorizedAs)
-    throw new CatalogueError(
+    throw new RetentionError(
       403,
       "Retention sweep requires operator authority or a valid job key.",
     );
