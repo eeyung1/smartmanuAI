@@ -1,3 +1,5 @@
+import { sourceHTMLToText } from "./source-text";
+import { jsonFeedText } from "./json-feed";
 import { lookup } from "node:dns/promises";
 import { request } from "node:https";
 import { BlockList, isIP } from "node:net";
@@ -134,8 +136,15 @@ export async function readPage(response: IncomingMessage) {
     ?.split(";")[0]
     .trim()
     .toLowerCase();
+  const isFeed =
+    type === "application/feed+json" || type === "application/json";
   if (
-    !["text/plain", "text/html"].includes(type ?? "") ||
+    ![
+      "text/plain",
+      "text/html",
+      "application/feed+json",
+      "application/json",
+    ].includes(type ?? "") ||
     (response.headers["content-encoding"] &&
       response.headers["content-encoding"] !== "identity")
   ) {
@@ -166,7 +175,8 @@ export async function readPage(response: IncomingMessage) {
   if (
     declarations.length > 1 ||
     charsetParameters.length !== declarations.length ||
-    !encoding
+    !encoding ||
+    (isFeed && encoding !== "utf-8")
   ) {
     response.destroy();
     throw new RetrievalError("unsupported_encoding");
@@ -198,23 +208,17 @@ export async function readPage(response: IncomingMessage) {
   } catch {
     throw new RetrievalError("unsupported_encoding");
   }
-  if (type === "text/html")
-    text = text
-      .replace(/<!--[\s\S]*?-->/g, " ")
-      .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
-      .replace(/<[^>]*>/g, " ")
-      .replace(
-        /&(nbsp|amp|lt|gt|quot|#39);/g,
-        (s) =>
-          ({
-            "&nbsp;": " ",
-            "&amp;": "&",
-            "&lt;": "<",
-            "&gt;": ">",
-            "&quot;": '"',
-            "&#39;": "'",
-          })[s] ?? s,
-      );
+  if (type === "text/html") text = sourceHTMLToText(text);
+  if (isFeed) {
+    let excerpt: string | null;
+    try {
+      excerpt = jsonFeedText(JSON.parse(text));
+    } catch {
+      throw new RetrievalError("unsupported_content");
+    }
+    if (!excerpt) throw new RetrievalError("unsupported_content");
+    text = excerpt;
+  }
   text = text.replace(/\s+/g, " ").trim();
   if (text.length < 20) throw new RetrievalError("empty_source");
   while (Buffer.byteLength(text) > 10000)
@@ -352,7 +356,8 @@ export async function retrieveSourceResponse(
         agent: false,
         family: pinned.family,
         headers: {
-          Accept: "text/html, text/plain",
+          Accept:
+            "text/html, text/plain, application/feed+json;q=0.9, application/json;q=0.8",
           "Accept-Encoding": "identity",
           "User-Agent": "smartmanuAI/0.1",
           ...conditionalHeaders(validators),
