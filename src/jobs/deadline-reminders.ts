@@ -10,6 +10,10 @@ import {
   renderDeadlineReminder,
 } from "../domain/reminders";
 import { LOCAL_CONSENT_VERSION } from "./digests";
+import {
+  verifyReminderCandidateFreshness,
+  type ReminderRecheckTransport,
+} from "./reminder-recheck";
 
 const FRESHNESS_MS = 24 * 60 * 60 * 1000;
 
@@ -33,13 +37,15 @@ export type DeadlineReminderResult = {
 };
 
 /**
- * Dispatch due reminders to the configured local sink. No external provider is
- * contacted. Sink event keys are unique, so repeated or concurrent runs do not
- * send the same deadline revision and threshold more than once.
+ * Dispatch due reminders to the configured local sink. No external request is
+ * possible unless a source-recheck transport is explicitly injected. Sink event
+ * keys are unique, so repeated or concurrent runs do not send the same deadline
+ * revision and threshold more than once.
  */
 export async function dispatchDeadlineReminders(
   sql: SQL,
   now = new Date(),
+  recheckTransport?: ReminderRecheckTransport,
 ): Promise<DeadlineReminderResult> {
   if (!Number.isFinite(now.getTime()))
     throw new Error("Invalid reminder time.");
@@ -78,6 +84,25 @@ export async function dispatchDeadlineReminders(
     if (!details.deadline) continue;
     const threshold = deadlineReminderThreshold(details.deadline, now);
     if (!threshold) continue;
+    const eventKey = deadlineReminderEventKey({
+      userId: String(candidate.user_id),
+      opportunityId: String(candidate.opportunity_id),
+      revision: Number(candidate.revision),
+      deadline: details.deadline,
+      threshold,
+    });
+    const freshness = await verifyReminderCandidateFreshness(sql, {
+      userId: String(candidate.user_id),
+      opportunityId: String(candidate.opportunity_id),
+      revision: Number(candidate.revision),
+      eventKey,
+      checkedAt: now,
+      transport: recheckTransport,
+    });
+    if (!freshness.fresh) {
+      result.suppressed++;
+      continue;
+    }
 
     const sent = await sql.transaction(async (tx) => {
       await tx.query("SELECT id FROM auth_user WHERE id=$1 FOR NO KEY UPDATE", [
@@ -116,6 +141,12 @@ export async function dispatchDeadlineReminders(
         now,
       );
       if (!currentThreshold) return "suppressed" as const;
+      if (
+        Number(current.revision) !== Number(candidate.revision) ||
+        currentDetails.deadline !== details.deadline ||
+        currentThreshold !== threshold
+      )
+        return "suppressed" as const;
       const verifiedAt = new Date(String(current.verified_at));
       if (
         !Number.isFinite(verifiedAt.getTime()) ||
@@ -134,13 +165,6 @@ export async function dispatchDeadlineReminders(
           return "suppressed" as const;
       }
 
-      const eventKey = deadlineReminderEventKey({
-        userId: String(current.user_id),
-        opportunityId: String(current.opportunity_id),
-        revision: Number(current.revision),
-        deadline: currentDetails.deadline,
-        threshold: currentThreshold,
-      });
       const message = renderDeadlineReminder({
         language: current.language ?? "en",
         title: currentDetails.title,
