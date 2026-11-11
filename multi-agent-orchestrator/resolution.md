@@ -803,3 +803,58 @@ Append-only completed-work evidence.
   - Task 37: `feature-residence-eligibility-evaluator` (Priority 10, PENDING)
   - Task 38: `feature-operations-metrics-aggregator` (Priority 9, PENDING)
   - Task 39: `feature-research-brochure-parser` (Priority 8, PENDING)
+
+## feature-residence-eligibility-evaluator — claim-4be1252bddae3bfd8034514a115171f4
+- Session: opencode-gpt56sol-20261111-m4c8f2-20261111-8dc3ac6c
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/residence-eligibility.test.ts && npm run typecheck
+- Evidence: ✔ country codes normalize from alpha-2 and alpha-3 forms (2.28382ms); ✔ allowed country lists decide residence eligibility (0.993066ms); ✔ regional blocs expand to their member countries (2.578603ms); ✔ host-country residence and abroad application rules are distinguished (0.501432ms); ✔ excluded countries and unstated rules are handled cleanly (0.406001ms); ✔ nationality is reported separately from physical residence (0.414168ms); ✔ explanations are bilingual and evaluation is deterministic (2.371206ms); ℹ tests 7; ℹ suites 0; ℹ pass 7; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 272.809158; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T15:15:02Z
+
+## feature-operations-metrics-aggregator — claim-7e647a60e07c0bf2b8ba36aed785a5c9
+- Session: opencode-gpt56sol-20261111-n7d3e5-20261111-67330fd4
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/operations-aggregator.test.ts && npm run typecheck
+- Evidence: ✔ healthy inputs aggregate without diagnostics (5.47565ms); ✔ dead letters and high spending degrade the verdict (1.601562ms); ✔ an open circuit or exhausted budget is critical (3.811116ms); ✔ stale jobs, slow database and error rates raise warnings (0.632873ms); ✔ missing or malformed inputs aggregate safely and deterministically (3.623864ms); ℹ tests 5; ℹ suites 0; ℹ pass 5; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 538.976435; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T15:24:17Z
+
+## feature-research-brochure-parser — claim-10b33aca7e5d0c79039da4c7bd7ab829
+- Session: opencode-gpt56sol-20261111-p9e4a8-20261111-209aa89c
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/brochure-parser.test.ts && npm run typecheck
+- Evidence: ✔ brochure sections, funding, documents and milestones are extracted (13.190738ms); ✔ dates are normalized from several written formats (2.015537ms); ✔ chinese section headings and funding are recognized (3.181118ms); ✔ partial funding is classified without overstating coverage (1.069338ms); ✔ malformed or unstructured brochures degrade gracefully (2.241092ms); ℹ tests 5; ℹ suites 0; ℹ pass 5; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 480.025052; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T15:34:07Z
+
+## PR #98 — feature-residence-eligibility-evaluator
+- PR: https://github.com/eeyung1/smartmanuAI/pull/98
+- Branch: `feat/residence-eligibility-evaluator`
+- Merge Commit: `8efec91513ce838f32ec4319c73f9dfe8353713e`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T15:28:48Z
+
+## PR #99 — feature-operations-metrics-aggregator
+- PR: https://github.com/eeyung1/smartmanuAI/pull/99
+- Branch: `feat/operations-metrics-aggregator`
+- Merge Commit: `3e025570e31d537231eb534799d7619919e8bc16`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T15:37:52Z
+
+## PR #100 — feature-research-brochure-parser
+- PR: https://github.com/eeyung1/smartmanuAI/pull/100
+- Branch: `feat/research-brochure-parser`
+- Merge Commit: `628cf709704e302e065451a93d565a0120edc6fb`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T15:46:18Z
+
+## milestone-13-residence-operations-brochure — Review Decision: APPROVED
+- Review Decision: APPROVED
+- Decided by: `planner-antigravity-20261104-b9e2894a`
+- Decided UTC: 2026-11-11T15:47:17Z
+- Evaluated Tasks:
+  - Task 37: `feature-residence-eligibility-evaluator` (PR #98, merge commit `8efec91513ce838f32ec4319c73f9dfe8353713e`)
+  - Task 38: `feature-operations-metrics-aggregator` (PR #99, merge commit `3e025570e31d537231eb534799d7619919e8bc16`)
+  - Task 39: `feature-research-brochure-parser` (PR #100, merge commit `628cf709704e302e065451a93d565a0120edc6fb`)
+- Milestone 13 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 37, 38, 39) merged, CI green, and validated in `main`.

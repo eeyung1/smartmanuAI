@@ -8,7 +8,7 @@
       "feature": "feature-residence-eligibility-evaluator",
       "scope": "src/domain/residence-eligibility.ts,tests/residence-eligibility.test.ts",
       "priority": 10,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement applicant residence country eligibility evaluator to evaluate applicant country of residence against opportunity geographic eligibility constraints (e.g. domestic applicants, bilateral student exchange agreements, regional resident quotas like ASEAN/EU/Belt and Road, and international students currently residing in China vs abroad).",
       "acceptance_criteria": [
@@ -29,7 +29,7 @@
       "feature": "feature-operations-metrics-aggregator",
       "scope": "src/admin/operations-aggregator.ts,tests/operations-aggregator.test.ts",
       "priority": 9,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement unified operational health metrics aggregator to synthesize system health across research jobs, outbound delivery queues, monthly spending vs budget caps, and system SLAs into unified dashboard metrics with status indicators (HEALTHY, DEGRADED, CRITICAL).",
       "acceptance_criteria": [
@@ -49,7 +49,7 @@
       "feature": "feature-research-brochure-parser",
       "scope": "src/research/brochure-parser.ts,tests/brochure-parser.test.ts",
       "priority": 8,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement multi-format admissions brochure and guideline parser to parse structured text and markdown admissions guides, extracting funding packages, eligibility requirements, application steps, and timeline milestones into candidate opportunity records.",
       "acceptance_criteria": [
