@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 146,
+    "generation": 147,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -247,6 +247,11 @@
       "id": "milestone-9-lineage-cooldown-schedule",
       "description": "Milestone 9: Offering Lineage, Host Cooldowns and Deadline-Aware Scheduling",
       "status": "APPROVED"
+    },
+    "milestone-11-cost-settlement-translation-transport": {
+      "id": "milestone-11-cost-settlement-translation-transport",
+      "description": "Milestone 11: Actual-Cost Settlement, Opportunity Translation Caching and Outbound Delivery Dispatching",
+      "status": "OPEN"
     }
   },
   "tasks": {
@@ -267,7 +272,7 @@
         "Safe relative returnTo preservation through magic-link sign-in and post-auth redirect"
       ],
       "validation": [
-        "node --import tsx --test tests/auth-destination.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/auth-destination.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-auth-destination-preservation",
@@ -291,7 +296,7 @@
         "Dedicated 3-step onboarding wizard (/onboarding) with persisted progress, bilingual UI, and preference saving"
       ],
       "validation": [
-        "node --import tsx --test tests/onboarding.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/onboarding.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-multistep-onboarding-5532d854",
@@ -317,7 +322,7 @@
         "Server-side tracker pagination (12/page), status filters (interested/applying/applied/dismissed), search, beyond 100-item cap"
       ],
       "validation": [
-        "node --import tsx --test tests/tracker-pagination.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/tracker-pagination.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-tracker-pagination-filtering",
@@ -345,7 +350,7 @@
         "Deterministic in-memory / SQL-compatible state transitions with comprehensive input validation and safe error handling"
       ],
       "validation": [
-        "node --import tsx --test tests/delivery-intent.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/delivery-intent.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-delivery-intent-queue-809a7d8d",
@@ -372,7 +377,7 @@
         "Handles malformed snapshots, empty content, schema mismatches, and budget exhaustion safely without unhandled rejections"
       ],
       "validation": [
-        "node --import tsx --test tests/extraction-dispatcher.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/extraction-dispatcher.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-extraction-dispatch-coordinator-51fdb5fc",
@@ -399,7 +404,7 @@
         "Pure domain logic and safe error handling (rejects duplicate emails, expired tokens, tampered tokens, and malformed inputs)"
       ],
       "validation": [
-        "node --import tsx --test tests/email-change.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/email-change.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-verified-email-change-66593bc0",
@@ -422,7 +427,7 @@
         "Automated calculation and dispatch of 7-day and 2-day urgent deadline reminders for active saved opportunities in the user tracker (interested or applying), with idempotency and deduplication guards"
       ],
       "validation": [
-        "node --import tsx --test tests/deadline-reminders.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/deadline-reminders.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-deadline-reminders-a4a059d6",
@@ -448,7 +453,7 @@
         "Granular preference checkboxes in /notifications to toggle deadline reminders separately from general digests, plus an in-browser preview component rendering the upcoming digest before delivery"
       ],
       "validation": [
-        "node --import tsx --test tests/notification-settings-preview.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/notification-settings-preview.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-notification-settings-preview-83596a9c",
@@ -473,7 +478,7 @@
         "Detection of material changes on saved opportunities (funding cancellation, deadline reduction/extension, program closure) and queueing immediate high-priority outbox notifications"
       ],
       "validation": [
-        "node --import tsx --test tests/material-changes.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/material-changes.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-opportunity-withdrawal-alerts-59333149",
@@ -500,7 +505,7 @@
         "Bilingual labels in English and Simplified Chinese"
       ],
       "validation": [
-        "node --import tsx --test tests/admin-preview.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/admin-preview.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-admin-publication-preview-639c3d72",
@@ -523,13 +528,13 @@
       "description": "Implement administrative duplicate opportunity merge service and API endpoint to consolidate duplicate candidate opportunities into a single surviving record, preserving source URL provenance and mapping user saved tracker items without losing progression status",
       "acceptance_criteria": [
         "Admin endpoint POST /api/admin/opportunities/[id]/merge requiring admin authentication and CSRF check",
-        "Repoints saved_items from duplicate opportunity to surviving target opportunity, preserving highest status progression (applied \u003e applying \u003e interested \u003e dismissed) on collision",
+        "Repoints saved_items from duplicate opportunity to surviving target opportunity, preserving highest status progression (applied > applying > interested > dismissed) on collision",
         "Transitions duplicate opportunity state to archived with merge explanation in opportunity_revisions",
         "Records an audited revision on target opportunity linking to the merged duplicate ID",
         "Idempotent and transactionally safe against concurrent saves"
       ],
       "validation": [
-        "node --import tsx --test tests/catalogue-merge.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/catalogue-merge.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-opportunity-duplicate-merge-a9b799c7",
@@ -558,7 +563,7 @@
         "Migration 015 with updated staging schema bootstrap and staging test assertion (15 migrations)"
       ],
       "validation": [
-        "node --import tsx --test tests/lifecycle-archive.test.ts tests/staging.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/lifecycle-archive.test.ts tests/staging.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-opportunity-lifecycle-archive-e04945af",
@@ -586,7 +591,7 @@
         "Retains local-sink isolation; no live external requests without injected/mocked transport in tests"
       ],
       "validation": [
-        "node --import tsx --test tests/reminder-recheck.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/reminder-recheck.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-reminder-source-recheck-4e99dc4d",
@@ -612,7 +617,7 @@
         "Zero private user data or raw request credentials exposed"
       ],
       "validation": [
-        "node --import tsx --test tests/refresh-tracker.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/refresh-tracker.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-source-refresh-indicator-748cc7e8",
@@ -638,7 +643,7 @@
         "Handles malformed content, empty files, comments, and missing directives gracefully with safe defaults (allow if not explicitly disallowed)"
       ],
       "validation": [
-        "node --import tsx --test tests/robots-policy.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/robots-policy.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-source-robots-policy-142692c5",
@@ -665,7 +670,7 @@
         "Operates in-memory with deterministic clock injection in unit tests"
       ],
       "validation": [
-        "node --import tsx --test tests/host-pacer.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/host-pacer.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-host-rate-limiter-7fddf847",
@@ -683,7 +688,7 @@
       "assignment_generation": 70,
       "session_id": "opencode-gpt56sol-20261110-f7b30e-20261110-b9209f4e",
       "result_id": "milestone-5-discovery-pacing-scoring::feature-language-score-matching::70",
-      "description": "Implement deterministic language proficiency score evaluation and qualification matching service for applicant profiles against scholarship requirement criteria, supporting IELTS (0–9), TOEFL iBT (0–120), and Chinese HSK (Levels 1–6) score comparisons.",
+      "description": "Implement deterministic language proficiency score evaluation and qualification matching service for applicant profiles against scholarship requirement criteria, supporting IELTS (0\u20139), TOEFL iBT (0\u2013120), and Chinese HSK (Levels 1\u20136) score comparisons.",
       "acceptance_criteria": [
         "evaluateLanguageRequirement(profileScores, requirement) deterministically checks applicant eligibility against opportunity language criteria",
         "Supports IELTS band scores (including overall and sub-band minimums), TOEFL iBT total scores, and HSK level + total score rules",
@@ -692,7 +697,7 @@
         "Handles missing or exempt applicant test scores with safe fallback semantics"
       ],
       "validation": [
-        "node --import tsx --test tests/language-scoring.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/language-scoring.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-language-score-matching-f638372e",
@@ -719,7 +724,7 @@
         "Handles invalid XML, namespaces, CDATA, and missing fields gracefully with safe fallbacks"
       ],
       "validation": [
-        "node --import tsx --test tests/rss-feed.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/rss-feed.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-source-rss-adapter-7720c696",
@@ -742,13 +747,13 @@
         "extractCandidateLinks(html, baseUrl, options) extracts candidate opportunity links from HTML anchor tags",
         "Resolves relative URLs to absolute URLs against baseUrl using standard URL normalization",
         "Filters candidate links to same host or academic subdomains while excluding third-party links, social media, and tracking URLs",
-        "Applies scholarship and admission heuristics matching terms like scholarship, admissions, international, apply, bursary, fellowship, 奖学金, 招生, 留学生 in URL paths and anchor text",
+        "Applies scholarship and admission heuristics matching terms like scholarship, admissions, international, apply, bursary, fellowship, \u5956\u5b66\u91d1, \u62db\u751f, \u7559\u5b66\u751f in URL paths and anchor text",
         "Excludes binary assets, documents, and fragments (e.g., .pdf, .zip, .docx, .png, .jpg, #hash, mailto:, javascript:)",
         "Enforces bounded limits (max candidate count, max HTML length) and canonical URL deduplication",
         "Handles malformed HTML safely without throwing unexpected exceptions"
       ],
       "validation": [
-        "node --import tsx --test tests/candidate-extractor.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/candidate-extractor.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-candidate-link-extractor-31121668",
@@ -771,13 +776,13 @@
         "parseDeadline(input, options) parses diverse deadline strings and formats into a structured ParsedDeadline object (kind: 'date' | 'timestamp' | 'rolling' | 'rounds' | 'unknown')",
         "For date-only deadlines (YYYY-MM-DD), resolves to end-of-day in China Standard Time (UTC+8 / Asia/Shanghai) by default, or an explicitly supplied timezone",
         "For precise timestamps (YYYY-MM-DD HH:mm with timezone like CST, UTC, GMT+8, etc.), resolves exact ISO UTC instant",
-        "Recognizes rolling admissions indicators ('rolling', 'until filled', '滚动录取', '额满为止') with isRolling: true",
+        "Recognizes rolling admissions indicators ('rolling', 'until filled', '\u6eda\u52a8\u5f55\u53d6', '\u989d\u6ee1\u4e3a\u6b62') with isRolling: true",
         "Supports structured multiple intake rounds (e.g. Round 1, Round 2) and identifies the next upcoming round deadline",
-        "evaluateDeadlineStatus(parsed, now) returns boolean isClosed, daysRemaining, isUrgent (\u003c= 7 days), and human-readable status badge key",
+        "evaluateDeadlineStatus(parsed, now) returns boolean isClosed, daysRemaining, isUrgent (<= 7 days), and human-readable status badge key",
         "Rejects invalid formats gracefully with safe fallback semantics"
       ],
       "validation": [
-        "node --import tsx --test tests/deadline-semantics.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/deadline-semantics.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-deadline-semantics-924446b9",
@@ -799,13 +804,13 @@
       "acceptance_criteria": [
         "anonymizeReviewerContributions(sql, operatorId, targetUserId, reason) safely decouples reviewer personal identity from published audit history",
         "Verifies operator authority (enforces admin privilege for the acting operator)",
-        "Reassigns all reviewer contributions (sources.created_by, opportunity_revisions.actor_id, source_collection_policies.actor_id, research_job_actions.actor_id) to a deterministic redacted pseudonym (anonymized-reviewer-\u003chash\u003e)",
+        "Reassigns all reviewer contributions (sources.created_by, opportunity_revisions.actor_id, source_collection_policies.actor_id, research_job_actions.actor_id) to a deterministic redacted pseudonym (anonymized-reviewer-<hash>)",
         "Records an immutable administrative audit action in the database documenting the anonymization event with timestamp and justification",
         "After anonymization, unblocks requestAccountDeletion for the targeted user so their account, sessions, and personal profile can be purged",
         "Operates transactionally to prevent partial or corrupted anonymization state"
       ],
       "validation": [
-        "node --import tsx --test tests/operator-anonymization.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/operator-anonymization.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-reviewer-anonymization-ff846ef5",
@@ -825,7 +830,7 @@
       "result_id": "milestone-7-discovery-multi-retention::feature-data-retention-sweeper::98",
       "description": "Implement automated data lifecycle retention sweeper to enforce GDPR and operational storage retention policies (FR09), purging delivery logs older than 90 days, evidence snapshots older than 180 days, and expired ephemeral tokens, operating transactionally with audit logging.",
       "acceptance_criteria": [
-        "executeRetentionSweep(sql, options) identifies and purges expired records according to configured retention windows (delivery logs \u003e 90d, evidence snapshots \u003e 180d, expired session/auth tokens \u003e 30d)",
+        "executeRetentionSweep(sql, options) identifies and purges expired records according to configured retention windows (delivery logs > 90d, evidence snapshots > 180d, expired session/auth tokens > 30d)",
         "Executes deletions transactionally (or in bounded batches) to prevent table locks and database degradation",
         "Generates a structured sweep report detailing record counts deleted per table and duration",
         "Preserves referential integrity and avoids breaking active foreign keys",
@@ -833,7 +838,7 @@
         "Verifies operator authority or automated job authentication before execution"
       ],
       "validation": [
-        "node --import tsx --test tests/retention-sweeper.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/retention-sweeper.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-data-retention-sweeper-402c9c7a",
@@ -861,7 +866,7 @@
         "Enforces bounded limits for input length and max extracted opportunities per document"
       ],
       "validation": [
-        "node --import tsx --test tests/multi-extractor.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/multi-extractor.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-multi-opportunity-extractor-4ca2de7a",
@@ -882,14 +887,14 @@
       "description": "Implement automated bilingual (EN/ZH) scholarship discovery query generator for target academic institutions, degree tiers, and disciplines (smart manufacturing, robotics) with negative-term filtering and syntax formatting.",
       "acceptance_criteria": [
         "generateDiscoveryQueries(options) builds structured search query strings across targeted dimensions (institution, degree, discipline, intake year)",
-        "Generates bilingual queries supporting English and Chinese terms (e.g. 'smart manufacturing', '智能制造', 'robotics', '机器人', 'scholarship', '奖学金')",
+        "Generates bilingual queries supporting English and Chinese terms (e.g. 'smart manufacturing', '\u667a\u80fd\u5236\u9020', 'robotics', '\u673a\u5668\u4eba', 'scholarship', '\u5956\u5b66\u91d1')",
         "Applies negative search filters to prune noise (e.g. -consultancy, -agents, -commercial, -recruitment)",
         "Supports operator-configurable search provider targets (Google, Bing, Baidu) with appropriate syntax modifiers (e.g. site:edu.cn, filetype:html)",
         "Returns structured query objects with unique ID, query text, intended search engine target, priority weight, and metadata tags",
         "Enforces bounded query list sizing and input parameter validation"
       ],
       "validation": [
-        "node --import tsx --test tests/discovery-queries.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/discovery-queries.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-search-query-generator-ed2f5478",
@@ -917,7 +922,7 @@
         "Enforces deterministic evaluation with zero side effects"
       ],
       "validation": [
-        "node --import tsx --test tests/mismatch-explainer.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/mismatch-explainer.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-catalogue-mismatch-explainer-f56536b4",
@@ -945,7 +950,7 @@
         "Handles job-level errors gracefully, isolating failures so subsequent scheduled tasks or dependent hooks are not crashed"
       ],
       "validation": [
-        "node --import tsx --test tests/cron-runner.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/cron-runner.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-cron-scheduler-runner-fec95e73",
@@ -967,13 +972,13 @@
       "acceptance_criteria": [
         "calculateMonthlySpending(usageRecords, options) aggregates provider token consumption and research/outbound operational costs into USD microdollars for a given billing month (defaulting to current UTC month)",
         "Evaluates spending against configurable monthly budget ceilings (defaulting to PRD D05 US$30.00 / 30,000,000 microdollars)",
-        "Computes operational spend threshold alerts: status NORMAL (\u003c70%), WARNING (\u003e=70%), THROTTLE (\u003e=90%), and HARD_STOP (\u003e=100%)",
+        "Computes operational spend threshold alerts: status NORMAL (<70%), WARNING (>=70%), THROTTLE (>=90%), and HARD_STOP (>=100%)",
         "Provides structured throttle directives indicating whether expensive AI extractions or collection jobs should be deferred or blocked",
         "Formats bilingual alert messages (EN/ZH) suitable for administrator notification digests and operations dashboard display",
         "Validates input usage records, handles empty or malformed cost inputs safely without throwing, and ensures deterministic monetary math (integer microdollars)"
       ],
       "validation": [
-        "node --import tsx --test tests/spending-meter.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/spending-meter.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-operations-spending-meter-e065eca1",
@@ -1000,7 +1005,7 @@
         "Handles edge cases: missing deadline, rolling admission flag, malformed dates, timezone discrepancies, and dates in the past"
       ],
       "validation": [
-        "node --import tsx --test tests/deadline-schedule.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/deadline-schedule.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-deadline-schedule-calculator-bb9809f5",
@@ -1028,7 +1033,7 @@
         "Pure in-memory coordinator with thread-safe/idempotent state mutations, handling unknown hosts or malformed hostnames gracefully"
       ],
       "validation": [
-        "node --import tsx --test tests/host-cooldown-coordinator.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/host-cooldown-coordinator.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-host-cooldown-coordinator-af0f00d9",
@@ -1050,17 +1055,80 @@
       "acceptance_criteria": [
         "reconcileIntakeIdentity(incoming, existingOfferings, options) evaluates incoming intake title, term/academic year, and target deadline against existing published/historical offerings",
         "Identifies relationship: SAME_EDITION (exact match or alias of current intake), NEW_CYCLE (valid future intake cycle for same program, e.g. Fall 2027 following Fall 2026), PREVIOUS_CYCLE (expired/historical cycle), or AMBIGUOUS (conflicting or unstated term requiring human review)",
-        "Parses common term naming variants in English and Chinese (e.g. 'Fall 2026', 'Autumn 2026', '2026秋季', 'Spring 2027', '2027春季', '2026-2027 Academic Year')",
+        "Parses common term naming variants in English and Chinese (e.g. 'Fall 2026', 'Autumn 2026', '2026\u79cb\u5b63', 'Spring 2027', '2027\u6625\u5b63', '2026-2027 Academic Year')",
         "Generates normalized canonical intake identifier (e.g. '2026-fall', '2027-spring') and provides a match confidence score",
         "Deterministic evaluation with pure domain logic, handling malformed, empty, or unparseable intake strings safely without throwing"
       ],
       "validation": [
-        "node --import tsx --test tests/intake-reconciler.test.ts \u0026\u0026 npm run typecheck"
+        "node --import tsx --test tests/intake-reconciler.test.ts && npm run typecheck"
       ],
       "capability": "coding",
       "branch": "agent/feature-intake-reconciliation-service-61d90f54",
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-intake-reconciliation-service-61d90f54",
       "base_sha": "main"
+    },
+    "milestone-11-cost-settlement-translation-transport::feature-actual-cost-settlement": {
+      "id": "feature-actual-cost-settlement",
+      "objective_id": "milestone-11-cost-settlement-translation-transport",
+      "feature": "feature-actual-cost-settlement",
+      "scope": "src/admin/cost-settlement.ts,tests/cost-settlement.test.ts",
+      "priority": 10,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement operational actual-cost token settlement and monthly budget rollover coordinator to reconcile estimated microdollar reservations against actual model usage, settle net microdollar balances, and manage calendar month budget transitions.",
+      "acceptance_criteria": [
+        "settleActualCost(reservationId, usage, options) reconciles estimated microdollars with actual model prompt and completion token counts from provider responses",
+        "Computes refunds for over-reserved estimates or charges incremental microdollars when usage exceeds estimate within safety caps",
+        "rolloverBudgetPeriod(currentPeriod, options) handles calendar month boundaries, archives past period spending aggregates, and resets spend meters to zero for the new month",
+        "Enforces hard ceiling invariants and reports anomalies when actual spend exceeds reserved bounds",
+        "Deterministic in-memory / SQL-compatible state transitions with comprehensive input validation and safe error handling"
+      ],
+      "validation": [
+        "node --import tsx --test tests/cost-settlement.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-11-cost-settlement-translation-transport::feature-opportunity-translation-cache": {
+      "id": "feature-opportunity-translation-cache",
+      "objective_id": "milestone-11-cost-settlement-translation-transport",
+      "feature": "feature-opportunity-translation-cache",
+      "scope": "src/i18n/translation-cache.ts,tests/translation-cache.test.ts",
+      "priority": 9,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement reviewed opportunity translation caching and content revision invalidation manager to store multilingual translations tagged with source content hashes and invalidate stale translations upon source changes.",
+      "acceptance_criteria": [
+        "getOpportunityTranslation(opportunityId, targetLocale, sourceContentHash) retrieves cached translation or returns cache miss / stale status",
+        "cacheOpportunityTranslation(opportunityId, targetLocale, sourceContentHash, translationPayload, options) stores validated translations tagged with model/reviewer metadata and source content hash",
+        "invalidateTranslations(opportunityId, newContentHash, options) invalidates or marks stale all translations associated with prior source revisions",
+        "Enforces locale support (en, zh-Hans) and rejects malformed payloads, mismatched hashes, or unreviewed machine outputs when strict review is required",
+        "Deterministic in-memory state transitions with safe error handling and zero unhandled rejections"
+      ],
+      "validation": [
+        "node --import tsx --test tests/translation-cache.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-11-cost-settlement-translation-transport::feature-delivery-transport-dispatcher": {
+      "id": "feature-delivery-transport-dispatcher",
+      "objective_id": "milestone-11-cost-settlement-translation-transport",
+      "feature": "feature-delivery-transport-dispatcher",
+      "scope": "src/delivery/transport-dispatcher.ts,tests/transport-dispatcher.test.ts",
+      "priority": 8,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement live outbound delivery transport dispatcher to bind leased delivery intents from the intent queue to concrete transport adapters (email with RFC 8058 headers and Telegram Bot API), formatting payloads, enforcing circuit breaker checks, and returning structured receipts.",
+      "acceptance_criteria": [
+        "dispatchDeliveryIntent(intent, transport, options) maps an acquired delivery intent into channel-specific payloads (email with RFC 8058 List-Unsubscribe headers or Telegram formatted Markdown)",
+        "Dispatches through injected transport interface with configurable network timeout signals and retry headers",
+        "Normalizes provider responses into standardized receipts (status: \"accepted\" | \"retry\" | \"failed\" | \"suppressed\", external reference ID, timestamp)",
+        "Handles network errors, timeouts, HTTP 429 rate limits, and provider errors safely without uncaught rejections",
+        "Pure domain logic and safe error handling conforming to delivery queue interfaces"
+      ],
+      "validation": [
+        "node --import tsx --test tests/transport-dispatcher.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
     }
   },
   "results": {
@@ -1488,7 +1556,7 @@
       "assignment_generation": 8,
       "branch": "agent/feature-auth-destination-preservation",
       "head_sha": "cbe8995bcab4b2ddcc52f970a50bc88e3370005b",
-      "validation": "node --import tsx --test tests/auth-destination.test.ts \u0026\u0026 npm run typecheck (3 pass, 0 fail; CI green)",
+      "validation": "node --import tsx --test tests/auth-destination.test.ts && npm run typecheck (3 pass, 0 fail; CI green)",
       "recorded_utc": "2026-11-04T10:41:00Z"
     },
     "result-pr-28": {
@@ -1499,7 +1567,7 @@
       "assignment_generation": 9,
       "branch": "agent/feature-tracker-pagination-filtering",
       "head_sha": "b4da58ccc28cd3e5b9d1f55cbb595578a95721f3",
-      "validation": "node --import tsx --test tests/tracker-pagination.test.ts \u0026\u0026 npm run typecheck (1 pass, 0 fail; CI green)",
+      "validation": "node --import tsx --test tests/tracker-pagination.test.ts && npm run typecheck (1 pass, 0 fail; CI green)",
       "recorded_utc": "2026-11-04T10:55:45Z"
     },
     "result-pr-29": {
@@ -1510,7 +1578,7 @@
       "assignment_generation": 11,
       "branch": "agent/feature-multistep-onboarding-5532d854",
       "head_sha": "296b4e860a6d68a6569520ad44c287fd413b1539",
-      "validation": "node --import tsx --test tests/onboarding.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run check (72 pass, 0 fail; CI green)",
+      "validation": "node --import tsx --test tests/onboarding.test.ts && npm run typecheck && npm run check (72 pass, 0 fail; CI green)",
       "recorded_utc": "2026-11-04T12:49:10Z"
     },
     "result-pr-30": {
@@ -1521,7 +1589,7 @@
       "assignment_generation": 16,
       "branch": "agent/feature-deadline-reminders-a4a059d6",
       "head_sha": "9a11a276509c99b66cbd8334a5e1c14463162e8b",
-      "validation": "node --import tsx --test tests/deadline-reminders.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run check (73 pass, 0 fail; CI green)",
+      "validation": "node --import tsx --test tests/deadline-reminders.test.ts && npm run typecheck && npm run check (73 pass, 0 fail; CI green)",
       "recorded_utc": "2026-11-04T13:18:20Z"
     },
     "result-pr-31": {
@@ -1532,7 +1600,7 @@
       "assignment_generation": 20,
       "branch": "agent/feature-opportunity-withdrawal-alerts-59333149",
       "head_sha": "85aa84dc6d1abc8bd1c9d756a5021c3d2140a995",
-      "validation": "node --import tsx --test tests/material-changes.test.ts \u0026\u0026 npm run typecheck (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/material-changes.test.ts && npm run typecheck (pass; CI local-spike green)",
       "recorded_utc": "2026-11-04T13:33:34Z"
     },
     "result-pr-32": {
@@ -1543,7 +1611,7 @@
       "assignment_generation": 25,
       "branch": "agent/feature-notification-settings-preview-83596a9c",
       "head_sha": "da7fd69f7140ea44da88f7ad168387c2f44e9b80",
-      "validation": "node --import tsx --test tests/notification-settings-preview.test.ts tests/privacy.test.ts tests/deadline-reminders.test.ts tests/staging.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/notification-settings-preview.test.ts tests/privacy.test.ts tests/deadline-reminders.test.ts tests/staging.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-04T14:17:02Z"
     },
     "result-pr-33": {
@@ -1554,7 +1622,7 @@
       "assignment_generation": 36,
       "branch": "agent/feature-opportunity-lifecycle-archive-e04945af",
       "head_sha": "6607fd77103b262b21a60122dbc808ac79d962c5",
-      "validation": "node --import tsx --test tests/lifecycle-archive.test.ts tests/staging.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/lifecycle-archive.test.ts tests/staging.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-04T14:51:40Z"
     },
     "result-pr-34": {
@@ -1565,7 +1633,7 @@
       "assignment_generation": 38,
       "branch": "agent/feature-opportunity-duplicate-merge-a9b799c7",
       "head_sha": "933ee6a55a2270aad062d670a10243e44d3a9b3c",
-      "validation": "node --import tsx --test tests/catalogue-merge.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 75/75 tests)",
+      "validation": "node --import tsx --test tests/catalogue-merge.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 75/75 tests)",
       "recorded_utc": "2026-11-04T15:22:38Z"
     },
     "result-pr-35": {
@@ -1576,7 +1644,7 @@
       "assignment_generation": 42,
       "branch": "agent/feature-admin-publication-preview-639c3d72",
       "head_sha": "8bf9b13ee82a8a6cd57970d9daf83a2e131e01ad",
-      "validation": "node --import tsx --test tests/admin-preview.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 76/76 tests)",
+      "validation": "node --import tsx --test tests/admin-preview.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 76/76 tests)",
       "recorded_utc": "2026-11-04T15:44:27Z"
     },
     "result-pr-70": {
@@ -1587,7 +1655,7 @@
       "assignment_generation": 0,
       "branch": "feat/json-feed-source-adapter",
       "head_sha": "13647726daba646c634a9d6eb1d24b2a8703e809",
-      "validation": "node --import tsx --test tests/json-feed.test.ts \u0026\u0026 npm run typecheck (pass; CI local-spike green 77/77 tests)",
+      "validation": "node --import tsx --test tests/json-feed.test.ts && npm run typecheck (pass; CI local-spike green 77/77 tests)",
       "recorded_utc": "2026-11-10T13:35:09Z"
     },
     "result-pr-71": {
@@ -1598,7 +1666,7 @@
       "assignment_generation": 48,
       "branch": "agent/feature-source-refresh-indicator-748cc7e8",
       "head_sha": "e8f52407ff7874bb801af6c10a67ace4b3f66aa4",
-      "validation": "node --import tsx --test tests/refresh-tracker.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 78/78 tests)",
+      "validation": "node --import tsx --test tests/refresh-tracker.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 78/78 tests)",
       "recorded_utc": "2026-11-10T14:54:47Z"
     },
     "result-pr-72": {
@@ -1609,7 +1677,7 @@
       "assignment_generation": 52,
       "branch": "agent/feature-source-robots-policy-142692c5",
       "head_sha": "37eb615e8509394b1593e85247cffa83ad944a1a",
-      "validation": "node --import tsx --test tests/robots-policy.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 78/78 tests)",
+      "validation": "node --import tsx --test tests/robots-policy.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 78/78 tests)",
       "recorded_utc": "2026-11-10T15:02:07Z"
     },
     "result-pr-73": {
@@ -1620,7 +1688,7 @@
       "assignment_generation": 56,
       "branch": "agent/feature-reminder-source-recheck-4e99dc4d",
       "head_sha": "16a964cca4ab732e022006a32204e5679f9837f9",
-      "validation": "node --import tsx --test tests/reminder-recheck.test.ts tests/deadline-reminders.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 78/78 tests)",
+      "validation": "node --import tsx --test tests/reminder-recheck.test.ts tests/deadline-reminders.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 78/78 tests)",
       "recorded_utc": "2026-11-10T15:27:03Z"
     },
     "result-pr-74": {
@@ -1631,7 +1699,7 @@
       "assignment_generation": 62,
       "branch": "agent/feature-source-rss-adapter-7720c696",
       "head_sha": "abdf64b512f7f147d05e3c8c590de01d7200ca91",
-      "validation": "node --import tsx --test tests/rss-feed.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 78/78 tests)",
+      "validation": "node --import tsx --test tests/rss-feed.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 78/78 tests)",
       "recorded_utc": "2026-11-10T18:27:10Z"
     },
     "result-pr-75": {
@@ -1642,7 +1710,7 @@
       "assignment_generation": 66,
       "branch": "agent/feature-host-rate-limiter-7fddf847",
       "head_sha": "affdc7b4cbfc896256ec096dfafa8baa5efcb5a3",
-      "validation": "node --import tsx --test tests/host-pacer.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 78/78 tests)",
+      "validation": "node --import tsx --test tests/host-pacer.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 78/78 tests)",
       "recorded_utc": "2026-11-10T18:34:42Z"
     },
     "result-pr-76": {
@@ -1653,7 +1721,7 @@
       "assignment_generation": 70,
       "branch": "agent/feature-language-score-matching-f638372e",
       "head_sha": "9146191796cecfd56c0f4b1c11a2959ff72cea9d",
-      "validation": "node --import tsx --test tests/language-scoring.test.ts tests/language-tests.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green 78/78 tests)",
+      "validation": "node --import tsx --test tests/language-scoring.test.ts tests/language-tests.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green 78/78 tests)",
       "recorded_utc": "2026-11-10T18:45:43Z"
     },
     "result-pr-77": {
@@ -1664,7 +1732,7 @@
       "assignment_generation": 76,
       "branch": "agent/feature-candidate-link-extractor-31121668",
       "head_sha": "29dd8d62a57906d8839d1f627b3a3effcf4e74b4",
-      "validation": "node --import tsx --test tests/candidate-extractor.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/candidate-extractor.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T19:11:00Z"
     },
     "result-pr-78": {
@@ -1675,7 +1743,7 @@
       "assignment_generation": 80,
       "branch": "agent/feature-deadline-semantics-924446b9",
       "head_sha": "7c04fbed64f285d84d6c21f8b8ceaf191500fcb9",
-      "validation": "node --import tsx --test tests/deadline-semantics.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/deadline-semantics.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T19:22:30Z"
     },
     "result-pr-79": {
@@ -1686,7 +1754,7 @@
       "assignment_generation": 84,
       "branch": "agent/feature-reviewer-anonymization-ff846ef5",
       "head_sha": "87c037b8da6d2a6e23f87cd93db74aef35f73d6a",
-      "validation": "node --import tsx --test tests/operator-anonymization.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/operator-anonymization.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T19:40:04Z"
     },
     "result-pr-80": {
@@ -1697,7 +1765,7 @@
       "assignment_generation": 90,
       "branch": "agent/feature-search-query-generator-ed2f5478",
       "head_sha": "d36eab5556ba383e0dc44d1cbe3e3d9d0a0ab8bf",
-      "validation": "node --import tsx --test tests/discovery-queries.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/discovery-queries.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T20:05:40Z"
     },
     "result-pr-81": {
@@ -1708,7 +1776,7 @@
       "assignment_generation": 94,
       "branch": "agent/feature-multi-opportunity-extractor-4ca2de7a",
       "head_sha": "6a32caabf19dd444c333bdcbd55800cd066a159a",
-      "validation": "node --import tsx --test tests/multi-extractor.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/multi-extractor.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T20:10:20Z"
     },
     "result-pr-82": {
@@ -1719,7 +1787,7 @@
       "assignment_generation": 98,
       "branch": "agent/feature-data-retention-sweeper-402c9c7a",
       "head_sha": "1c6b0a8948795b119a078d969ab964e499aa03b2",
-      "validation": "node --import tsx --test tests/retention-sweeper.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/retention-sweeper.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T20:36:18Z"
     },
     "result-pr-83": {
@@ -1730,7 +1798,7 @@
       "assignment_generation": 106,
       "branch": "agent/feature-catalogue-mismatch-explainer-f56536b4",
       "head_sha": "b26baa0cba332c62cefdd8a5629c0df579da6f8d",
-      "validation": "node --import tsx --test tests/mismatch-explainer.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/mismatch-explainer.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-11T08:55:08Z"
     },
     "result-pr-84": {
@@ -1741,7 +1809,7 @@
       "assignment_generation": 110,
       "branch": "agent/feature-operations-spending-meter-e065eca1",
       "head_sha": "959fa6d7c330bffe8788319e1edc793547784715",
-      "validation": "node --import tsx --test tests/spending-meter.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/spending-meter.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-11T09:41:33Z"
     },
     "result-pr-85": {
@@ -1752,7 +1820,7 @@
       "assignment_generation": 114,
       "branch": "agent/feature-cron-scheduler-runner-fec95e73",
       "head_sha": "591dc327b1fa8a1368daf714e67340abd5957b4e",
-      "validation": "node --import tsx --test tests/cron-runner.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/cron-runner.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-11T10:23:54Z"
     }
   },
@@ -2887,6 +2955,13 @@
       "operation": "review-decision",
       "generation": 146,
       "utc": "2026-11-11T12:56:03Z"
+    },
+    {
+      "id": "147-adopt-milestone-11",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "adopt-objective",
+      "generation": 147,
+      "utc": "2026-11-11T13:08:00Z"
     }
   ]
 }

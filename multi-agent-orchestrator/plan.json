@@ -1,67 +1,67 @@
 {
-  "id": "milestone-10-delivery-intent-and-dispatch",
-  "objective": "Milestone 10: Outbound Delivery Intent Queue, Email Change Verification and Extraction Dispatching",
+  "id": "milestone-11-cost-settlement-translation-transport",
+  "objective": "Milestone 11: Actual-Cost Settlement, Opportunity Translation Caching and Outbound Delivery Dispatching",
   "tasks": [
     {
-      "id": "feature-delivery-intent-queue",
-      "objective_id": "milestone-10-delivery-intent-and-dispatch",
-      "feature": "feature-delivery-intent-queue",
-      "scope": "src/delivery/intent-queue.ts,tests/delivery-intent.test.ts",
+      "id": "feature-actual-cost-settlement",
+      "objective_id": "milestone-11-cost-settlement-translation-transport",
+      "feature": "feature-actual-cost-settlement",
+      "scope": "src/admin/cost-settlement.ts,tests/cost-settlement.test.ts",
       "priority": 10,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement outbound delivery intent queue to manage the lifecycle of outbound notification requests (PENDING, DISPATCHING, DELIVERED, FAILED, SUPPRESSED, DEAD_LETTER), enforcing exponential retry backoff, channel failure isolation, and deduplication keys.",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement operational actual-cost token settlement and monthly budget rollover coordinator to reconcile estimated microdollar reservations against actual model usage, settle net microdollar balances, and manage calendar month budget transitions.",
       "acceptance_criteria": [
-        "enqueueDeliveryIntent(input, options) enqueues validated notification intents (email or telegram) with user ID, channel, template type, recipient address/chat, encrypted payload reference, and idempotent deduplication key",
-        "leaseNextDeliveryIntents(options) acquires leases on pending or retry-eligible intents with bounded TTL (e.g. 60s) to support safe concurrent worker processing without double dispatch",
-        "Supports status transitions: markDelivered(intentId, receipt), markFailed(intentId, error, options) with exponential retry backoff, markSuppressed(intentId, reason), and transitions to DEAD_LETTER once max retry ceiling (default 5 attempts) is exhausted",
-        "Provides circuit breaking and channel pause checks (isChannelPaused(channel)) when consecutive channel-level failures exceed error thresholds",
+        "settleActualCost(reservationId, usage, options) reconciles estimated microdollars with actual model prompt and completion token counts from provider responses",
+        "Computes refunds for over-reserved estimates or charges incremental microdollars when usage exceeds estimate within safety caps",
+        "rolloverBudgetPeriod(currentPeriod, options) handles calendar month boundaries, archives past period spending aggregates, and resets spend meters to zero for the new month",
+        "Enforces hard ceiling invariants and reports anomalies when actual spend exceeds reserved bounds",
         "Deterministic in-memory / SQL-compatible state transitions with comprehensive input validation and safe error handling"
       ],
       "validation": [
-        "node --import tsx --test tests/delivery-intent.test.ts && npm run typecheck"
+        "node --import tsx --test tests/cost-settlement.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-verified-email-change",
-      "objective_id": "milestone-10-delivery-intent-and-dispatch",
-      "feature": "feature-verified-email-change",
-      "scope": "src/auth/email-change.ts,tests/email-change.test.ts",
+      "id": "feature-opportunity-translation-cache",
+      "objective_id": "milestone-11-cost-settlement-translation-transport",
+      "feature": "feature-opportunity-translation-cache",
+      "scope": "src/i18n/translation-cache.ts,tests/translation-cache.test.ts",
       "priority": 9,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement verified account email change service to coordinate secure address updating, generating signed/hashed confirmation tokens, validating expiration windows, preventing email collisions, and managing audit logs.",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement reviewed opportunity translation caching and content revision invalidation manager to store multilingual translations tagged with source content hashes and invalidate stale translations upon source changes.",
       "acceptance_criteria": [
-        "requestEmailChange(actor, newEmail, options) validates new email format, checks against reserved/existing user emails, and creates a pending email change request with a cryptographic verification token and bounded TTL (e.g. 1 hour)",
-        "verifyEmailChange(token, options) validates token authenticity, expiration, and user state, updates the account's primary email address atomically, and invalidates any other active pending change tokens for that user",
-        "cancelEmailChange(actor, options) allows the user to cancel any active pending email change request",
-        "Enforces rate limiting on email change requests (max 3 requests per 24 hours per account) and emits audit events recording requested and completed transitions",
-        "Pure domain logic and safe error handling (rejects duplicate emails, expired tokens, tampered tokens, and malformed inputs)"
+        "getOpportunityTranslation(opportunityId, targetLocale, sourceContentHash) retrieves cached translation or returns cache miss / stale status",
+        "cacheOpportunityTranslation(opportunityId, targetLocale, sourceContentHash, translationPayload, options) stores validated translations tagged with model/reviewer metadata and source content hash",
+        "invalidateTranslations(opportunityId, newContentHash, options) invalidates or marks stale all translations associated with prior source revisions",
+        "Enforces locale support (en, zh-Hans) and rejects malformed payloads, mismatched hashes, or unreviewed machine outputs when strict review is required",
+        "Deterministic in-memory state transitions with safe error handling and zero unhandled rejections"
       ],
       "validation": [
-        "node --import tsx --test tests/email-change.test.ts && npm run typecheck"
+        "node --import tsx --test tests/translation-cache.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-extraction-dispatch-coordinator",
-      "objective_id": "milestone-10-delivery-intent-and-dispatch",
-      "feature": "feature-extraction-dispatch-coordinator",
-      "scope": "src/research/extraction-dispatcher.ts,tests/extraction-dispatcher.test.ts",
+      "id": "feature-delivery-transport-dispatcher",
+      "objective_id": "milestone-11-cost-settlement-translation-transport",
+      "feature": "feature-delivery-transport-dispatcher",
+      "scope": "src/delivery/transport-dispatcher.ts,tests/transport-dispatcher.test.ts",
       "priority": 8,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement automatic extraction dispatch coordinator to evaluate harvested source snapshots, check operational spending caps and rate quotas, validate opportunity candidate schema compliance, and prevent duplicate extraction runs.",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement live outbound delivery transport dispatcher to bind leased delivery intents from the intent queue to concrete transport adapters (email with RFC 8058 headers and Telegram Bot API), formatting payloads, enforcing circuit breaker checks, and returning structured receipts.",
       "acceptance_criteria": [
-        "evaluateExtractionEligibility(snapshot, options) checks whether a newly harvested source snapshot requires extraction based on content hash differences, existing extraction status, and source staleness",
-        "Enforces operational spending guards: checks against current spending meter status (refuses dispatch if budget ceiling reached or throttled) and reserves estimated microdollar costs",
-        "Coordinates extraction lifecycle states: PENDING_EXTRACTION, EXTRACTING, COMPLETED, SKIPPED_UNCHANGED, REJECTED_SCHEMA, FAILED",
-        "Deduplicates extracted candidates across snapshots and produces structured extraction summary records with field counts and confidence metrics",
-        "Handles malformed snapshots, empty content, schema mismatches, and budget exhaustion safely without unhandled rejections"
+        "dispatchDeliveryIntent(intent, transport, options) maps an acquired delivery intent into channel-specific payloads (email with RFC 8058 List-Unsubscribe headers or Telegram formatted Markdown)",
+        "Dispatches through injected transport interface with configurable network timeout signals and retry headers",
+        "Normalizes provider responses into standardized receipts (status: \"accepted\" | \"retry\" | \"failed\" | \"suppressed\", external reference ID, timestamp)",
+        "Handles network errors, timeouts, HTTP 429 rate limits, and provider errors safely without uncaught rejections",
+        "Pure domain logic and safe error handling conforming to delivery queue interfaces"
       ],
       "validation": [
-        "node --import tsx --test tests/extraction-dispatcher.test.ts && npm run typecheck"
+        "node --import tsx --test tests/transport-dispatcher.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }

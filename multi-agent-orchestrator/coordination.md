@@ -147,3 +147,11 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - **2026-11-11 12:28 UTC**: Planner merged PR #90 (`feat/verified-email-change`) into `main` (merge commit `eb29e2fa64142b311b1f8bd017e3fe3ffcd95db8`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 29 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-11 12:55 UTC**: Planner merged PR #91 (`feat/extraction-dispatch-coordinator`) into `main` (merge commit `3f063c6d925a0d1e909d6b72a40ca6bbbc329cbf`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 30 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-11 12:56 UTC**: Planner completed formal objective review for Milestone 10 (`milestone-10-delivery-intent-and-dispatch`) with decision `APPROVED` (Gen 146). Milestone 10 is 100% COMPLETE & APPROVED. Primary checkout on `main` synchronized.
+
+## Milestone 11 Formulation & Decomposition — 2026-11-11T13:08:00Z
+- Human operator authorized Milestone 11 ("Actual-Cost Settlement, Opportunity Translation Caching and Outbound Delivery Dispatching").
+- Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
+  31. `feature-actual-cost-settlement`: Operational actual-cost token settlement and monthly budget rollover coordinator (`src/admin/cost-settlement.ts`, `tests/cost-settlement.test.ts`). Status: **PENDING**.
+  32. `feature-opportunity-translation-cache`: Reviewed opportunity translation caching and content revision invalidation manager (`src/i18n/translation-cache.ts`, `tests/translation-cache.test.ts`). Status: **PENDING**.
+  33. `feature-delivery-transport-dispatcher`: Live outbound delivery transport dispatcher binding leased delivery intents to transport adapters (`src/delivery/transport-dispatcher.ts`, `tests/transport-dispatcher.test.ts`). Status: **PENDING**.
+- Structured authority reconciled in `state.json` (Gen 147) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.

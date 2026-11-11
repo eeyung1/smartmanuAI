@@ -660,3 +660,13 @@ Append-only completed-work evidence.
   - Task 29: `feature-verified-email-change` (PR #90, merge commit `eb29e2fa64142b311b1f8bd017e3fe3ffcd95db8`)
   - Task 30: `feature-extraction-dispatch-coordinator` (PR #91, merge commit `3f063c6d925a0d1e909d6b72a40ca6bbbc329cbf`)
 - Milestone 10 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 28, 29, 30) merged, CI green, and validated in `main`.
+
+## milestone-11-cost-settlement-translation-transport — Objective Adopted
+- Objective ID: `milestone-11-cost-settlement-translation-transport`
+- Description: Milestone 11: Actual-Cost Settlement, Opportunity Translation Caching and Outbound Delivery Dispatching
+- Adopted by: `planner-antigravity-20261104-b9e2894a`
+- Adopted UTC: 2026-11-11T13:08:00Z
+- Tasks:
+  - Task 31: `feature-actual-cost-settlement` (Priority 10, PENDING)
+  - Task 32: `feature-opportunity-translation-cache` (Priority 9, PENDING)
+  - Task 33: `feature-delivery-transport-dispatcher` (Priority 8, PENDING)
