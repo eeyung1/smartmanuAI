@@ -133,3 +133,11 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - **2026-11-11 11:20 UTC**: Planner merged PR #87 (`feat/host-cooldown-coordinator`) into `main` (merge commit `0048ccf06c87c21dd218ee9d8172f7327b96451d`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 26 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-11 11:41 UTC**: Planner merged PR #88 (`feat/deadline-schedule-calculator`) into `main` (merge commit `b4603bb542c2dcad025245998a27f78b20d19065`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 27 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-11 11:42 UTC**: Planner completed formal objective review for Milestone 9 (`milestone-9-lineage-cooldown-schedule`) with decision `APPROVED` (Gen 132). Milestone 9 is 100% COMPLETE & APPROVED. Primary checkout on `main` synchronized.
+
+## Milestone 10 Formulation & Decomposition — 2026-11-11T12:05:00Z
+- Human operator authorized Milestone 10 ("Outbound Delivery Intent Queue, Email Change Verification and Extraction Dispatching").
+- Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
+  28. `feature-delivery-intent-queue`: Outbound delivery intent queue to manage notification lifecycles (PENDING, DISPATCHING, DELIVERED, FAILED, SUPPRESSED, DEAD_LETTER), retry backoff, channel failure isolation, and deduplication (`src/delivery/intent-queue.ts`, `tests/delivery-intent.test.ts`). Status: **PENDING**.
+  29. `feature-verified-email-change`: Verified account email change service coordinating cryptographic verification tokens, expiration windows, rate-limiting, and collision prevention (`src/auth/email-change.ts`, `tests/email-change.test.ts`). Status: **PENDING**.
+  30. `feature-extraction-dispatch-coordinator`: Automatic extraction dispatch coordinator evaluating harvested source snapshots, operational spending caps, schema validation, and duplicate prevention (`src/research/extraction-dispatcher.ts`, `tests/extraction-dispatcher.test.ts`). Status: **PENDING**.
+- Structured authority reconciled in `state.json` (Gen 133) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.

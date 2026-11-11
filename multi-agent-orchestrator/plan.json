@@ -1,68 +1,67 @@
 {
-  "id": "milestone-9-lineage-cooldown-schedule",
-  "objective": "Milestone 9: Offering Lineage, Host Cooldowns and Deadline-Aware Scheduling",
+  "id": "milestone-10-delivery-intent-and-dispatch",
+  "objective": "Milestone 10: Outbound Delivery Intent Queue, Email Change Verification and Extraction Dispatching",
   "tasks": [
     {
-      "id": "feature-intake-reconciliation-service",
-      "objective_id": "milestone-9-lineage-cooldown-schedule",
-      "feature": "feature-intake-reconciliation-service",
-      "scope": "src/catalogue/intake-reconciler.ts,tests/intake-reconciler.test.ts",
+      "id": "feature-delivery-intent-queue",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "feature": "feature-delivery-intent-queue",
+      "scope": "src/delivery/intent-queue.ts,tests/delivery-intent.test.ts",
       "priority": 10,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement intake identity reconciliation service to distinguish new recurring scholarship/program intakes (e.g. Fall 2027 vs. Fall 2026), recognize edition equivalence across academic terms, identify ambiguous labels requiring operator review, and generate canonical offering identity keys.",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement outbound delivery intent queue to manage the lifecycle of outbound notification requests (PENDING, DISPATCHING, DELIVERED, FAILED, SUPPRESSED, DEAD_LETTER), enforcing exponential retry backoff, channel failure isolation, and deduplication keys.",
       "acceptance_criteria": [
-        "reconcileIntakeIdentity(incoming, existingOfferings, options) evaluates incoming intake title, term/academic year, and target deadline against existing published/historical offerings",
-        "Identifies relationship: SAME_EDITION (exact match or alias of current intake), NEW_CYCLE (valid future intake cycle for same program, e.g. Fall 2027 following Fall 2026), PREVIOUS_CYCLE (expired/historical cycle), or AMBIGUOUS (conflicting or unstated term requiring human review)",
-        "Parses common term naming variants in English and Chinese (e.g. 'Fall 2026', 'Autumn 2026', '2026秋季', 'Spring 2027', '2027春季', '2026-2027 Academic Year')",
-        "Generates normalized canonical intake identifier (e.g. '2026-fall', '2027-spring') and provides a match confidence score",
-        "Deterministic evaluation with pure domain logic, handling malformed, empty, or unparseable intake strings safely without throwing"
+        "enqueueDeliveryIntent(input, options) enqueues validated notification intents (email or telegram) with user ID, channel, template type, recipient address/chat, encrypted payload reference, and idempotent deduplication key",
+        "leaseNextDeliveryIntents(options) acquires leases on pending or retry-eligible intents with bounded TTL (e.g. 60s) to support safe concurrent worker processing without double dispatch",
+        "Supports status transitions: markDelivered(intentId, receipt), markFailed(intentId, error, options) with exponential retry backoff, markSuppressed(intentId, reason), and transitions to DEAD_LETTER once max retry ceiling (default 5 attempts) is exhausted",
+        "Provides circuit breaking and channel pause checks (isChannelPaused(channel)) when consecutive channel-level failures exceed error thresholds",
+        "Deterministic in-memory / SQL-compatible state transitions with comprehensive input validation and safe error handling"
       ],
       "validation": [
-        "node --import tsx --test tests/intake-reconciler.test.ts && npm run typecheck"
+        "node --import tsx --test tests/delivery-intent.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-host-cooldown-coordinator",
-      "objective_id": "milestone-9-lineage-cooldown-schedule",
-      "feature": "feature-host-cooldown-coordinator",
-      "scope": "src/research/host-cooldown.ts,tests/host-cooldown-coordinator.test.ts",
+      "id": "feature-verified-email-change",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "feature": "feature-verified-email-change",
+      "scope": "src/auth/email-change.ts,tests/email-change.test.ts",
       "priority": 9,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement host collection lease and cooldown coordinator to prevent crawler flooding, enforce exponential backoff on consecutive host failures (429, 503, network timeouts), evaluate host availability, and manage bounded leases for concurrent collection workers.",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement verified account email change service to coordinate secure address updating, generating signed/hashed confirmation tokens, validating expiration windows, preventing email collisions, and managing audit logs.",
       "acceptance_criteria": [
-        "evaluateHostAvailability(hostState, options) checks whether an academic host is currently eligible for collection based on last request timestamp, active lease count, and backoff cooldown",
-        "Implements exponential backoff cooldown calculation: base delay scaled exponentially with consecutive failures (e.g. 1st fail: 10s, 2nd: 30s, 3rd: 120s, up to max ceiling 1800s / 30m)",
-        "Supports explicit Retry-After header overrides when provided by the host response",
-        "Manages collection lease grants (acquireHostLease) with bounded TTL (e.g. 60s) to prevent abandoned locks, and releases leases upon completion or failure (releaseHostLease)",
-        "Tracks host health metrics: status AVAILABLE, RATE_LIMITED, COOLING_DOWN, MAX_RETRIES_EXCEEDED",
-        "Pure in-memory coordinator with thread-safe/idempotent state mutations, handling unknown hosts or malformed hostnames gracefully"
+        "requestEmailChange(actor, newEmail, options) validates new email format, checks against reserved/existing user emails, and creates a pending email change request with a cryptographic verification token and bounded TTL (e.g. 1 hour)",
+        "verifyEmailChange(token, options) validates token authenticity, expiration, and user state, updates the account's primary email address atomically, and invalidates any other active pending change tokens for that user",
+        "cancelEmailChange(actor, options) allows the user to cancel any active pending email change request",
+        "Enforces rate limiting on email change requests (max 3 requests per 24 hours per account) and emits audit events recording requested and completed transitions",
+        "Pure domain logic and safe error handling (rejects duplicate emails, expired tokens, tampered tokens, and malformed inputs)"
       ],
       "validation": [
-        "node --import tsx --test tests/host-cooldown-coordinator.test.ts && npm run typecheck"
+        "node --import tsx --test tests/email-change.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-deadline-schedule-calculator",
-      "objective_id": "milestone-9-lineage-cooldown-schedule",
-      "feature": "feature-deadline-schedule-calculator",
-      "scope": "src/jobs/deadline-schedule.ts,tests/deadline-schedule.test.ts",
+      "id": "feature-extraction-dispatch-coordinator",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "feature": "feature-extraction-dispatch-coordinator",
+      "scope": "src/research/extraction-dispatcher.ts,tests/extraction-dispatcher.test.ts",
       "priority": 8,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement dynamic deadline-aware collection and recheck schedule calculator to compute next collection timestamps based on application deadlines, urgency horizons, and source verification requirements.",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement automatic extraction dispatch coordinator to evaluate harvested source snapshots, check operational spending caps and rate quotas, validate opportunity candidate schema compliance, and prevent duplicate extraction runs.",
       "acceptance_criteria": [
-        "calculateNextScheduleTime(opportunity, options) determines the next required verification/collection timestamp based on deadline proximity relative to reference time (defaulting to current UTC)",
-        "Applies tiered cadence rules: Urgent horizon (within 48 hours of deadline: hourly recheck), Approaching horizon (within 14 days of deadline: daily recheck at configured UTC hour), Standard horizon (more than 14 days out: weekly recheck), Rolling/unstated deadline (bi-weekly cadence), Past deadline (expired: terminal/no further scheduled runs)",
-        "Supports pre-digest and pre-reminder urgent recheck window calculation (e.g. ensure freshness within 6 hours before 7-day or 2-day reminder dispatch)",
-        "Evaluates isScheduleDue(nextScheduleTime, referenceTime) returning boolean due status and delay/overdue duration in seconds",
-        "Handles edge cases: missing deadline, rolling admission flag, malformed dates, timezone discrepancies, and dates in the past"
+        "evaluateExtractionEligibility(snapshot, options) checks whether a newly harvested source snapshot requires extraction based on content hash differences, existing extraction status, and source staleness",
+        "Enforces operational spending guards: checks against current spending meter status (refuses dispatch if budget ceiling reached or throttled) and reserves estimated microdollar costs",
+        "Coordinates extraction lifecycle states: PENDING_EXTRACTION, EXTRACTING, COMPLETED, SKIPPED_UNCHANGED, REJECTED_SCHEMA, FAILED",
+        "Deduplicates extracted candidates across snapshots and produces structured extraction summary records with field counts and confidence metrics",
+        "Handles malformed snapshots, empty content, schema mismatches, and budget exhaustion safely without unhandled rejections"
       ],
       "validation": [
-        "node --import tsx --test tests/deadline-schedule.test.ts && npm run typecheck"
+        "node --import tsx --test tests/extraction-dispatcher.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }

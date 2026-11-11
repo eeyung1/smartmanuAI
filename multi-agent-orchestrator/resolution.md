@@ -598,3 +598,13 @@ Append-only completed-work evidence.
   - Task 26: `feature-host-cooldown-coordinator` (PR #87, merge commit `0048ccf06c87c21dd218ee9d8172f7327b96451d`)
   - Task 27: `feature-deadline-schedule-calculator` (PR #88, merge commit `b4603bb542c2dcad025245998a27f78b20d19065`)
 - Milestone 9 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 25, 26, 27) merged, CI green, and validated in `main`.
+
+## milestone-10-delivery-intent-and-dispatch — Objective Adopted
+- Objective ID: `milestone-10-delivery-intent-and-dispatch`
+- Description: Milestone 10: Outbound Delivery Intent Queue, Email Change Verification and Extraction Dispatching
+- Adopted by: `planner-antigravity-20261104-b9e2894a`
+- Adopted UTC: 2026-11-11T12:05:00Z
+- Tasks:
+  - Task 28: `feature-delivery-intent-queue` (Priority 10, PENDING)
+  - Task 29: `feature-verified-email-change` (Priority 9, PENDING)
+  - Task 30: `feature-extraction-dispatch-coordinator` (Priority 8, PENDING)
