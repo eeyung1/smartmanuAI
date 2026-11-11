@@ -1,67 +1,67 @@
 {
-  "id": "milestone-11-cost-settlement-translation-transport",
-  "objective": "Milestone 11: Actual-Cost Settlement, Opportunity Translation Caching and Outbound Delivery Dispatching",
+  "id": "milestone-12-circuit-breaker-sitemap-qualifications",
+  "objective": "Milestone 12: Delivery Circuit Breaker, XML Sitemap Parser and Qualification Equivalence",
   "tasks": [
     {
-      "id": "feature-actual-cost-settlement",
-      "objective_id": "milestone-11-cost-settlement-translation-transport",
-      "feature": "feature-actual-cost-settlement",
-      "scope": "src/admin/cost-settlement.ts,tests/cost-settlement.test.ts",
+      "id": "feature-delivery-circuit-breaker",
+      "objective_id": "milestone-12-circuit-breaker-sitemap-qualifications",
+      "feature": "feature-delivery-circuit-breaker",
+      "scope": "src/delivery/circuit-breaker.ts,tests/delivery-circuit-breaker.test.ts",
       "priority": 10,
-      "status": "COMPLETE",
+      "status": "PENDING",
       "attempt": 0,
-      "description": "Implement operational actual-cost token settlement and monthly budget rollover coordinator to reconcile estimated microdollar reservations against actual model usage, settle net microdollar balances, and manage calendar month budget transitions.",
+      "description": "Implement outbound delivery circuit breaker and dead-letter queue (DLQ) policy manager to track consecutive delivery provider failures per channel (email, telegram), transition states across CLOSED, OPEN, and HALF_OPEN, enforce cooldown periods, and manage DLQ routing and replay.",
       "acceptance_criteria": [
-        "settleActualCost(reservationId, usage, options) reconciles estimated microdollars with actual model prompt and completion token counts from provider responses",
-        "Computes refunds for over-reserved estimates or charges incremental microdollars when usage exceeds estimate within safety caps",
-        "rolloverBudgetPeriod(currentPeriod, options) handles calendar month boundaries, archives past period spending aggregates, and resets spend meters to zero for the new month",
-        "Enforces hard ceiling invariants and reports anomalies when actual spend exceeds reserved bounds",
-        "Deterministic in-memory / SQL-compatible state transitions with comprehensive input validation and safe error handling"
+        "evaluateCircuitState(channel, options) evaluates channel health, failure counters, and trip thresholds (e.g. 5 consecutive 5xx/timeout failures trips to OPEN for 15-minute cooldown)",
+        "recordDeliveryOutcome(channel, outcome, options) transitions state to HALF_OPEN after cooldown expiry to test single probes, resetting to CLOSED on success or tripping back to OPEN on failure",
+        "routeToDeadLetterQueue(intent, reason, options) routes permanently exhausted delivery intents (exceeded max retries or fatal non-retryable recipient error) to DLQ with metadata and error diagnostics",
+        "replayDeadLetterQueue(criteria, options) provides safe in-memory / SQL-compatible batch re-queueing of eligible DLQ intents once transport health is restored",
+        "Deterministic in-memory domain state transitions conforming to delivery intent queue contracts with zero uncaught exceptions"
       ],
       "validation": [
-        "node --import tsx --test tests/cost-settlement.test.ts && npm run typecheck"
+        "node --import tsx --test tests/delivery-circuit-breaker.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-opportunity-translation-cache",
-      "objective_id": "milestone-11-cost-settlement-translation-transport",
-      "feature": "feature-opportunity-translation-cache",
-      "scope": "src/i18n/translation-cache.ts,tests/translation-cache.test.ts",
+      "id": "feature-research-sitemap-parser",
+      "objective_id": "milestone-12-circuit-breaker-sitemap-qualifications",
+      "feature": "feature-research-sitemap-parser",
+      "scope": "src/research/sitemap-parser.ts,tests/sitemap-parser.test.ts",
       "priority": 9,
-      "status": "COMPLETE",
+      "status": "PENDING",
       "attempt": 0,
-      "description": "Implement reviewed opportunity translation caching and content revision invalidation manager to store multilingual translations tagged with source content hashes and invalidate stale translations upon source changes.",
+      "description": "Implement automated XML sitemap parser and admission page discoverer supporting sitemaps.org XML protocol, nested sitemap indexes, change frequency and priority weighting, and domain restriction guards.",
       "acceptance_criteria": [
-        "getOpportunityTranslation(opportunityId, targetLocale, sourceContentHash) retrieves cached translation or returns cache miss / stale status",
-        "cacheOpportunityTranslation(opportunityId, targetLocale, sourceContentHash, translationPayload, options) stores validated translations tagged with model/reviewer metadata and source content hash",
-        "invalidateTranslations(opportunityId, newContentHash, options) invalidates or marks stale all translations associated with prior source revisions",
-        "Enforces locale support (en, zh-Hans) and rejects malformed payloads, mismatched hashes, or unreviewed machine outputs when strict review is required",
-        "Deterministic in-memory state transitions with safe error handling and zero unhandled rejections"
+        "parseSitemapXml(xmlContent, baseOrigin, options) parses <urlset> and <sitemapindex> XML documents into normalized sitemap entry records",
+        "Extracts canonical <loc>, <lastmod>, <changefreq>, and <priority> elements, resolving relative links against source origin",
+        "Filters out cross-domain links, malformed URLs, and excluded path patterns according to source robots policy directives",
+        "Handles gzipped XML buffers, missing optional tags, large URL sets (up to 50,000 URLs), and malformed XML safely without crash",
+        "Pure domain logic and safe error handling conforming to research collection interfaces"
       ],
       "validation": [
-        "node --import tsx --test tests/translation-cache.test.ts && npm run typecheck"
+        "node --import tsx --test tests/sitemap-parser.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-delivery-transport-dispatcher",
-      "objective_id": "milestone-11-cost-settlement-translation-transport",
-      "feature": "feature-delivery-transport-dispatcher",
-      "scope": "src/delivery/transport-dispatcher.ts,tests/transport-dispatcher.test.ts",
+      "id": "feature-qualification-equivalence-evaluator",
+      "objective_id": "milestone-12-circuit-breaker-sitemap-qualifications",
+      "feature": "feature-qualification-equivalence-evaluator",
+      "scope": "src/domain/qualification-equivalence.ts,tests/qualification-equivalence.test.ts",
       "priority": 8,
-      "status": "COMPLETE",
+      "status": "PENDING",
       "attempt": 0,
-      "description": "Implement live outbound delivery transport dispatcher to bind leased delivery intents from the intent queue to concrete transport adapters (email with RFC 8058 headers and Telegram Bot API), formatting payloads, enforcing circuit breaker checks, and returning structured receipts.",
+      "description": "Implement international academic qualification and degree level equivalence evaluator to map diverse global education credentials into standardized tiers, score field-of-study relevance, and evaluate minimum degree eligibility criteria for opportunities.",
       "acceptance_criteria": [
-        "dispatchDeliveryIntent(intent, transport, options) maps an acquired delivery intent into channel-specific payloads (email with RFC 8058 List-Unsubscribe headers or Telegram formatted Markdown)",
-        "Dispatches through injected transport interface with configurable network timeout signals and retry headers",
-        "Normalizes provider responses into standardized receipts (status: \"accepted\" | \"retry\" | \"failed\" | \"suppressed\", external reference ID, timestamp)",
-        "Handles network errors, timeouts, HTTP 429 rate limits, and provider errors safely without uncaught rejections",
-        "Pure domain logic and safe error handling conforming to delivery queue interfaces"
+        "normalizeQualification(credential, options) standardizes global academic credentials (high school, vocational diploma, Associate, Bachelor's, Master's, PhD) into ordered hierarchical levels",
+        "evaluateQualificationEligibility(applicantProfile, opportunityRules, options) verifies if an applicant's academic background meets or exceeds minimum degree prerequisites (e.g. Master's satisfies Bachelor's requirement)",
+        "scoreFieldRelevance(applicantDiscipline, targetTopics, options) computes discipline affinity scores (e.g. Robotics, Mechatronics, Industrial Automation, Computer Science vs. general STEM)",
+        "Handles unrecognized credentials gracefully with structured review_required uncertainty flags rather than false rejections",
+        "Pure in-memory domain logic with deterministic scoring and comprehensive validation"
       ],
       "validation": [
-        "node --import tsx --test tests/transport-dispatcher.test.ts && npm run typecheck"
+        "node --import tsx --test tests/qualification-equivalence.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }

@@ -726,3 +726,14 @@ Append-only completed-work evidence.
   - Task 32: `feature-opportunity-translation-cache` (PR #93, merge commit `acacd812c9d04a262e4854216447ded1600e338e`)
   - Task 33: `feature-delivery-transport-dispatcher` (PR #94, merge commit `5a8a94f7f06504661317f984e71b97efa9f13556`)
 - Milestone 11 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 31, 32, 33) merged, CI green, and validated in `main`.
+
+
+## milestone-12-circuit-breaker-sitemap-qualifications — Objective Adopted
+- Objective ID: `milestone-12-circuit-breaker-sitemap-qualifications`
+- Description: Milestone 12: Delivery Circuit Breaker, XML Sitemap Parser and Qualification Equivalence
+- Adopted by: `planner-antigravity-20261104-b9e2894a`
+- Adopted UTC: 2026-11-11T13:59:00Z
+- Tasks:
+  - Task 34: `feature-delivery-circuit-breaker` (Priority 10, PENDING)
+  - Task 35: `feature-research-sitemap-parser` (Priority 9, PENDING)
+  - Task 36: `feature-qualification-equivalence-evaluator` (Priority 8, PENDING)

@@ -161,3 +161,12 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - **2026-11-11 13:35 UTC**: Planner merged PR #93 (`feat/opportunity-translation-cache`) into `main` (merge commit `acacd812c9d04a262e4854216447ded1600e338e`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 32 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-11 13:43 UTC**: Planner merged PR #94 (`feat/delivery-transport-dispatcher`) into `main` (merge commit `5a8a94f7f06504661317f984e71b97efa9f13556`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 33 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-11 13:43 UTC**: Planner completed formal objective review for Milestone 11 (`milestone-11-cost-settlement-translation-transport`) with decision `APPROVED` (Gen 160). Milestone 11 is 100% COMPLETE & APPROVED. Primary checkout on `main` synchronized.
+
+
+## Milestone 12 Formulation & Decomposition — 2026-11-11T13:59:00Z
+- Human operator authorized Milestone 12 ("Delivery Circuit Breaker, XML Sitemap Parser and Qualification Equivalence").
+- Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
+  34. `feature-delivery-circuit-breaker`: Outbound delivery circuit breaker and dead-letter queue (DLQ) policy manager to track consecutive delivery provider failures per channel, manage circuit state transitions (CLOSED, OPEN, HALF_OPEN), and handle DLQ routing/replay (`src/delivery/circuit-breaker.ts`, `tests/delivery-circuit-breaker.test.ts`). Status: **PENDING**.
+  35. `feature-research-sitemap-parser`: Automated XML sitemap parser and admission page discoverer supporting sitemaps.org XML protocol, nested sitemap indexes, change frequency weighting, and domain restriction guards (`src/research/sitemap-parser.ts`, `tests/sitemap-parser.test.ts`). Status: **PENDING**.
+  36. `feature-qualification-equivalence-evaluator`: International academic qualification and degree level equivalence evaluator standardizing diverse global credentials, scoring field-of-study relevance, and evaluating degree eligibility criteria (`src/domain/qualification-equivalence.ts`, `tests/qualification-equivalence.test.ts`). Status: **PENDING**.
+- Structured authority reconciled in `state.json` (Gen 161) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.
