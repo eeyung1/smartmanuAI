@@ -8,7 +8,7 @@
       "feature": "feature-delivery-circuit-breaker",
       "scope": "src/delivery/circuit-breaker.ts,tests/delivery-circuit-breaker.test.ts",
       "priority": 10,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement outbound delivery circuit breaker and dead-letter queue (DLQ) policy manager to track consecutive delivery provider failures per channel (email, telegram), transition states across CLOSED, OPEN, and HALF_OPEN, enforce cooldown periods, and manage DLQ routing and replay.",
       "acceptance_criteria": [
@@ -29,7 +29,7 @@
       "feature": "feature-research-sitemap-parser",
       "scope": "src/research/sitemap-parser.ts,tests/sitemap-parser.test.ts",
       "priority": 9,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement automated XML sitemap parser and admission page discoverer supporting sitemaps.org XML protocol, nested sitemap indexes, change frequency and priority weighting, and domain restriction guards.",
       "acceptance_criteria": [
@@ -50,7 +50,7 @@
       "feature": "feature-qualification-equivalence-evaluator",
       "scope": "src/domain/qualification-equivalence.ts,tests/qualification-equivalence.test.ts",
       "priority": 8,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement international academic qualification and degree level equivalence evaluator to map diverse global education credentials into standardized tiers, score field-of-study relevance, and evaluate minimum degree eligibility criteria for opportunities.",
       "acceptance_criteria": [

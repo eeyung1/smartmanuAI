@@ -737,3 +737,58 @@ Append-only completed-work evidence.
   - Task 34: `feature-delivery-circuit-breaker` (Priority 10, PENDING)
   - Task 35: `feature-research-sitemap-parser` (Priority 9, PENDING)
   - Task 36: `feature-qualification-equivalence-evaluator` (Priority 8, PENDING)
+
+## feature-delivery-circuit-breaker — claim-513b91aa39535ed33afe1be930cbb8b8
+- Session: opencode-gpt56sol-20261111-g7b2e1-20261111-6b33ca3d
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/delivery-circuit-breaker.test.ts && npm run typecheck
+- Evidence: ✔ consecutive failures trip the channel open and cool it down (5.103373ms); ✔ half-open probes either close the channel or trip it again (1.437205ms); ✔ success, suppression and fatal recipient errors are not provider failures (0.564177ms); ✔ exhausted and fatal intents route to the dead-letter queue (1.855822ms); ✔ dead letters replay only when the channel is healthy (1.593895ms); ℹ tests 5; ℹ suites 0; ℹ pass 5; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 350.542017; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T14:08:00Z
+
+## feature-research-sitemap-parser — claim-d6b1d7505f23ca607450bd033a3d5173
+- Session: opencode-gpt56sol-20261111-h4c9f3-20261111-4c874e93
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/sitemap-parser.test.ts && npm run typecheck
+- Evidence: ✔ urlset entries are normalized with metadata and relative link resolution (6.922365ms); ✔ sitemap indexes are parsed as nested sitemap entries (2.042277ms); ✔ cross-domain, excluded and malformed links are filtered out (2.636921ms); ✔ gzip buffers, entities and CDATA are handled (12.363664ms); ✔ malformed documents and unsafe input fail safely (0.741895ms); ✔ entry limits and robots-style path patterns are respected (3.87857ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 824.488203; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T14:13:27Z
+
+## feature-qualification-equivalence-evaluator — claim-4dfae7b488c5f0323bbded076e8a4d2d
+- Session: opencode-gpt56sol-20261111-j8d5a2-20261111-4d73ecc7
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/qualification-equivalence.test.ts && npm run typecheck
+- Evidence: ✔ global credentials normalize onto ordered academic levels (7.976093ms); ✔ unrecognized credentials raise a review flag instead of a rejection (0.696308ms); ✔ eligibility compares ordered levels against the stated minimum (1.181387ms); ✔ unrecognized applicant credentials request review rather than a hard rejection (0.545492ms); ✔ field relevance scores related disciplines deterministically (2.327012ms); ✔ evaluation is deterministic and side-effect free (1.760475ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 381.569836; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T14:25:56Z
+
+## PR #95 — feature-delivery-circuit-breaker
+- PR: https://github.com/eeyung1/smartmanuAI/pull/95
+- Branch: `feat/delivery-circuit-breaker`
+- Merge Commit: `6452e4059073bba88a32299b3ecc90f767525ae2`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T14:15:20Z
+
+## PR #96 — feature-research-sitemap-parser
+- PR: https://github.com/eeyung1/smartmanuAI/pull/96
+- Branch: `feat/research-sitemap-parser`
+- Merge Commit: `59ea134e23a85e935ad495f38e43e262414f9643`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T14:21:40Z
+
+## PR #97 — feature-qualification-equivalence-evaluator
+- PR: https://github.com/eeyung1/smartmanuAI/pull/97
+- Branch: `feat/qualification-equivalence-evaluator`
+- Merge Commit: `a3f87b905c7856769de16ccd29a3f05c9372fbfe`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T14:33:15Z
+
+## milestone-12-circuit-breaker-sitemap-qualifications — Review Decision: APPROVED
+- Review Decision: APPROVED
+- Decided by: `planner-antigravity-20261104-b9e2894a`
+- Decided UTC: 2026-11-11T14:34:46Z
+- Evaluated Tasks:
+  - Task 34: `feature-delivery-circuit-breaker` (PR #95, merge commit `6452e4059073bba88a32299b3ecc90f767525ae2`)
+  - Task 35: `feature-research-sitemap-parser` (PR #96, merge commit `59ea134e23a85e935ad495f38e43e262414f9643`)
+  - Task 36: `feature-qualification-equivalence-evaluator` (PR #97, merge commit `a3f87b905c7856769de16ccd29a3f05c9372fbfe`)
+- Milestone 12 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 34, 35, 36) merged, CI green, and validated in `main`.
