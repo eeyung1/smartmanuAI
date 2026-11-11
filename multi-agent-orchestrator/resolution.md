@@ -670,3 +670,59 @@ Append-only completed-work evidence.
   - Task 31: `feature-actual-cost-settlement` (Priority 10, PENDING)
   - Task 32: `feature-opportunity-translation-cache` (Priority 9, PENDING)
   - Task 33: `feature-delivery-transport-dispatcher` (Priority 8, PENDING)
+
+## feature-actual-cost-settlement — claim-b77adc04044641499caad5ba56316233
+- Session: opencode-gpt56sol-20261111-c5d2e8-20261111-264d35c5
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/cost-settlement.test.ts && npm run typecheck
+- Evidence: ✔ settlement refunds an over-reserved estimate (3.920843ms); ✔ settlement charges incremental cost when usage exceeds the estimate (0.765823ms); ✔ safety caps limit a charge and report the anomaly (1.106214ms); ✔ the hard ceiling refuses a settlement that would exceed the budget (0.753088ms); ✔ invalid usage and unknown reservations are refused safely (1.064671ms); ✔ rollover archives the period and resets the meter (0.866458ms); ✔ period arithmetic crosses the year boundary (0.68135ms); ℹ tests 7; ℹ suites 0; ℹ pass 7; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 328.137985; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T13:19:16Z
+
+## feature-opportunity-translation-cache — claim-19ab1ca35b34658cb352b9ab8b1cce99
+- Session: opencode-gpt56sol-20261111-d7e4b9-20261111-2a23975e
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/translation-cache.test.ts && npm run typecheck
+- Evidence: ✔ a cached translation is returned for the same content hash (4.786566ms); ✔ changed content hashes produce a miss or a stale entry (0.650676ms); ✔ invalidation invalidates or marks translations stale (1.394493ms); ✔ unsupported locales and malformed payloads are rejected (1.076097ms); ✔ strict review refuses unreviewed machine output (0.8368ms); ✔ caching is deterministic and the reference helper is stable (1.054297ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 485.409116; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T13:23:19Z
+
+## feature-delivery-transport-dispatcher — claim-8255e31832af408289301cbc9d0b8da1
+- Session: opencode-gpt56sol-20261111-e9f6c2-20261111-5ab8c7c4
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/transport-dispatcher.test.ts && npm run typecheck
+- Evidence: ✔ email intents are dispatched with RFC 8058 headers (9.409216ms); ✔ telegram intents are dispatched as bounded formatted messages (1.310709ms); ✔ provider responses normalize into receipts (1.784677ms); ✔ timeouts and network errors are retried without uncaught rejections (22.397708ms); ✔ paused channels, missing payloads and unleased intents never reach the transport (3.932019ms); ✔ payloads resolve through the stored reference (3.680361ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 480.493181; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T13:27:44Z
+
+
+## PR #92 — feature-actual-cost-settlement
+- PR: https://github.com/eeyung1/smartmanuAI/pull/92
+- Branch: `feat/actual-cost-settlement`
+- Merge Commit: `87efe1dec8171c066ddbb3280c519a5d6dc0abe4`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T13:19:16Z
+
+## PR #93 — feature-opportunity-translation-cache
+- PR: https://github.com/eeyung1/smartmanuAI/pull/93
+- Branch: `feat/opportunity-translation-cache`
+- Merge Commit: `acacd812c9d04a262e4854216447ded1600e338e`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T13:35:42Z
+
+## PR #94 — feature-delivery-transport-dispatcher
+- PR: https://github.com/eeyung1/smartmanuAI/pull/94
+- Branch: `feat/delivery-transport-dispatcher`
+- Merge Commit: `5a8a94f7f06504661317f984e71b97efa9f13556`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T13:43:20Z
+
+## milestone-11-cost-settlement-translation-transport — Review Decision: APPROVED
+- Review Decision: APPROVED
+- Decided by: `planner-antigravity-20261104-b9e2894a`
+- Decided UTC: 2026-11-11T13:43:44Z
+- Evaluated Tasks:
+  - Task 31: `feature-actual-cost-settlement` (PR #92, merge commit `87efe1dec8171c066ddbb3280c519a5d6dc0abe4`)
+  - Task 32: `feature-opportunity-translation-cache` (PR #93, merge commit `acacd812c9d04a262e4854216447ded1600e338e`)
+  - Task 33: `feature-delivery-transport-dispatcher` (PR #94, merge commit `5a8a94f7f06504661317f984e71b97efa9f13556`)
+- Milestone 11 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 31, 32, 33) merged, CI green, and validated in `main`.

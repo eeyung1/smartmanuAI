@@ -151,7 +151,13 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 ## Milestone 11 Formulation & Decomposition — 2026-11-11T13:08:00Z
 - Human operator authorized Milestone 11 ("Actual-Cost Settlement, Opportunity Translation Caching and Outbound Delivery Dispatching").
 - Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
-  31. `feature-actual-cost-settlement`: Operational actual-cost token settlement and monthly budget rollover coordinator (`src/admin/cost-settlement.ts`, `tests/cost-settlement.test.ts`). Status: **PENDING**.
-  32. `feature-opportunity-translation-cache`: Reviewed opportunity translation caching and content revision invalidation manager (`src/i18n/translation-cache.ts`, `tests/translation-cache.test.ts`). Status: **PENDING**.
-  33. `feature-delivery-transport-dispatcher`: Live outbound delivery transport dispatcher binding leased delivery intents to transport adapters (`src/delivery/transport-dispatcher.ts`, `tests/transport-dispatcher.test.ts`). Status: **PENDING**.
-- Structured authority reconciled in `state.json` (Gen 147) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.
+  31. `feature-actual-cost-settlement`: Operational actual-cost token settlement and monthly budget rollover coordinator (`src/admin/cost-settlement.ts`, `tests/cost-settlement.test.ts`). **MERGED** via PR #92 (`87efe1dec8171c066ddbb3280c519a5d6dc0abe4`).
+  32. `feature-opportunity-translation-cache`: Reviewed opportunity translation caching and content revision invalidation manager (`src/i18n/translation-cache.ts`, `tests/translation-cache.test.ts`). **MERGED** via PR #93 (`acacd812c9d04a262e4854216447ded1600e338e`).
+  33. `feature-delivery-transport-dispatcher`: Live outbound delivery transport dispatcher binding leased delivery intents to transport adapters (`src/delivery/transport-dispatcher.ts`, `tests/transport-dispatcher.test.ts`). **MERGED** via PR #94 (`5a8a94f7f06504661317f984e71b97efa9f13556`).
+- Structured authority reconciled in `state.json` (Gen 160) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.
+
+## Milestone 11 Publication Progress
+- **2026-11-11 13:19 UTC**: Planner merged PR #92 (`feat/actual-cost-settlement`) into `main` (merge commit `87efe1dec8171c066ddbb3280c519a5d6dc0abe4`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 31 marked Complete. Primary checkout on `main` synchronized.
+- **2026-11-11 13:35 UTC**: Planner merged PR #93 (`feat/opportunity-translation-cache`) into `main` (merge commit `acacd812c9d04a262e4854216447ded1600e338e`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 32 marked Complete. Primary checkout on `main` synchronized.
+- **2026-11-11 13:43 UTC**: Planner merged PR #94 (`feat/delivery-transport-dispatcher`) into `main` (merge commit `5a8a94f7f06504661317f984e71b97efa9f13556`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 33 marked Complete. Primary checkout on `main` synchronized.
+- **2026-11-11 13:43 UTC**: Planner completed formal objective review for Milestone 11 (`milestone-11-cost-settlement-translation-transport`) with decision `APPROVED` (Gen 160). Milestone 11 is 100% COMPLETE & APPROVED. Primary checkout on `main` synchronized.

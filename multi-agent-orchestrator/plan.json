@@ -8,7 +8,7 @@
       "feature": "feature-actual-cost-settlement",
       "scope": "src/admin/cost-settlement.ts,tests/cost-settlement.test.ts",
       "priority": 10,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement operational actual-cost token settlement and monthly budget rollover coordinator to reconcile estimated microdollar reservations against actual model usage, settle net microdollar balances, and manage calendar month budget transitions.",
       "acceptance_criteria": [
@@ -29,7 +29,7 @@
       "feature": "feature-opportunity-translation-cache",
       "scope": "src/i18n/translation-cache.ts,tests/translation-cache.test.ts",
       "priority": 9,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement reviewed opportunity translation caching and content revision invalidation manager to store multilingual translations tagged with source content hashes and invalidate stale translations upon source changes.",
       "acceptance_criteria": [
@@ -50,7 +50,7 @@
       "feature": "feature-delivery-transport-dispatcher",
       "scope": "src/delivery/transport-dispatcher.ts,tests/transport-dispatcher.test.ts",
       "priority": 8,
-      "status": "PENDING",
+      "status": "COMPLETE",
       "attempt": 0,
       "description": "Implement live outbound delivery transport dispatcher to bind leased delivery intents from the intent queue to concrete transport adapters (email with RFC 8058 headers and Telegram Bot API), formatting payloads, enforcing circuit breaker checks, and returning structured receipts.",
       "acceptance_criteria": [
