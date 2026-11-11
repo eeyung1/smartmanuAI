@@ -792,3 +792,14 @@ Append-only completed-work evidence.
   - Task 35: `feature-research-sitemap-parser` (PR #96, merge commit `59ea134e23a85e935ad495f38e43e262414f9643`)
   - Task 36: `feature-qualification-equivalence-evaluator` (PR #97, merge commit `a3f87b905c7856769de16ccd29a3f05c9372fbfe`)
 - Milestone 12 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 34, 35, 36) merged, CI green, and validated in `main`.
+
+
+## milestone-13-residence-operations-brochure — Objective Adopted
+- Objective ID: `milestone-13-residence-operations-brochure`
+- Description: Milestone 13: Residence Eligibility, Operations Metrics Aggregator and Brochure Section Parser
+- Adopted by: `planner-antigravity-20261104-b9e2894a`
+- Adopted UTC: 2026-11-11T14:56:00Z
+- Tasks:
+  - Task 37: `feature-residence-eligibility-evaluator` (Priority 10, PENDING)
+  - Task 38: `feature-operations-metrics-aggregator` (Priority 9, PENDING)
+  - Task 39: `feature-research-brochure-parser` (Priority 8, PENDING)

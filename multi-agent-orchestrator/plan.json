@@ -1,67 +1,66 @@
 {
-  "id": "milestone-12-circuit-breaker-sitemap-qualifications",
-  "objective": "Milestone 12: Delivery Circuit Breaker, XML Sitemap Parser and Qualification Equivalence",
+  "id": "milestone-13-residence-operations-brochure",
+  "objective": "Milestone 13: Residence Eligibility, Operations Metrics Aggregator and Brochure Section Parser",
   "tasks": [
     {
-      "id": "feature-delivery-circuit-breaker",
-      "objective_id": "milestone-12-circuit-breaker-sitemap-qualifications",
-      "feature": "feature-delivery-circuit-breaker",
-      "scope": "src/delivery/circuit-breaker.ts,tests/delivery-circuit-breaker.test.ts",
+      "id": "feature-residence-eligibility-evaluator",
+      "objective_id": "milestone-13-residence-operations-brochure",
+      "feature": "feature-residence-eligibility-evaluator",
+      "scope": "src/domain/residence-eligibility.ts,tests/residence-eligibility.test.ts",
       "priority": 10,
-      "status": "COMPLETE",
+      "status": "PENDING",
       "attempt": 0,
-      "description": "Implement outbound delivery circuit breaker and dead-letter queue (DLQ) policy manager to track consecutive delivery provider failures per channel (email, telegram), transition states across CLOSED, OPEN, and HALF_OPEN, enforce cooldown periods, and manage DLQ routing and replay.",
+      "description": "Implement applicant residence country eligibility evaluator to evaluate applicant country of residence against opportunity geographic eligibility constraints (e.g. domestic applicants, bilateral student exchange agreements, regional resident quotas like ASEAN/EU/Belt and Road, and international students currently residing in China vs abroad).",
       "acceptance_criteria": [
-        "evaluateCircuitState(channel, options) evaluates channel health, failure counters, and trip thresholds (e.g. 5 consecutive 5xx/timeout failures trips to OPEN for 15-minute cooldown)",
-        "recordDeliveryOutcome(channel, outcome, options) transitions state to HALF_OPEN after cooldown expiry to test single probes, resetting to CLOSED on success or tripping back to OPEN on failure",
-        "routeToDeadLetterQueue(intent, reason, options) routes permanently exhausted delivery intents (exceeded max retries or fatal non-retryable recipient error) to DLQ with metadata and error diagnostics",
-        "replayDeadLetterQueue(criteria, options) provides safe in-memory / SQL-compatible batch re-queueing of eligible DLQ intents once transport health is restored",
-        "Deterministic in-memory domain state transitions conforming to delivery intent queue contracts with zero uncaught exceptions"
+        "evaluateResidenceEligibility(applicantProfile, opportunityRules, options) evaluates whether an applicant's country of residence satisfies the opportunity's geographic criteria (allowed countries, excluded countries, regional blocs)",
+        "Supports regional blocs (e.g. ASEAN, EU, AFRICAN_UNION, BELT_AND_ROAD, GLOBAL) expanding to standard ISO-3166-1 alpha-2 / alpha-3 country codes",
+        "Distinguishes citizenship/nationality requirements from physical country of residence, including 'must currently reside in host country (CN)' vs 'must apply from home country abroad'",
+        "Handles unstated or worldwide residence rules cleanly with structured match outcomes and explanatory notes",
+        "Pure in-memory domain logic with zero side-effects and comprehensive unit tests"
       ],
       "validation": [
-        "node --import tsx --test tests/delivery-circuit-breaker.test.ts && npm run typecheck"
+        "node --import tsx --test tests/residence-eligibility.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-research-sitemap-parser",
-      "objective_id": "milestone-12-circuit-breaker-sitemap-qualifications",
-      "feature": "feature-research-sitemap-parser",
-      "scope": "src/research/sitemap-parser.ts,tests/sitemap-parser.test.ts",
+      "id": "feature-operations-metrics-aggregator",
+      "objective_id": "milestone-13-residence-operations-brochure",
+      "feature": "feature-operations-metrics-aggregator",
+      "scope": "src/admin/operations-aggregator.ts,tests/operations-aggregator.test.ts",
       "priority": 9,
-      "status": "COMPLETE",
+      "status": "PENDING",
       "attempt": 0,
-      "description": "Implement automated XML sitemap parser and admission page discoverer supporting sitemaps.org XML protocol, nested sitemap indexes, change frequency and priority weighting, and domain restriction guards.",
+      "description": "Implement unified operational health metrics aggregator to synthesize system health across research jobs, outbound delivery queues, monthly spending vs budget caps, and system SLAs into unified dashboard metrics with status indicators (HEALTHY, DEGRADED, CRITICAL).",
       "acceptance_criteria": [
-        "parseSitemapXml(xmlContent, baseOrigin, options) parses <urlset> and <sitemapindex> XML documents into normalized sitemap entry records",
-        "Extracts canonical <loc>, <lastmod>, <changefreq>, and <priority> elements, resolving relative links against source origin",
-        "Filters out cross-domain links, malformed URLs, and excluded path patterns according to source robots policy directives",
-        "Handles gzipped XML buffers, missing optional tags, large URL sets (up to 50,000 URLs), and malformed XML safely without crash",
-        "Pure domain logic and safe error handling conforming to research collection interfaces"
+        "aggregateOperationsMetrics(inputs, options) aggregates metrics from research collection (job count, failure rate, oldest active job), delivery queues (pending count, dead-letter count, trip count), spending (microdollar spend, budget percentage, throttle state), and database/system health",
+        "Computes overall operational status (HEALTHY, DEGRADED, CRITICAL) using deterministic threshold rules (e.g. DLQ > 0 or spending >= 90% trips to DEGRADED, spending >= 100% or circuit breaker OPEN trips to CRITICAL)",
+        "Formats bilingual (EN/ZH) summary messages and actionable diagnostic alerts for operator dashboards",
+        "Pure in-memory aggregation logic conforming to admin operations interfaces with robust test coverage"
       ],
       "validation": [
-        "node --import tsx --test tests/sitemap-parser.test.ts && npm run typecheck"
+        "node --import tsx --test tests/operations-aggregator.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-qualification-equivalence-evaluator",
-      "objective_id": "milestone-12-circuit-breaker-sitemap-qualifications",
-      "feature": "feature-qualification-equivalence-evaluator",
-      "scope": "src/domain/qualification-equivalence.ts,tests/qualification-equivalence.test.ts",
+      "id": "feature-research-brochure-parser",
+      "objective_id": "milestone-13-residence-operations-brochure",
+      "feature": "feature-research-brochure-parser",
+      "scope": "src/research/brochure-parser.ts,tests/brochure-parser.test.ts",
       "priority": 8,
-      "status": "COMPLETE",
+      "status": "PENDING",
       "attempt": 0,
-      "description": "Implement international academic qualification and degree level equivalence evaluator to map diverse global education credentials into standardized tiers, score field-of-study relevance, and evaluate minimum degree eligibility criteria for opportunities.",
+      "description": "Implement multi-format admissions brochure and guideline parser to parse structured text and markdown admissions guides, extracting funding packages, eligibility requirements, application steps, and timeline milestones into candidate opportunity records.",
       "acceptance_criteria": [
-        "normalizeQualification(credential, options) standardizes global academic credentials (high school, vocational diploma, Associate, Bachelor's, Master's, PhD) into ordered hierarchical levels",
-        "evaluateQualificationEligibility(applicantProfile, opportunityRules, options) verifies if an applicant's academic background meets or exceeds minimum degree prerequisites (e.g. Master's satisfies Bachelor's requirement)",
-        "scoreFieldRelevance(applicantDiscipline, targetTopics, options) computes discipline affinity scores (e.g. Robotics, Mechatronics, Industrial Automation, Computer Science vs. general STEM)",
-        "Handles unrecognized credentials gracefully with structured review_required uncertainty flags rather than false rejections",
-        "Pure in-memory domain logic with deterministic scoring and comprehensive validation"
+        "parseBrochureDocument(content, options) extracts structured sections from plain text or markdown admissions brochures (e.g. Program Overview, Scholarship Coverage / Stipend, Eligibility Criteria, Application Documents, Important Dates)",
+        "Parses tabular and list-formatted funding details (tuition waiver, accommodation, monthly living allowance in CNY) and matches standard funding tier patterns",
+        "Extracts deadline anchors and chronological milestones (application window, interview date, result notification) into normalized ISO date strings",
+        "Handles malformed, unstructured, or missing sections gracefully with confidence scores and extraction diagnostics",
+        "Pure domain logic with zero external runtime dependencies and comprehensive unit tests"
       ],
       "validation": [
-        "node --import tsx --test tests/qualification-equivalence.test.ts && npm run typecheck"
+        "node --import tsx --test tests/brochure-parser.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }
