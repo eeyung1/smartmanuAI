@@ -8,8 +8,8 @@
       "feature": "feature-delivery-intent-queue",
       "scope": "src/delivery/intent-queue.ts,tests/delivery-intent.test.ts",
       "priority": 10,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement outbound delivery intent queue to manage the lifecycle of outbound notification requests (PENDING, DISPATCHING, DELIVERED, FAILED, SUPPRESSED, DEAD_LETTER), enforcing exponential retry backoff, channel failure isolation, and deduplication keys.",
       "acceptance_criteria": [
         "enqueueDeliveryIntent(input, options) enqueues validated notification intents (email or telegram) with user ID, channel, template type, recipient address/chat, encrypted payload reference, and idempotent deduplication key",
@@ -29,8 +29,8 @@
       "feature": "feature-verified-email-change",
       "scope": "src/auth/email-change.ts,tests/email-change.test.ts",
       "priority": 9,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement verified account email change service to coordinate secure address updating, generating signed/hashed confirmation tokens, validating expiration windows, preventing email collisions, and managing audit logs.",
       "acceptance_criteria": [
         "requestEmailChange(actor, newEmail, options) validates new email format, checks against reserved/existing user emails, and creates a pending email change request with a cryptographic verification token and bounded TTL (e.g. 1 hour)",
@@ -50,8 +50,8 @@
       "feature": "feature-extraction-dispatch-coordinator",
       "scope": "src/research/extraction-dispatcher.ts,tests/extraction-dispatcher.test.ts",
       "priority": 8,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement automatic extraction dispatch coordinator to evaluate harvested source snapshots, check operational spending caps and rate quotas, validate opportunity candidate schema compliance, and prevent duplicate extraction runs.",
       "acceptance_criteria": [
         "evaluateExtractionEligibility(snapshot, options) checks whether a newly harvested source snapshot requires extraction based on content hash differences, existing extraction status, and source staleness",

@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 133,
+    "generation": 146,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -135,6 +135,12 @@
       "state": "ACTIVE",
       "generation": 99
     },
+    "opencode-gpt56sol-20261111-a9e7f3-20261111-b0b255da": {
+      "id": "opencode-gpt56sol-20261111-a9e7f3-20261111-b0b255da",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 143
+    },
     "opencode-gpt56sol-20261111-n5c7d1-20261111-b03acb8d": {
       "id": "opencode-gpt56sol-20261111-n5c7d1-20261111-b03acb8d",
       "role": "worker",
@@ -171,6 +177,18 @@
       "state": "ACTIVE",
       "generation": 129
     },
+    "opencode-gpt56sol-20261111-y7f2c4-20261111-71dcd830": {
+      "id": "opencode-gpt56sol-20261111-y7f2c4-20261111-71dcd830",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 135
+    },
+    "opencode-gpt56sol-20261111-z8d4a6-20261111-f169e646": {
+      "id": "opencode-gpt56sol-20261111-z8d4a6-20261111-f169e646",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 139
+    },
     "planner-antigravity-20261104-b9e2894a": {
       "id": "planner-antigravity-20261104-b9e2894a",
       "role": "planner",
@@ -184,6 +202,11 @@
       "id": "milestone-1-application-flow",
       "description": "Milestone 1: Application Flow and Usability",
       "status": "COMPLETE"
+    },
+    "milestone-10-delivery-intent-and-dispatch": {
+      "id": "milestone-10-delivery-intent-and-dispatch",
+      "description": "Milestone 10: Outbound Delivery Intent Queue, Email Change Verification and Extraction Dispatching",
+      "status": "APPROVED"
     },
     "milestone-2-proactive-notifications": {
       "id": "milestone-2-proactive-notifications",
@@ -224,11 +247,6 @@
       "id": "milestone-9-lineage-cooldown-schedule",
       "description": "Milestone 9: Offering Lineage, Host Cooldowns and Deadline-Aware Scheduling",
       "status": "APPROVED"
-    },
-    "milestone-10-delivery-intent-and-dispatch": {
-      "id": "milestone-10-delivery-intent-and-dispatch",
-      "description": "Milestone 10: Outbound Delivery Intent Queue, Email Change Verification and Extraction Dispatching",
-      "status": "OPEN"
     }
   },
   "tasks": {
@@ -306,6 +324,87 @@
       "base_sha": "main",
       "validated_head": "b4da58ccc28cd3e5b9d1f55cbb595578a95721f3",
       "validation_evidence": "PR #28 merged to main (merge commit 2869e47b50420b14b1675ca98a87035f9fe75164; CI green)"
+    },
+    "milestone-10-delivery-intent-and-dispatch::feature-delivery-intent-queue": {
+      "id": "feature-delivery-intent-queue",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "feature": "feature-delivery-intent-queue",
+      "scope": "src/delivery/intent-queue.ts,tests/delivery-intent.test.ts",
+      "priority": 10,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 134,
+      "session_id": "opencode-gpt56sol-20261111-y7f2c4-20261111-71dcd830",
+      "result_id": "milestone-10-delivery-intent-and-dispatch::feature-delivery-intent-queue::134",
+      "description": "Implement outbound delivery intent queue to manage the lifecycle of outbound notification requests (PENDING, DISPATCHING, DELIVERED, FAILED, SUPPRESSED, DEAD_LETTER), enforcing exponential retry backoff, channel failure isolation, and deduplication keys.",
+      "acceptance_criteria": [
+        "enqueueDeliveryIntent(input, options) enqueues validated notification intents (email or telegram) with user ID, channel, template type, recipient address/chat, encrypted payload reference, and idempotent deduplication key",
+        "leaseNextDeliveryIntents(options) acquires leases on pending or retry-eligible intents with bounded TTL (e.g. 60s) to support safe concurrent worker processing without double dispatch",
+        "Supports status transitions: markDelivered(intentId, receipt), markFailed(intentId, error, options) with exponential retry backoff, markSuppressed(intentId, reason), and transitions to DEAD_LETTER once max retry ceiling (default 5 attempts) is exhausted",
+        "Provides circuit breaking and channel pause checks (isChannelPaused(channel)) when consecutive channel-level failures exceed error thresholds",
+        "Deterministic in-memory / SQL-compatible state transitions with comprehensive input validation and safe error handling"
+      ],
+      "validation": [
+        "node --import tsx --test tests/delivery-intent.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-delivery-intent-queue-809a7d8d",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-delivery-intent-queue-809a7d8d",
+      "base_sha": "main"
+    },
+    "milestone-10-delivery-intent-and-dispatch::feature-extraction-dispatch-coordinator": {
+      "id": "feature-extraction-dispatch-coordinator",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "feature": "feature-extraction-dispatch-coordinator",
+      "scope": "src/research/extraction-dispatcher.ts,tests/extraction-dispatcher.test.ts",
+      "priority": 8,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 142,
+      "session_id": "opencode-gpt56sol-20261111-a9e7f3-20261111-b0b255da",
+      "result_id": "milestone-10-delivery-intent-and-dispatch::feature-extraction-dispatch-coordinator::142",
+      "description": "Implement automatic extraction dispatch coordinator to evaluate harvested source snapshots, check operational spending caps and rate quotas, validate opportunity candidate schema compliance, and prevent duplicate extraction runs.",
+      "acceptance_criteria": [
+        "evaluateExtractionEligibility(snapshot, options) checks whether a newly harvested source snapshot requires extraction based on content hash differences, existing extraction status, and source staleness",
+        "Enforces operational spending guards: checks against current spending meter status (refuses dispatch if budget ceiling reached or throttled) and reserves estimated microdollar costs",
+        "Coordinates extraction lifecycle states: PENDING_EXTRACTION, EXTRACTING, COMPLETED, SKIPPED_UNCHANGED, REJECTED_SCHEMA, FAILED",
+        "Deduplicates extracted candidates across snapshots and produces structured extraction summary records with field counts and confidence metrics",
+        "Handles malformed snapshots, empty content, schema mismatches, and budget exhaustion safely without unhandled rejections"
+      ],
+      "validation": [
+        "node --import tsx --test tests/extraction-dispatcher.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-extraction-dispatch-coordinator-51fdb5fc",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-extraction-dispatch-coordinator-51fdb5fc",
+      "base_sha": "main"
+    },
+    "milestone-10-delivery-intent-and-dispatch::feature-verified-email-change": {
+      "id": "feature-verified-email-change",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "feature": "feature-verified-email-change",
+      "scope": "src/auth/email-change.ts,tests/email-change.test.ts",
+      "priority": 9,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 138,
+      "session_id": "opencode-gpt56sol-20261111-z8d4a6-20261111-f169e646",
+      "result_id": "milestone-10-delivery-intent-and-dispatch::feature-verified-email-change::138",
+      "description": "Implement verified account email change service to coordinate secure address updating, generating signed/hashed confirmation tokens, validating expiration windows, preventing email collisions, and managing audit logs.",
+      "acceptance_criteria": [
+        "requestEmailChange(actor, newEmail, options) validates new email format, checks against reserved/existing user emails, and creates a pending email change request with a cryptographic verification token and bounded TTL (e.g. 1 hour)",
+        "verifyEmailChange(token, options) validates token authenticity, expiration, and user state, updates the account's primary email address atomically, and invalidates any other active pending change tokens for that user",
+        "cancelEmailChange(actor, options) allows the user to cancel any active pending email change request",
+        "Enforces rate limiting on email change requests (max 3 requests per 24 hours per account) and emits audit events recording requested and completed transitions",
+        "Pure domain logic and safe error handling (rejects duplicate emails, expired tokens, tampered tokens, and malformed inputs)"
+      ],
+      "validation": [
+        "node --import tsx --test tests/email-change.test.ts \u0026\u0026 npm run typecheck"
+      ],
+      "capability": "coding",
+      "branch": "agent/feature-verified-email-change-66593bc0",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-verified-email-change-66593bc0",
+      "base_sha": "main"
     },
     "milestone-2-proactive-notifications::feature-deadline-reminders": {
       "id": "feature-deadline-reminders",
@@ -962,69 +1061,6 @@
       "branch": "agent/feature-intake-reconciliation-service-61d90f54",
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-intake-reconciliation-service-61d90f54",
       "base_sha": "main"
-    },
-    "milestone-10-delivery-intent-and-dispatch::feature-delivery-intent-queue": {
-      "id": "feature-delivery-intent-queue",
-      "objective_id": "milestone-10-delivery-intent-and-dispatch",
-      "feature": "feature-delivery-intent-queue",
-      "scope": "src/delivery/intent-queue.ts,tests/delivery-intent.test.ts",
-      "priority": 10,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement outbound delivery intent queue to manage the lifecycle of outbound notification requests (PENDING, DISPATCHING, DELIVERED, FAILED, SUPPRESSED, DEAD_LETTER), enforcing exponential retry backoff, channel failure isolation, and deduplication keys.",
-      "acceptance_criteria": [
-        "enqueueDeliveryIntent(input, options) enqueues validated notification intents (email or telegram) with user ID, channel, template type, recipient address/chat, encrypted payload reference, and idempotent deduplication key",
-        "leaseNextDeliveryIntents(options) acquires leases on pending or retry-eligible intents with bounded TTL (e.g. 60s) to support safe concurrent worker processing without double dispatch",
-        "Supports status transitions: markDelivered(intentId, receipt), markFailed(intentId, error, options) with exponential retry backoff, markSuppressed(intentId, reason), and transitions to DEAD_LETTER once max retry ceiling (default 5 attempts) is exhausted",
-        "Provides circuit breaking and channel pause checks (isChannelPaused(channel)) when consecutive channel-level failures exceed error thresholds",
-        "Deterministic in-memory / SQL-compatible state transitions with comprehensive input validation and safe error handling"
-      ],
-      "validation": [
-        "node --import tsx --test tests/delivery-intent.test.ts \u0026\u0026 npm run typecheck"
-      ],
-      "capability": "coding"
-    },
-    "milestone-10-delivery-intent-and-dispatch::feature-verified-email-change": {
-      "id": "feature-verified-email-change",
-      "objective_id": "milestone-10-delivery-intent-and-dispatch",
-      "feature": "feature-verified-email-change",
-      "scope": "src/auth/email-change.ts,tests/email-change.test.ts",
-      "priority": 9,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement verified account email change service to coordinate secure address updating, generating signed/hashed confirmation tokens, validating expiration windows, preventing email collisions, and managing audit logs.",
-      "acceptance_criteria": [
-        "requestEmailChange(actor, newEmail, options) validates new email format, checks against reserved/existing user emails, and creates a pending email change request with a cryptographic verification token and bounded TTL (e.g. 1 hour)",
-        "verifyEmailChange(token, options) validates token authenticity, expiration, and user state, updates the account's primary email address atomically, and invalidates any other active pending change tokens for that user",
-        "cancelEmailChange(actor, options) allows the user to cancel any active pending email change request",
-        "Enforces rate limiting on email change requests (max 3 requests per 24 hours per account) and emits audit events recording requested and completed transitions",
-        "Pure domain logic and safe error handling (rejects duplicate emails, expired tokens, tampered tokens, and malformed inputs)"
-      ],
-      "validation": [
-        "node --import tsx --test tests/email-change.test.ts \u0026\u0026 npm run typecheck"
-      ],
-      "capability": "coding"
-    },
-    "milestone-10-delivery-intent-and-dispatch::feature-extraction-dispatch-coordinator": {
-      "id": "feature-extraction-dispatch-coordinator",
-      "objective_id": "milestone-10-delivery-intent-and-dispatch",
-      "feature": "feature-extraction-dispatch-coordinator",
-      "scope": "src/research/extraction-dispatcher.ts,tests/extraction-dispatcher.test.ts",
-      "priority": 8,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement automatic extraction dispatch coordinator to evaluate harvested source snapshots, check operational spending caps and rate quotas, validate opportunity candidate schema compliance, and prevent duplicate extraction runs.",
-      "acceptance_criteria": [
-        "evaluateExtractionEligibility(snapshot, options) checks whether a newly harvested source snapshot requires extraction based on content hash differences, existing extraction status, and source staleness",
-        "Enforces operational spending guards: checks against current spending meter status (refuses dispatch if budget ceiling reached or throttled) and reserves estimated microdollar costs",
-        "Coordinates extraction lifecycle states: PENDING_EXTRACTION, EXTRACTING, COMPLETED, SKIPPED_UNCHANGED, REJECTED_SCHEMA, FAILED",
-        "Deduplicates extracted candidates across snapshots and produces structured extraction summary records with field counts and confidence metrics",
-        "Handles malformed snapshots, empty content, schema mismatches, and budget exhaustion safely without unhandled rejections"
-      ],
-      "validation": [
-        "node --import tsx --test tests/extraction-dispatcher.test.ts \u0026\u0026 npm run typecheck"
-      ],
-      "capability": "coding"
     }
   },
   "results": {
@@ -1041,6 +1077,57 @@
         "823fa99"
       ],
       "recorded_utc": "2026-11-04T12:25:02Z"
+    },
+    "milestone-10-delivery-intent-and-dispatch::feature-delivery-intent-queue::134": {
+      "id": "milestone-10-delivery-intent-and-dispatch::feature-delivery-intent-queue::134",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "task_id": "feature-delivery-intent-queue",
+      "session_id": "opencode-gpt56sol-20261111-y7f2c4-20261111-71dcd830",
+      "assignment_generation": 134,
+      "branch": "agent/feature-delivery-intent-queue-809a7d8d",
+      "head_sha": "d3070aa3c31b0295af2fd0998b395e0eabb77688",
+      "validation": "delivery intent tests pass (6/6); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "d3070aa"
+      ],
+      "limitations": [
+        "Queue state is process-local in-memory and does not replace the existing durable outbox and delivery_simulations tables"
+      ],
+      "recorded_utc": "2026-11-11T12:17:47Z"
+    },
+    "milestone-10-delivery-intent-and-dispatch::feature-extraction-dispatch-coordinator::142": {
+      "id": "milestone-10-delivery-intent-and-dispatch::feature-extraction-dispatch-coordinator::142",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "task_id": "feature-extraction-dispatch-coordinator",
+      "session_id": "opencode-gpt56sol-20261111-a9e7f3-20261111-b0b255da",
+      "assignment_generation": 142,
+      "branch": "agent/feature-extraction-dispatch-coordinator-51fdb5fc",
+      "head_sha": "ec3d90283e8e5336d27615f8115b80358cf39468",
+      "validation": "extraction dispatcher tests pass (6/6); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "ec3d902"
+      ],
+      "limitations": [
+        "Coordinator tracks state in memory and does not call the paid model itself, which stays with the existing research:once extraction flow"
+      ],
+      "recorded_utc": "2026-11-11T12:32:52Z"
+    },
+    "milestone-10-delivery-intent-and-dispatch::feature-verified-email-change::138": {
+      "id": "milestone-10-delivery-intent-and-dispatch::feature-verified-email-change::138",
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "task_id": "feature-verified-email-change",
+      "session_id": "opencode-gpt56sol-20261111-z8d4a6-20261111-f169e646",
+      "assignment_generation": 138,
+      "branch": "agent/feature-verified-email-change-66593bc0",
+      "head_sha": "31729bbdd8cac8afb63be9b64e781f90a8ed4a4a",
+      "validation": "email change tests pass (7/7); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "31729bb"
+      ],
+      "limitations": [
+        "Service state is in-memory and sends no confirmation mail itself; delivering the link stays with the existing local mail sink"
+      ],
+      "recorded_utc": "2026-11-11T12:25:13Z"
     },
     "milestone-2-proactive-notifications::feature-deadline-reminders::16": {
       "id": "milestone-2-proactive-notifications::feature-deadline-reminders::16",
@@ -1678,6 +1765,18 @@
         "result-pr-27",
         "result-pr-28"
       ]
+    },
+    "milestone-10-delivery-intent-and-dispatch": {
+      "objective_id": "milestone-10-delivery-intent-and-dispatch",
+      "status": "APPROVED",
+      "result_ids": [
+        "milestone-10-delivery-intent-and-dispatch::feature-delivery-intent-queue::134",
+        "milestone-10-delivery-intent-and-dispatch::feature-extraction-dispatch-coordinator::142",
+        "milestone-10-delivery-intent-and-dispatch::feature-verified-email-change::138"
+      ],
+      "decision": "APPROVED",
+      "decided_by": "planner-antigravity-20261104-b9e2894a",
+      "decided_utc": "2026-11-11T12:56:03Z"
     },
     "milestone-2-proactive-notifications": {
       "objective_id": "milestone-2-proactive-notifications",
@@ -2697,6 +2796,97 @@
       "operation": "adopt-objective",
       "generation": 133,
       "utc": "2026-11-11T12:05:00Z"
+    },
+    {
+      "id": "134-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 134,
+      "utc": "2026-11-11T12:14:40Z"
+    },
+    {
+      "id": "135-register-session",
+      "actor": "opencode-gpt56sol-20261111-y7f2c4-20261111-71dcd830",
+      "operation": "register-session",
+      "generation": 135,
+      "utc": "2026-11-11T12:14:40Z"
+    },
+    {
+      "id": "136-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 136,
+      "utc": "2026-11-11T12:14:40Z"
+    },
+    {
+      "id": "137-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 137,
+      "utc": "2026-11-11T12:17:47Z"
+    },
+    {
+      "id": "138-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 138,
+      "utc": "2026-11-11T12:19:21Z"
+    },
+    {
+      "id": "139-register-session",
+      "actor": "opencode-gpt56sol-20261111-z8d4a6-20261111-f169e646",
+      "operation": "register-session",
+      "generation": 139,
+      "utc": "2026-11-11T12:19:21Z"
+    },
+    {
+      "id": "140-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 140,
+      "utc": "2026-11-11T12:19:22Z"
+    },
+    {
+      "id": "141-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 141,
+      "utc": "2026-11-11T12:25:13Z"
+    },
+    {
+      "id": "142-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 142,
+      "utc": "2026-11-11T12:25:24Z"
+    },
+    {
+      "id": "143-register-session",
+      "actor": "opencode-gpt56sol-20261111-a9e7f3-20261111-b0b255da",
+      "operation": "register-session",
+      "generation": 143,
+      "utc": "2026-11-11T12:25:24Z"
+    },
+    {
+      "id": "144-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 144,
+      "utc": "2026-11-11T12:25:24Z"
+    },
+    {
+      "id": "145-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 145,
+      "utc": "2026-11-11T12:32:52Z"
+    },
+    {
+      "id": "146-review-decision",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "review-decision",
+      "generation": 146,
+      "utc": "2026-11-11T12:56:03Z"
     }
   ]
 }

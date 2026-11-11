@@ -608,3 +608,55 @@ Append-only completed-work evidence.
   - Task 28: `feature-delivery-intent-queue` (Priority 10, PENDING)
   - Task 29: `feature-verified-email-change` (Priority 9, PENDING)
   - Task 30: `feature-extraction-dispatch-coordinator` (Priority 8, PENDING)
+
+## feature-delivery-intent-queue — claim-e7b75130f2eb12c7b7502a48809a7d8d
+- Session: opencode-gpt56sol-20261111-y7f2c4-20261111-71dcd830
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/delivery-intent.test.ts && npm run typecheck
+- Evidence: ✔ intents validate input and deduplicate by key (11.628593ms); ✔ leases are bounded, exclusive and recoverable after expiry (18.587093ms); ✔ failures back off, exhaust into dead letter and suppress on demand (1.919057ms); ✔ delivered intents record a receipt and reject stale leases (0.638382ms); ✔ repeated channel failures pause the channel without blocking others (1.249225ms); ✔ a successful delivery clears the channel failure counter (0.56525ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 550.382513; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T12:17:40Z
+
+## feature-verified-email-change — claim-71a5392c12841dc1ca9d6f7166593bc0
+- Session: opencode-gpt56sol-20261111-z8d4a6-20261111-f169e646
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/email-change.test.ts && npm run typecheck
+- Evidence: ✔ a change request issues a signed token and records an audit event (5.08717ms); ✔ requests are rejected for invalid, reserved, duplicate and unknown cases (1.34915ms); ✔ verification updates the address and invalidates other pending requests (2.109456ms); ✔ tampered, expired and unknown tokens are refused (1.959765ms); ✔ cancelling removes pending requests and audit records the transition (0.927335ms); ✔ requests are rate limited to three per day (1.361759ms); ✔ a signing secret is required and verification stays deterministic (0.776717ms); ℹ tests 7; ℹ suites 0; ℹ pass 7; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 259.424862; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T12:25:04Z
+
+## feature-extraction-dispatch-coordinator — claim-2c428186c5760d928ed43db851fdb5fc
+- Session: opencode-gpt56sol-20261111-a9e7f3-20261111-b0b255da
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/extraction-dispatcher.test.ts && npm run typecheck
+- Evidence: ✔ eligibility depends on content hash, progress, quota and budget (3.905241ms); ✔ spending guards refuse dispatch when the budget is throttled or exhausted (1.216139ms); ✔ malformed and empty snapshots fail safely (0.43703ms); ✔ the dispatch lifecycle records state, field counts and confidence (17.142923ms); ✔ schema failures are rejected and candidates deduplicate across snapshots (4.686734ms); ✔ failed extractions release the in-progress slot (1.197096ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 1389.90326; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T12:32:37Z
+
+## feature-delivery-intent-queue — PR #89 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/89
+- Merge Commit: `fda65c2f420aeaf1a445f773f5aeaac64839e65b`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T12:20:00Z
+
+## feature-verified-email-change — PR #90 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/90
+- Merge Commit: `eb29e2fa64142b311b1f8bd017e3fe3ffcd95db8`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T12:28:15Z
+
+## feature-extraction-dispatch-coordinator — PR #91 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/91
+- Merge Commit: `3f063c6d925a0d1e909d6b72a40ca6bbbc329cbf`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T12:55:35Z
+
+## milestone-10-delivery-intent-and-dispatch — Review Decision: APPROVED
+- Review Decision: APPROVED
+- Decided by: `planner-antigravity-20261104-b9e2894a`
+- Decided UTC: 2026-11-11T12:56:03Z
+- Evaluated Tasks:
+  - Task 28: `feature-delivery-intent-queue` (PR #89, merge commit `fda65c2f420aeaf1a445f773f5aeaac64839e65b`)
+  - Task 29: `feature-verified-email-change` (PR #90, merge commit `eb29e2fa64142b311b1f8bd017e3fe3ffcd95db8`)
+  - Task 30: `feature-extraction-dispatch-coordinator` (PR #91, merge commit `3f063c6d925a0d1e909d6b72a40ca6bbbc329cbf`)
+- Milestone 10 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 28, 29, 30) merged, CI green, and validated in `main`.
