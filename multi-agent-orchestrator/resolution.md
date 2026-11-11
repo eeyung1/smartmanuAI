@@ -546,3 +546,55 @@ Append-only completed-work evidence.
   - Task 25: `feature-intake-reconciliation-service` (Priority 10, PENDING)
   - Task 26: `feature-host-cooldown-coordinator` (Priority 9, PENDING)
   - Task 27: `feature-deadline-schedule-calculator` (Priority 8, PENDING)
+
+## feature-intake-reconciliation-service — claim-ba9ae0847b73ffdbb0af6a5561d90f54
+- Session: opencode-gpt56sol-20261111-t7c4a8-20261111-285809b8
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/intake-reconciler.test.ts && npm run typecheck
+- Evidence: ✔ intake labels parse into canonical terms across English and Chinese variants (6.624745ms); ✔ the same edition is detected exactly and across aliases (2.403685ms); ✔ a later cycle is a new cycle and an earlier cycle is historical (0.631218ms); ✔ ambiguous evidence is escalated for operator review (0.618477ms); ✔ draft offerings are ignored unless explicitly included (2.438044ms); ✔ expired editions are noted and evaluation stays deterministic (0.695699ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 267.847535; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T10:44:06Z
+
+## feature-host-cooldown-coordinator — claim-b9f07e0fba28c00d3ae91399af0f00d9
+- Session: opencode-gpt56sol-20261111-u2b6d5-20261111-b584d31f
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/host-cooldown-coordinator.test.ts && npm run typecheck
+- Evidence: ✔ host availability reflects failures, backoff and retry-after (7.39769ms); ✔ repeated failures escalate to the ceiling and then stop the host (2.985867ms); ✔ leases are bounded, expire and release idempotently (0.910448ms); ✔ malformed and unknown hosts are handled without throwing (0.955933ms); ✔ pure availability evaluation never mutates the given state (0.560197ms); ℹ tests 5; ℹ suites 0; ℹ pass 5; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 483.21304; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T10:48:12Z
+
+## feature-deadline-schedule-calculator — claim-1601bf98c43c9ce2e84734bdbb9809f5
+- Session: opencode-gpt56sol-20261111-w9c3f7-20261111-b47bb63a
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/deadline-schedule.test.ts && npm run typecheck
+- Evidence: ✔ deadline proximity selects the hourly, daily and weekly cadences (6.948478ms); ✔ rolling, unstated and malformed deadlines fall back to a bi-weekly cadence (1.059916ms); ✔ a passed deadline is terminal and schedules nothing further (0.464153ms); ✔ the reminder freshness window pulls a recheck forward (2.377715ms); ✔ schedule due status reports delay and overdue seconds (1.937802ms); ✔ scheduling is deterministic and safe for malformed input (1.387557ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 460.049414; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T10:55:27Z
+
+## feature-intake-reconciliation-service — PR #86 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/86
+- Merge Commit: `a01d647f3601ea8b9b563d63fcea8495d2b25667`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T11:10:00Z
+
+## feature-host-cooldown-coordinator — PR #87 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/87
+- Merge Commit: `0048ccf06c87c21dd218ee9d8172f7327b96451d`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T11:20:50Z
+
+## feature-deadline-schedule-calculator — PR #88 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/88
+- Merge Commit: `b4603bb542c2dcad025245998a27f78b20d19065`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T11:41:54Z
+
+## milestone-9-lineage-cooldown-schedule — Review Decision: APPROVED
+- Review Decision: APPROVED
+- Decided by: `planner-antigravity-20261104-b9e2894a`
+- Decided UTC: 2026-11-11T11:42:29Z
+- Evaluated Tasks:
+  - Task 25: `feature-intake-reconciliation-service` (PR #86, merge commit `a01d647f3601ea8b9b563d63fcea8495d2b25667`)
+  - Task 26: `feature-host-cooldown-coordinator` (PR #87, merge commit `0048ccf06c87c21dd218ee9d8172f7327b96451d`)
+  - Task 27: `feature-deadline-schedule-calculator` (PR #88, merge commit `b4603bb542c2dcad025245998a27f78b20d19065`)
+- Milestone 9 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 25, 26, 27) merged, CI green, and validated in `main`.

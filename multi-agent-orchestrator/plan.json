@@ -8,8 +8,8 @@
       "feature": "feature-intake-reconciliation-service",
       "scope": "src/catalogue/intake-reconciler.ts,tests/intake-reconciler.test.ts",
       "priority": 10,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement intake identity reconciliation service to distinguish new recurring scholarship/program intakes (e.g. Fall 2027 vs. Fall 2026), recognize edition equivalence across academic terms, identify ambiguous labels requiring operator review, and generate canonical offering identity keys.",
       "acceptance_criteria": [
         "reconcileIntakeIdentity(incoming, existingOfferings, options) evaluates incoming intake title, term/academic year, and target deadline against existing published/historical offerings",
@@ -29,8 +29,8 @@
       "feature": "feature-host-cooldown-coordinator",
       "scope": "src/research/host-cooldown.ts,tests/host-cooldown-coordinator.test.ts",
       "priority": 9,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement host collection lease and cooldown coordinator to prevent crawler flooding, enforce exponential backoff on consecutive host failures (429, 503, network timeouts), evaluate host availability, and manage bounded leases for concurrent collection workers.",
       "acceptance_criteria": [
         "evaluateHostAvailability(hostState, options) checks whether an academic host is currently eligible for collection based on last request timestamp, active lease count, and backoff cooldown",
@@ -51,8 +51,8 @@
       "feature": "feature-deadline-schedule-calculator",
       "scope": "src/jobs/deadline-schedule.ts,tests/deadline-schedule.test.ts",
       "priority": 8,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement dynamic deadline-aware collection and recheck schedule calculator to compute next collection timestamps based on application deadlines, urgency horizons, and source verification requirements.",
       "acceptance_criteria": [
         "calculateNextScheduleTime(opportunity, options) determines the next required verification/collection timestamp based on deadline proximity relative to reference time (defaulting to current UTC)",

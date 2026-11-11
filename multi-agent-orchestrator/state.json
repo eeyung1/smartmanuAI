@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 119,
+    "generation": 132,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -153,6 +153,24 @@
       "state": "ACTIVE",
       "generation": 115
     },
+    "opencode-gpt56sol-20261111-t7c4a8-20261111-285809b8": {
+      "id": "opencode-gpt56sol-20261111-t7c4a8-20261111-285809b8",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 121
+    },
+    "opencode-gpt56sol-20261111-u2b6d5-20261111-b584d31f": {
+      "id": "opencode-gpt56sol-20261111-u2b6d5-20261111-b584d31f",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 125
+    },
+    "opencode-gpt56sol-20261111-w9c3f7-20261111-b47bb63a": {
+      "id": "opencode-gpt56sol-20261111-w9c3f7-20261111-b47bb63a",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 129
+    },
     "planner-antigravity-20261104-b9e2894a": {
       "id": "planner-antigravity-20261104-b9e2894a",
       "role": "planner",
@@ -205,7 +223,7 @@
     "milestone-9-lineage-cooldown-schedule": {
       "id": "milestone-9-lineage-cooldown-schedule",
       "description": "Milestone 9: Offering Lineage, Host Cooldowns and Deadline-Aware Scheduling",
-      "status": "OPEN"
+      "status": "APPROVED"
     }
   },
   "tasks": {
@@ -858,26 +876,32 @@
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-operations-spending-meter-e065eca1",
       "base_sha": "main"
     },
-    "milestone-9-lineage-cooldown-schedule::feature-intake-reconciliation-service": {
-      "id": "feature-intake-reconciliation-service",
+    "milestone-9-lineage-cooldown-schedule::feature-deadline-schedule-calculator": {
+      "id": "feature-deadline-schedule-calculator",
       "objective_id": "milestone-9-lineage-cooldown-schedule",
-      "feature": "feature-intake-reconciliation-service",
-      "scope": "src/catalogue/intake-reconciler.ts,tests/intake-reconciler.test.ts",
-      "priority": 10,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement intake identity reconciliation service to distinguish new recurring scholarship/program intakes (e.g. Fall 2027 vs. Fall 2026), recognize edition equivalence across academic terms, identify ambiguous labels requiring operator review, and generate canonical offering identity keys.",
+      "feature": "feature-deadline-schedule-calculator",
+      "scope": "src/jobs/deadline-schedule.ts,tests/deadline-schedule.test.ts",
+      "priority": 8,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 128,
+      "session_id": "opencode-gpt56sol-20261111-w9c3f7-20261111-b47bb63a",
+      "result_id": "milestone-9-lineage-cooldown-schedule::feature-deadline-schedule-calculator::128",
+      "description": "Implement dynamic deadline-aware collection and recheck schedule calculator to compute next collection timestamps based on application deadlines, urgency horizons, and source verification requirements.",
       "acceptance_criteria": [
-        "reconcileIntakeIdentity(incoming, existingOfferings, options) evaluates incoming intake title, term/academic year, and target deadline against existing published/historical offerings",
-        "Identifies relationship: SAME_EDITION (exact match or alias of current intake), NEW_CYCLE (valid future intake cycle for same program, e.g. Fall 2027 following Fall 2026), PREVIOUS_CYCLE (expired/historical cycle), or AMBIGUOUS (conflicting or unstated term requiring human review)",
-        "Parses common term naming variants in English and Chinese (e.g. 'Fall 2026', 'Autumn 2026', '2026秋季', 'Spring 2027', '2027春季', '2026-2027 Academic Year')",
-        "Generates normalized canonical intake identifier (e.g. '2026-fall', '2027-spring') and provides a match confidence score",
-        "Deterministic evaluation with pure domain logic, handling malformed, empty, or unparseable intake strings safely without throwing"
+        "calculateNextScheduleTime(opportunity, options) determines the next required verification/collection timestamp based on deadline proximity relative to reference time (defaulting to current UTC)",
+        "Applies tiered cadence rules: Urgent horizon (within 48 hours of deadline: hourly recheck), Approaching horizon (within 14 days of deadline: daily recheck at configured UTC hour), Standard horizon (more than 14 days out: weekly recheck), Rolling/unstated deadline (bi-weekly cadence), Past deadline (expired: terminal/no further scheduled runs)",
+        "Supports pre-digest and pre-reminder urgent recheck window calculation (e.g. ensure freshness within 6 hours before 7-day or 2-day reminder dispatch)",
+        "Evaluates isScheduleDue(nextScheduleTime, referenceTime) returning boolean due status and delay/overdue duration in seconds",
+        "Handles edge cases: missing deadline, rolling admission flag, malformed dates, timezone discrepancies, and dates in the past"
       ],
       "validation": [
-        "node --import tsx --test tests/intake-reconciler.test.ts && npm run typecheck"
+        "node --import tsx --test tests/deadline-schedule.test.ts \u0026\u0026 npm run typecheck"
       ],
-      "capability": "coding"
+      "capability": "coding",
+      "branch": "agent/feature-deadline-schedule-calculator-bb9809f5",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-deadline-schedule-calculator-bb9809f5",
+      "base_sha": "main"
     },
     "milestone-9-lineage-cooldown-schedule::feature-host-cooldown-coordinator": {
       "id": "feature-host-cooldown-coordinator",
@@ -885,8 +909,11 @@
       "feature": "feature-host-cooldown-coordinator",
       "scope": "src/research/host-cooldown.ts,tests/host-cooldown-coordinator.test.ts",
       "priority": 9,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 124,
+      "session_id": "opencode-gpt56sol-20261111-u2b6d5-20261111-b584d31f",
+      "result_id": "milestone-9-lineage-cooldown-schedule::feature-host-cooldown-coordinator::124",
       "description": "Implement host collection lease and cooldown coordinator to prevent crawler flooding, enforce exponential backoff on consecutive host failures (429, 503, network timeouts), evaluate host availability, and manage bounded leases for concurrent collection workers.",
       "acceptance_criteria": [
         "evaluateHostAvailability(hostState, options) checks whether an academic host is currently eligible for collection based on last request timestamp, active lease count, and backoff cooldown",
@@ -897,30 +924,39 @@
         "Pure in-memory coordinator with thread-safe/idempotent state mutations, handling unknown hosts or malformed hostnames gracefully"
       ],
       "validation": [
-        "node --import tsx --test tests/host-cooldown-coordinator.test.ts && npm run typecheck"
+        "node --import tsx --test tests/host-cooldown-coordinator.test.ts \u0026\u0026 npm run typecheck"
       ],
-      "capability": "coding"
+      "capability": "coding",
+      "branch": "agent/feature-host-cooldown-coordinator-af0f00d9",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-host-cooldown-coordinator-af0f00d9",
+      "base_sha": "main"
     },
-    "milestone-9-lineage-cooldown-schedule::feature-deadline-schedule-calculator": {
-      "id": "feature-deadline-schedule-calculator",
+    "milestone-9-lineage-cooldown-schedule::feature-intake-reconciliation-service": {
+      "id": "feature-intake-reconciliation-service",
       "objective_id": "milestone-9-lineage-cooldown-schedule",
-      "feature": "feature-deadline-schedule-calculator",
-      "scope": "src/jobs/deadline-schedule.ts,tests/deadline-schedule.test.ts",
-      "priority": 8,
-      "status": "PENDING",
-      "attempt": 0,
-      "description": "Implement dynamic deadline-aware collection and recheck schedule calculator to compute next collection timestamps based on application deadlines, urgency horizons, and source verification requirements.",
+      "feature": "feature-intake-reconciliation-service",
+      "scope": "src/catalogue/intake-reconciler.ts,tests/intake-reconciler.test.ts",
+      "priority": 10,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 120,
+      "session_id": "opencode-gpt56sol-20261111-t7c4a8-20261111-285809b8",
+      "result_id": "milestone-9-lineage-cooldown-schedule::feature-intake-reconciliation-service::120",
+      "description": "Implement intake identity reconciliation service to distinguish new recurring scholarship/program intakes (e.g. Fall 2027 vs. Fall 2026), recognize edition equivalence across academic terms, identify ambiguous labels requiring operator review, and generate canonical offering identity keys.",
       "acceptance_criteria": [
-        "calculateNextScheduleTime(opportunity, options) determines the next required verification/collection timestamp based on deadline proximity relative to reference time (defaulting to current UTC)",
-        "Applies tiered cadence rules: Urgent horizon (within 48 hours of deadline: hourly recheck), Approaching horizon (within 14 days of deadline: daily recheck at configured UTC hour), Standard horizon (more than 14 days out: weekly recheck), Rolling/unstated deadline (bi-weekly cadence), Past deadline (expired: terminal/no further scheduled runs)",
-        "Supports pre-digest and pre-reminder urgent recheck window calculation (e.g. ensure freshness within 6 hours before 7-day or 2-day reminder dispatch)",
-        "Evaluates isScheduleDue(nextScheduleTime, referenceTime) returning boolean due status and delay/overdue duration in seconds",
-        "Handles edge cases: missing deadline, rolling admission flag, malformed dates, timezone discrepancies, and dates in the past"
+        "reconcileIntakeIdentity(incoming, existingOfferings, options) evaluates incoming intake title, term/academic year, and target deadline against existing published/historical offerings",
+        "Identifies relationship: SAME_EDITION (exact match or alias of current intake), NEW_CYCLE (valid future intake cycle for same program, e.g. Fall 2027 following Fall 2026), PREVIOUS_CYCLE (expired/historical cycle), or AMBIGUOUS (conflicting or unstated term requiring human review)",
+        "Parses common term naming variants in English and Chinese (e.g. 'Fall 2026', 'Autumn 2026', '2026秋季', 'Spring 2027', '2027春季', '2026-2027 Academic Year')",
+        "Generates normalized canonical intake identifier (e.g. '2026-fall', '2027-spring') and provides a match confidence score",
+        "Deterministic evaluation with pure domain logic, handling malformed, empty, or unparseable intake strings safely without throwing"
       ],
       "validation": [
-        "node --import tsx --test tests/deadline-schedule.test.ts && npm run typecheck"
+        "node --import tsx --test tests/intake-reconciler.test.ts \u0026\u0026 npm run typecheck"
       ],
-      "capability": "coding"
+      "capability": "coding",
+      "branch": "agent/feature-intake-reconciliation-service-61d90f54",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-intake-reconciliation-service-61d90f54",
+      "base_sha": "main"
     }
   },
   "results": {
@@ -1237,6 +1273,57 @@
         "Meter is a pure service over supplied usage records and does not read the database budget or research ledger, which was outside the approved scope"
       ],
       "recorded_utc": "2026-11-11T08:49:36Z"
+    },
+    "milestone-9-lineage-cooldown-schedule::feature-deadline-schedule-calculator::128": {
+      "id": "milestone-9-lineage-cooldown-schedule::feature-deadline-schedule-calculator::128",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "task_id": "feature-deadline-schedule-calculator",
+      "session_id": "opencode-gpt56sol-20261111-w9c3f7-20261111-b47bb63a",
+      "assignment_generation": 128,
+      "branch": "agent/feature-deadline-schedule-calculator-bb9809f5",
+      "head_sha": "437faddfb347df44ca386e8fa07a412bf5533bce",
+      "validation": "deadline schedule tests pass (6/6); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "437fadd"
+      ],
+      "limitations": [
+        "Calculator is a pure service and is not wired into the existing source_collection_policies scheduling, which stayed outside the approved scope"
+      ],
+      "recorded_utc": "2026-11-11T10:55:39Z"
+    },
+    "milestone-9-lineage-cooldown-schedule::feature-host-cooldown-coordinator::124": {
+      "id": "milestone-9-lineage-cooldown-schedule::feature-host-cooldown-coordinator::124",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "task_id": "feature-host-cooldown-coordinator",
+      "session_id": "opencode-gpt56sol-20261111-u2b6d5-20261111-b584d31f",
+      "assignment_generation": 124,
+      "branch": "agent/feature-host-cooldown-coordinator-af0f00d9",
+      "head_sha": "df3b50ad60b15ca665de963959101ecb45d0b4cd",
+      "validation": "host cooldown coordinator tests pass (5/5); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "df3b50a"
+      ],
+      "limitations": [
+        "Coordinator is process-local and does not replace the existing durable database host locks and cooldowns"
+      ],
+      "recorded_utc": "2026-11-11T10:48:20Z"
+    },
+    "milestone-9-lineage-cooldown-schedule::feature-intake-reconciliation-service::120": {
+      "id": "milestone-9-lineage-cooldown-schedule::feature-intake-reconciliation-service::120",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "task_id": "feature-intake-reconciliation-service",
+      "session_id": "opencode-gpt56sol-20261111-t7c4a8-20261111-285809b8",
+      "assignment_generation": 120,
+      "branch": "agent/feature-intake-reconciliation-service-61d90f54",
+      "head_sha": "171a2c5fdce7ce83786ab3f432ee54765b1674a8",
+      "validation": "intake reconciler tests pass (6/6); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "171a2c5"
+      ],
+      "limitations": [
+        "Reconciler is a pure domain service and does not yet drive review-tool decisions, which stayed outside the approved scope"
+      ],
+      "recorded_utc": "2026-11-11T10:44:18Z"
     },
     "result-pr-27": {
       "id": "result-pr-27",
@@ -1604,6 +1691,18 @@
       "decision": "APPROVED",
       "decided_by": "planner-antigravity-20261104-b9e2894a",
       "decided_utc": "2026-11-11T10:26:02Z"
+    },
+    "milestone-9-lineage-cooldown-schedule": {
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "status": "APPROVED",
+      "result_ids": [
+        "milestone-9-lineage-cooldown-schedule::feature-deadline-schedule-calculator::128",
+        "milestone-9-lineage-cooldown-schedule::feature-host-cooldown-coordinator::124",
+        "milestone-9-lineage-cooldown-schedule::feature-intake-reconciliation-service::120"
+      ],
+      "decision": "APPROVED",
+      "decided_by": "planner-antigravity-20261104-b9e2894a",
+      "decided_utc": "2026-11-11T11:42:29Z"
     }
   },
   "events": [
@@ -2432,6 +2531,97 @@
       "operation": "adopt-objective",
       "generation": 119,
       "utc": "2026-11-11T10:35:00Z"
+    },
+    {
+      "id": "120-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 120,
+      "utc": "2026-11-11T10:39:12Z"
+    },
+    {
+      "id": "121-register-session",
+      "actor": "opencode-gpt56sol-20261111-t7c4a8-20261111-285809b8",
+      "operation": "register-session",
+      "generation": 121,
+      "utc": "2026-11-11T10:39:12Z"
+    },
+    {
+      "id": "122-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 122,
+      "utc": "2026-11-11T10:39:13Z"
+    },
+    {
+      "id": "123-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 123,
+      "utc": "2026-11-11T10:44:18Z"
+    },
+    {
+      "id": "124-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 124,
+      "utc": "2026-11-11T10:44:34Z"
+    },
+    {
+      "id": "125-register-session",
+      "actor": "opencode-gpt56sol-20261111-u2b6d5-20261111-b584d31f",
+      "operation": "register-session",
+      "generation": 125,
+      "utc": "2026-11-11T10:44:34Z"
+    },
+    {
+      "id": "126-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 126,
+      "utc": "2026-11-11T10:44:34Z"
+    },
+    {
+      "id": "127-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 127,
+      "utc": "2026-11-11T10:48:20Z"
+    },
+    {
+      "id": "128-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 128,
+      "utc": "2026-11-11T10:48:30Z"
+    },
+    {
+      "id": "129-register-session",
+      "actor": "opencode-gpt56sol-20261111-w9c3f7-20261111-b47bb63a",
+      "operation": "register-session",
+      "generation": 129,
+      "utc": "2026-11-11T10:48:30Z"
+    },
+    {
+      "id": "130-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 130,
+      "utc": "2026-11-11T10:48:30Z"
+    },
+    {
+      "id": "131-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 131,
+      "utc": "2026-11-11T10:55:39Z"
+    },
+    {
+      "id": "132-review-decision",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "review-decision",
+      "generation": 132,
+      "utc": "2026-11-11T11:42:29Z"
     }
   ]
 }
