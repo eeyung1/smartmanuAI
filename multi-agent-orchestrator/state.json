@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 118,
+    "generation": 119,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -201,6 +201,11 @@
       "id": "milestone-8-spending-mismatch-cron",
       "description": "Milestone 8: Spending Controls, Mismatch Explanations and Hosted Cron Runner",
       "status": "APPROVED"
+    },
+    "milestone-9-lineage-cooldown-schedule": {
+      "id": "milestone-9-lineage-cooldown-schedule",
+      "description": "Milestone 9: Offering Lineage, Host Cooldowns and Deadline-Aware Scheduling",
+      "status": "OPEN"
     }
   },
   "tasks": {
@@ -852,6 +857,70 @@
       "branch": "agent/feature-operations-spending-meter-e065eca1",
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-operations-spending-meter-e065eca1",
       "base_sha": "main"
+    },
+    "milestone-9-lineage-cooldown-schedule::feature-intake-reconciliation-service": {
+      "id": "feature-intake-reconciliation-service",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "feature": "feature-intake-reconciliation-service",
+      "scope": "src/catalogue/intake-reconciler.ts,tests/intake-reconciler.test.ts",
+      "priority": 10,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement intake identity reconciliation service to distinguish new recurring scholarship/program intakes (e.g. Fall 2027 vs. Fall 2026), recognize edition equivalence across academic terms, identify ambiguous labels requiring operator review, and generate canonical offering identity keys.",
+      "acceptance_criteria": [
+        "reconcileIntakeIdentity(incoming, existingOfferings, options) evaluates incoming intake title, term/academic year, and target deadline against existing published/historical offerings",
+        "Identifies relationship: SAME_EDITION (exact match or alias of current intake), NEW_CYCLE (valid future intake cycle for same program, e.g. Fall 2027 following Fall 2026), PREVIOUS_CYCLE (expired/historical cycle), or AMBIGUOUS (conflicting or unstated term requiring human review)",
+        "Parses common term naming variants in English and Chinese (e.g. 'Fall 2026', 'Autumn 2026', '2026秋季', 'Spring 2027', '2027春季', '2026-2027 Academic Year')",
+        "Generates normalized canonical intake identifier (e.g. '2026-fall', '2027-spring') and provides a match confidence score",
+        "Deterministic evaluation with pure domain logic, handling malformed, empty, or unparseable intake strings safely without throwing"
+      ],
+      "validation": [
+        "node --import tsx --test tests/intake-reconciler.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-9-lineage-cooldown-schedule::feature-host-cooldown-coordinator": {
+      "id": "feature-host-cooldown-coordinator",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "feature": "feature-host-cooldown-coordinator",
+      "scope": "src/research/host-cooldown.ts,tests/host-cooldown-coordinator.test.ts",
+      "priority": 9,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement host collection lease and cooldown coordinator to prevent crawler flooding, enforce exponential backoff on consecutive host failures (429, 503, network timeouts), evaluate host availability, and manage bounded leases for concurrent collection workers.",
+      "acceptance_criteria": [
+        "evaluateHostAvailability(hostState, options) checks whether an academic host is currently eligible for collection based on last request timestamp, active lease count, and backoff cooldown",
+        "Implements exponential backoff cooldown calculation: base delay scaled exponentially with consecutive failures (e.g. 1st fail: 10s, 2nd: 30s, 3rd: 120s, up to max ceiling 1800s / 30m)",
+        "Supports explicit Retry-After header overrides when provided by the host response",
+        "Manages collection lease grants (acquireHostLease) with bounded TTL (e.g. 60s) to prevent abandoned locks, and releases leases upon completion or failure (releaseHostLease)",
+        "Tracks host health metrics: status AVAILABLE, RATE_LIMITED, COOLING_DOWN, MAX_RETRIES_EXCEEDED",
+        "Pure in-memory coordinator with thread-safe/idempotent state mutations, handling unknown hosts or malformed hostnames gracefully"
+      ],
+      "validation": [
+        "node --import tsx --test tests/host-cooldown-coordinator.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-9-lineage-cooldown-schedule::feature-deadline-schedule-calculator": {
+      "id": "feature-deadline-schedule-calculator",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "feature": "feature-deadline-schedule-calculator",
+      "scope": "src/jobs/deadline-schedule.ts,tests/deadline-schedule.test.ts",
+      "priority": 8,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement dynamic deadline-aware collection and recheck schedule calculator to compute next collection timestamps based on application deadlines, urgency horizons, and source verification requirements.",
+      "acceptance_criteria": [
+        "calculateNextScheduleTime(opportunity, options) determines the next required verification/collection timestamp based on deadline proximity relative to reference time (defaulting to current UTC)",
+        "Applies tiered cadence rules: Urgent horizon (within 48 hours of deadline: hourly recheck), Approaching horizon (within 14 days of deadline: daily recheck at configured UTC hour), Standard horizon (more than 14 days out: weekly recheck), Rolling/unstated deadline (bi-weekly cadence), Past deadline (expired: terminal/no further scheduled runs)",
+        "Supports pre-digest and pre-reminder urgent recheck window calculation (e.g. ensure freshness within 6 hours before 7-day or 2-day reminder dispatch)",
+        "Evaluates isScheduleDue(nextScheduleTime, referenceTime) returning boolean due status and delay/overdue duration in seconds",
+        "Handles edge cases: missing deadline, rolling admission flag, malformed dates, timezone discrepancies, and dates in the past"
+      ],
+      "validation": [
+        "node --import tsx --test tests/deadline-schedule.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
     }
   },
   "results": {
@@ -2356,6 +2425,13 @@
       "operation": "review-decision",
       "generation": 118,
       "utc": "2026-11-11T10:26:02Z"
+    },
+    {
+      "id": "119-adopt-milestone-9",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "adopt-objective",
+      "generation": 119,
+      "utc": "2026-11-11T10:35:00Z"
     }
   ]
 }

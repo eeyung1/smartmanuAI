@@ -536,3 +536,13 @@ Append-only completed-work evidence.
   - Task 23: `feature-catalogue-mismatch-explainer` (PR #83, merge commit `a313655137ee30bc2c1b0fa02f472abf1a2c14b2`)
   - Task 24: `feature-cron-scheduler-runner` (PR #85, merge commit `cafcb971aa20ca98a8003fd9bf0325dc560aa936`)
 - Milestone 8 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 22, 23, 24) merged, CI green, and validated in `main`.
+
+## milestone-9-lineage-cooldown-schedule — Objective Adopted
+- Objective ID: `milestone-9-lineage-cooldown-schedule`
+- Description: Milestone 9: Offering Lineage, Host Cooldowns and Deadline-Aware Scheduling
+- Adopted by: `planner-antigravity-20261104-b9e2894a`
+- Adopted UTC: 2026-11-11T10:35:00Z
+- Tasks:
+  - Task 25: `feature-intake-reconciliation-service` (Priority 10, PENDING)
+  - Task 26: `feature-host-cooldown-coordinator` (Priority 9, PENDING)
+  - Task 27: `feature-deadline-schedule-calculator` (Priority 8, PENDING)

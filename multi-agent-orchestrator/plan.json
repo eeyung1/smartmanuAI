@@ -1,70 +1,68 @@
 {
-  "id": "milestone-8-spending-mismatch-cron",
-  "objective": "Milestone 8: Spending Controls, Mismatch Explanations and Hosted Cron Runner",
+  "id": "milestone-9-lineage-cooldown-schedule",
+  "objective": "Milestone 9: Offering Lineage, Host Cooldowns and Deadline-Aware Scheduling",
   "tasks": [
     {
-      "id": "feature-operations-spending-meter",
-      "objective_id": "milestone-8-spending-mismatch-cron",
-      "feature": "feature-operations-spending-meter",
-      "scope": "src/admin/spending-meter.ts,tests/spending-meter.test.ts",
+      "id": "feature-intake-reconciliation-service",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "feature": "feature-intake-reconciliation-service",
+      "scope": "src/catalogue/intake-reconciler.ts,tests/intake-reconciler.test.ts",
       "priority": 10,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement monthly operational spending meter, token usage accounting, and spend threshold alerts (70% warning, 90% throttle, 100% hard ceiling against US$30/mo budget).",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement intake identity reconciliation service to distinguish new recurring scholarship/program intakes (e.g. Fall 2027 vs. Fall 2026), recognize edition equivalence across academic terms, identify ambiguous labels requiring operator review, and generate canonical offering identity keys.",
       "acceptance_criteria": [
-        "calculateMonthlySpending(usageRecords, options) aggregates provider token consumption and research/outbound operational costs into USD microdollars for a given billing month (defaulting to current UTC month)",
-        "Evaluates spending against configurable monthly budget ceilings (defaulting to PRD D05 US$30.00 / 30,000,000 microdollars)",
-        "Computes operational spend threshold alerts: status NORMAL (<70%), WARNING (>=70%), THROTTLE (>=90%), and HARD_STOP (>=100%)",
-        "Provides structured throttle directives indicating whether expensive AI extractions or collection jobs should be deferred or blocked",
-        "Formats bilingual alert messages (EN/ZH) suitable for administrator notification digests and operations dashboard display",
-        "Validates input usage records, handles empty or malformed cost inputs safely without throwing, and ensures deterministic monetary math (integer microdollars)"
+        "reconcileIntakeIdentity(incoming, existingOfferings, options) evaluates incoming intake title, term/academic year, and target deadline against existing published/historical offerings",
+        "Identifies relationship: SAME_EDITION (exact match or alias of current intake), NEW_CYCLE (valid future intake cycle for same program, e.g. Fall 2027 following Fall 2026), PREVIOUS_CYCLE (expired/historical cycle), or AMBIGUOUS (conflicting or unstated term requiring human review)",
+        "Parses common term naming variants in English and Chinese (e.g. 'Fall 2026', 'Autumn 2026', '2026秋季', 'Spring 2027', '2027春季', '2026-2027 Academic Year')",
+        "Generates normalized canonical intake identifier (e.g. '2026-fall', '2027-spring') and provides a match confidence score",
+        "Deterministic evaluation with pure domain logic, handling malformed, empty, or unparseable intake strings safely without throwing"
       ],
       "validation": [
-        "node --import tsx --test tests/spending-meter.test.ts && npm run typecheck"
+        "node --import tsx --test tests/intake-reconciler.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-catalogue-mismatch-explainer",
-      "objective_id": "milestone-8-spending-mismatch-cron",
-      "feature": "feature-catalogue-mismatch-explainer",
-      "scope": "src/domain/mismatch-explainer.ts,tests/mismatch-explainer.test.ts",
+      "id": "feature-host-cooldown-coordinator",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "feature": "feature-host-cooldown-coordinator",
+      "scope": "src/research/host-cooldown.ts,tests/host-cooldown-coordinator.test.ts",
       "priority": 9,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement deliberate catalogue mismatch explanation service to evaluate why an opportunity outside a user's match set does not match their saved profile.",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement host collection lease and cooldown coordinator to prevent crawler flooding, enforce exponential backoff on consecutive host failures (429, 503, network timeouts), evaluate host availability, and manage bounded leases for concurrent collection workers.",
       "acceptance_criteria": [
-        "explainOpportunityMismatch(opportunity, profile, options) compares an opportunity's eligibility rules against a user profile and returns a structured evaluation (isMatch: boolean, mismatches: MismatchReason[])",
-        "Evaluates specific mismatch dimensions: nationality restrictions, birth year/age limits, target degree tier mismatch (e.g. Bachelor vs Master/PhD), and language proficiency deficits (IELTS/TOEFL/HSK)",
-        "Generates clear, user-facing bilingual explanations (EN/ZH) for each identified mismatch dimension",
-        "Supports partial or incomplete profile inputs gracefully, identifying missing user qualifications as informational guidance rather than fatal mismatches",
-        "Computes a match affinity score or percentage to indicate how close a non-matching opportunity is to the user's qualifications",
-        "Enforces deterministic evaluation with zero side effects"
+        "evaluateHostAvailability(hostState, options) checks whether an academic host is currently eligible for collection based on last request timestamp, active lease count, and backoff cooldown",
+        "Implements exponential backoff cooldown calculation: base delay scaled exponentially with consecutive failures (e.g. 1st fail: 10s, 2nd: 30s, 3rd: 120s, up to max ceiling 1800s / 30m)",
+        "Supports explicit Retry-After header overrides when provided by the host response",
+        "Manages collection lease grants (acquireHostLease) with bounded TTL (e.g. 60s) to prevent abandoned locks, and releases leases upon completion or failure (releaseHostLease)",
+        "Tracks host health metrics: status AVAILABLE, RATE_LIMITED, COOLING_DOWN, MAX_RETRIES_EXCEEDED",
+        "Pure in-memory coordinator with thread-safe/idempotent state mutations, handling unknown hosts or malformed hostnames gracefully"
       ],
       "validation": [
-        "node --import tsx --test tests/mismatch-explainer.test.ts && npm run typecheck"
+        "node --import tsx --test tests/host-cooldown-coordinator.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-cron-scheduler-runner",
-      "objective_id": "milestone-8-spending-mismatch-cron",
-      "feature": "feature-cron-scheduler-runner",
-      "scope": "src/jobs/cron-runner.ts,tests/cron-runner.test.ts",
+      "id": "feature-deadline-schedule-calculator",
+      "objective_id": "milestone-9-lineage-cooldown-schedule",
+      "feature": "feature-deadline-schedule-calculator",
+      "scope": "src/jobs/deadline-schedule.ts,tests/deadline-schedule.test.ts",
       "priority": 8,
-      "status": "COMPLETE",
-      "attempt": 1,
-      "description": "Implement hosted background cron runner adapter to coordinate and execute scheduled recurring tasks (digests, deadline reminders, retention sweep) with authorized job keys and execution audit logs.",
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement dynamic deadline-aware collection and recheck schedule calculator to compute next collection timestamps based on application deadlines, urgency horizons, and source verification requirements.",
       "acceptance_criteria": [
-        "executeScheduledJobRunner(jobName, context, options) dispatches registered recurring jobs (digest_dispatch, reminder_recheck, retention_sweep) based on schedule criteria and authorized execution keys",
-        "Enforces job authorization via secret token/key or operator context, rejecting unauthorized trigger attempts",
-        "Records structured execution audit records detailing job name, start/end timestamps, outcome (SUCCESS, PARTIAL, FAILURE), affected entity counts, and execution duration",
-        "Implements job lock/overlap prevention semantics to ensure a long-running job instance does not execute concurrently with itself",
-        "Provides dry-run execution mode (dryRun: true) to simulate scheduled runs and report planned actions without committing changes",
-        "Handles job-level errors gracefully, isolating failures so subsequent scheduled tasks or dependent hooks are not crashed"
+        "calculateNextScheduleTime(opportunity, options) determines the next required verification/collection timestamp based on deadline proximity relative to reference time (defaulting to current UTC)",
+        "Applies tiered cadence rules: Urgent horizon (within 48 hours of deadline: hourly recheck), Approaching horizon (within 14 days of deadline: daily recheck at configured UTC hour), Standard horizon (more than 14 days out: weekly recheck), Rolling/unstated deadline (bi-weekly cadence), Past deadline (expired: terminal/no further scheduled runs)",
+        "Supports pre-digest and pre-reminder urgent recheck window calculation (e.g. ensure freshness within 6 hours before 7-day or 2-day reminder dispatch)",
+        "Evaluates isScheduleDue(nextScheduleTime, referenceTime) returning boolean due status and delay/overdue duration in seconds",
+        "Handles edge cases: missing deadline, rolling admission flag, malformed dates, timezone discrepancies, and dates in the past"
       ],
       "validation": [
-        "node --import tsx --test tests/cron-runner.test.ts && npm run typecheck"
+        "node --import tsx --test tests/deadline-schedule.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }
