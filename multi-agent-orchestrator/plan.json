@@ -1,70 +1,70 @@
 {
-  "id": "milestone-7-discovery-multi-retention",
-  "objective": "Milestone 7: Discovery Queries, Multi-Opportunity Extraction and Data Retention Sweeper",
+  "id": "milestone-8-spending-mismatch-cron",
+  "objective": "Milestone 8: Spending Controls, Mismatch Explanations and Hosted Cron Runner",
   "tasks": [
     {
-      "id": "feature-search-query-generator",
-      "objective_id": "milestone-7-discovery-multi-retention",
-      "feature": "feature-search-query-generator",
-      "scope": "src/research/discovery-queries.ts,tests/discovery-queries.test.ts",
+      "id": "feature-operations-spending-meter",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "feature": "feature-operations-spending-meter",
+      "scope": "src/admin/spending-meter.ts,tests/spending-meter.test.ts",
       "priority": 10,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement automated bilingual (EN/ZH) scholarship discovery query generator for target academic institutions, degree tiers, and disciplines (smart manufacturing, robotics) with negative-term filtering and syntax formatting.",
+      "description": "Implement monthly operational spending meter, token usage accounting, and spend threshold alerts (70% warning, 90% throttle, 100% hard ceiling against US$30/mo budget).",
       "acceptance_criteria": [
-        "generateDiscoveryQueries(options) builds structured search query strings across targeted dimensions (institution, degree, discipline, intake year)",
-        "Generates bilingual queries supporting English and Chinese terms (e.g. 'smart manufacturing', '智能制造', 'robotics', '机器人', 'scholarship', '奖学金')",
-        "Applies negative search filters to prune noise (e.g. -consultancy, -agents, -commercial, -recruitment)",
-        "Supports operator-configurable search provider targets (Google, Bing, Baidu) with appropriate syntax modifiers (e.g. site:edu.cn, filetype:html)",
-        "Returns structured query objects with unique ID, query text, intended search engine target, priority weight, and metadata tags",
-        "Enforces bounded query list sizing and input parameter validation"
+        "calculateMonthlySpending(usageRecords, options) aggregates provider token consumption and research/outbound operational costs into USD microdollars for a given billing month (defaulting to current UTC month)",
+        "Evaluates spending against configurable monthly budget ceilings (defaulting to PRD D05 US$30.00 / 30,000,000 microdollars)",
+        "Computes operational spend threshold alerts: status NORMAL (<70%), WARNING (>=70%), THROTTLE (>=90%), and HARD_STOP (>=100%)",
+        "Provides structured throttle directives indicating whether expensive AI extractions or collection jobs should be deferred or blocked",
+        "Formats bilingual alert messages (EN/ZH) suitable for administrator notification digests and operations dashboard display",
+        "Validates input usage records, handles empty or malformed cost inputs safely without throwing, and ensures deterministic monetary math (integer microdollars)"
       ],
       "validation": [
-        "node --import tsx --test tests/discovery-queries.test.ts && npm run typecheck"
+        "node --import tsx --test tests/spending-meter.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-multi-opportunity-extractor",
-      "objective_id": "milestone-7-discovery-multi-retention",
-      "feature": "feature-multi-opportunity-extractor",
-      "scope": "src/research/multi-extractor.ts,tests/multi-extractor.test.ts",
+      "id": "feature-catalogue-mismatch-explainer",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "feature": "feature-catalogue-mismatch-explainer",
+      "scope": "src/domain/mismatch-explainer.ts,tests/mismatch-explainer.test.ts",
       "priority": 9,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement multi-opportunity listing and table parser for aggregated directory and listing HTML pages, extracting individual opportunity records, deadlines, and direct apply links without row cross-contamination.",
+      "description": "Implement deliberate catalogue mismatch explanation service to evaluate why an opportunity outside a user's match set does not match their saved profile.",
       "acceptance_criteria": [
-        "extractMultipleOpportunities(html, baseUrl, options) parses aggregated HTML tables, lists, or card layouts containing multiple scholarship programs or degree offerings",
-        "Extracts structured candidate records with title, deadline text, funding level/type, host university, and resolved absolute URL",
-        "Prevents cross-contamination across adjacent table rows or sibling card elements",
-        "Enforces URL normalization and same-host or academic subdomain validation against baseUrl",
-        "Handles missing or partial fields gracefully with fallbacks and extraction confidence scoring",
-        "Enforces bounded limits for input length and max extracted opportunities per document"
+        "explainOpportunityMismatch(opportunity, profile, options) compares an opportunity's eligibility rules against a user profile and returns a structured evaluation (isMatch: boolean, mismatches: MismatchReason[])",
+        "Evaluates specific mismatch dimensions: nationality restrictions, birth year/age limits, target degree tier mismatch (e.g. Bachelor vs Master/PhD), and language proficiency deficits (IELTS/TOEFL/HSK)",
+        "Generates clear, user-facing bilingual explanations (EN/ZH) for each identified mismatch dimension",
+        "Supports partial or incomplete profile inputs gracefully, identifying missing user qualifications as informational guidance rather than fatal mismatches",
+        "Computes a match affinity score or percentage to indicate how close a non-matching opportunity is to the user's qualifications",
+        "Enforces deterministic evaluation with zero side effects"
       ],
       "validation": [
-        "node --import tsx --test tests/multi-extractor.test.ts && npm run typecheck"
+        "node --import tsx --test tests/mismatch-explainer.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     },
     {
-      "id": "feature-data-retention-sweeper",
-      "objective_id": "milestone-7-discovery-multi-retention",
-      "feature": "feature-data-retention-sweeper",
-      "scope": "src/privacy/retention-sweeper.ts,tests/retention-sweeper.test.ts",
+      "id": "feature-cron-scheduler-runner",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "feature": "feature-cron-scheduler-runner",
+      "scope": "src/jobs/cron-runner.ts,tests/cron-runner.test.ts",
       "priority": 8,
       "status": "PENDING",
       "attempt": 0,
-      "description": "Implement automated data lifecycle retention sweeper to enforce GDPR and operational storage retention policies (FR09), purging delivery logs older than 90 days, evidence snapshots older than 180 days, and expired ephemeral tokens, operating transactionally with audit logging.",
+      "description": "Implement hosted background cron runner adapter to coordinate and execute scheduled recurring tasks (digests, deadline reminders, retention sweep) with authorized job keys and execution audit logs.",
       "acceptance_criteria": [
-        "executeRetentionSweep(sql, options) identifies and purges expired records according to configured retention windows (delivery logs > 90d, evidence snapshots > 180d, expired session/auth tokens > 30d)",
-        "Executes deletions transactionally (or in bounded batches) to prevent table locks and database degradation",
-        "Generates a structured sweep report detailing record counts deleted per table and duration",
-        "Preserves referential integrity and avoids breaking active foreign keys",
-        "Dry-run mode (dryRun: true) supported to inspect candidates without mutating the database",
-        "Verifies operator authority or automated job authentication before execution"
+        "executeScheduledJobRunner(jobName, context, options) dispatches registered recurring jobs (digest_dispatch, reminder_recheck, retention_sweep) based on schedule criteria and authorized execution keys",
+        "Enforces job authorization via secret token/key or operator context, rejecting unauthorized trigger attempts",
+        "Records structured execution audit records detailing job name, start/end timestamps, outcome (SUCCESS, PARTIAL, FAILURE), affected entity counts, and execution duration",
+        "Implements job lock/overlap prevention semantics to ensure a long-running job instance does not execute concurrently with itself",
+        "Provides dry-run execution mode (dryRun: true) to simulate scheduled runs and report planned actions without committing changes",
+        "Handles job-level errors gracefully, isolating failures so subsequent scheduled tasks or dependent hooks are not crashed"
       ],
       "validation": [
-        "node --import tsx --test tests/retention-sweeper.test.ts && npm run typecheck"
+        "node --import tsx --test tests/cron-runner.test.ts && npm run typecheck"
       ],
       "capability": "coding"
     }

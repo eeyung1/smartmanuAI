@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 102,
+    "generation": 103,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -178,6 +178,11 @@
       "id": "milestone-7-discovery-multi-retention",
       "description": "Milestone 7: Discovery Queries, Multi-Opportunity Extraction and Data Retention Sweeper",
       "status": "APPROVED"
+    },
+    "milestone-8-spending-mismatch-cron": {
+      "id": "milestone-8-spending-mismatch-cron",
+      "description": "Milestone 8: Spending Controls, Mismatch Explanations and Hosted Cron Runner",
+      "status": "OPEN"
     }
   },
   "tasks": {
@@ -745,6 +750,72 @@
       "branch": "agent/feature-search-query-generator-ed2f5478",
       "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-search-query-generator-ed2f5478",
       "base_sha": "main"
+    },
+    "milestone-8-spending-mismatch-cron::feature-operations-spending-meter": {
+      "id": "feature-operations-spending-meter",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "feature": "feature-operations-spending-meter",
+      "scope": "src/admin/spending-meter.ts,tests/spending-meter.test.ts",
+      "priority": 10,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement monthly operational spending meter, token usage accounting, and spend threshold alerts (70% warning, 90% throttle, 100% hard ceiling against US$30/mo budget).",
+      "acceptance_criteria": [
+        "calculateMonthlySpending(usageRecords, options) aggregates provider token consumption and research/outbound operational costs into USD microdollars for a given billing month (defaulting to current UTC month)",
+        "Evaluates spending against configurable monthly budget ceilings (defaulting to PRD D05 US$30.00 / 30,000,000 microdollars)",
+        "Computes operational spend threshold alerts: status NORMAL (<70%), WARNING (>=70%), THROTTLE (>=90%), and HARD_STOP (>=100%)",
+        "Provides structured throttle directives indicating whether expensive AI extractions or collection jobs should be deferred or blocked",
+        "Formats bilingual alert messages (EN/ZH) suitable for administrator notification digests and operations dashboard display",
+        "Validates input usage records, handles empty or malformed cost inputs safely without throwing, and ensures deterministic monetary math (integer microdollars)"
+      ],
+      "validation": [
+        "node --import tsx --test tests/spending-meter.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-8-spending-mismatch-cron::feature-catalogue-mismatch-explainer": {
+      "id": "feature-catalogue-mismatch-explainer",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "feature": "feature-catalogue-mismatch-explainer",
+      "scope": "src/domain/mismatch-explainer.ts,tests/mismatch-explainer.test.ts",
+      "priority": 9,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement deliberate catalogue mismatch explanation service to evaluate why an opportunity outside a user's match set does not match their saved profile.",
+      "acceptance_criteria": [
+        "explainOpportunityMismatch(opportunity, profile, options) compares an opportunity's eligibility rules against a user profile and returns a structured evaluation (isMatch: boolean, mismatches: MismatchReason[])",
+        "Evaluates specific mismatch dimensions: nationality restrictions, birth year/age limits, target degree tier mismatch (e.g. Bachelor vs Master/PhD), and language proficiency deficits (IELTS/TOEFL/HSK)",
+        "Generates clear, user-facing bilingual explanations (EN/ZH) for each identified mismatch dimension",
+        "Supports partial or incomplete profile inputs gracefully, identifying missing user qualifications as informational guidance rather than fatal mismatches",
+        "Computes a match affinity score or percentage to indicate how close a non-matching opportunity is to the user's qualifications",
+        "Enforces deterministic evaluation with zero side effects"
+      ],
+      "validation": [
+        "node --import tsx --test tests/mismatch-explainer.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
+    },
+    "milestone-8-spending-mismatch-cron::feature-cron-scheduler-runner": {
+      "id": "feature-cron-scheduler-runner",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "feature": "feature-cron-scheduler-runner",
+      "scope": "src/jobs/cron-runner.ts,tests/cron-runner.test.ts",
+      "priority": 8,
+      "status": "PENDING",
+      "attempt": 0,
+      "description": "Implement hosted background cron runner adapter to coordinate and execute scheduled recurring tasks (digests, deadline reminders, retention sweep) with authorized job keys and execution audit logs.",
+      "acceptance_criteria": [
+        "executeScheduledJobRunner(jobName, context, options) dispatches registered recurring jobs (digest_dispatch, reminder_recheck, retention_sweep) based on schedule criteria and authorized execution keys",
+        "Enforces job authorization via secret token/key or operator context, rejecting unauthorized trigger attempts",
+        "Records structured execution audit records detailing job name, start/end timestamps, outcome (SUCCESS, PARTIAL, FAILURE), affected entity counts, and execution duration",
+        "Implements job lock/overlap prevention semantics to ensure a long-running job instance does not execute concurrently with itself",
+        "Provides dry-run execution mode (dryRun: true) to simulate scheduled runs and report planned actions without committing changes",
+        "Handles job-level errors gracefully, isolating failures so subsequent scheduled tasks or dependent hooks are not crashed"
+      ],
+      "validation": [
+        "node --import tsx --test tests/cron-runner.test.ts && npm run typecheck"
+      ],
+      "capability": "coding"
     }
   },
   "results": {
@@ -2044,6 +2115,13 @@
       "operation": "review-decision",
       "generation": 102,
       "utc": "2026-11-10T20:36:36Z"
+    },
+    {
+      "id": "103-adopt-milestone-8",
+      "actor": "planner-antigravity-20261104-b9e2894a",
+      "operation": "adopt-objective",
+      "generation": 103,
+      "utc": "2026-11-11T08:35:00Z"
     }
   ]
 }

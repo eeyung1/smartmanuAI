@@ -105,3 +105,11 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 - **2026-11-10 20:10 UTC**: Planner merged PR #81 (`feat/multi-opportunity-extractor`) into `main` (merge commit `5a2fc787e397f01845a8193f41a917fe9119b0fc`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 20 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-10 20:36 UTC**: Planner merged PR #82 (`feat/data-retention-sweeper`) into `main` (merge commit `2c4a2bb21299389d924eaab69a7d615d4754c0b6`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 21 marked Complete. Primary checkout on `main` synchronized.
 - **2026-11-10 20:36 UTC**: Planner completed formal objective review for Milestone 7 (`milestone-7-discovery-multi-retention`) with decision `APPROVED` (Gen 102). Milestone 7 is 100% COMPLETE & APPROVED. Primary checkout on `main` synchronized.
+
+## Milestone 8 Formulation & Decomposition — 2026-11-11T08:35:00Z
+- Human operator authorized Milestone 8 ("Spending Controls, Mismatch Explanations and Hosted Cron Runner").
+- Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
+  22. `feature-operations-spending-meter`: Monthly operational spending meter, token usage accounting, and spend threshold alerts (70% warning, 90% throttle, 100% hard ceiling against US$30/mo budget) (`src/admin/spending-meter.ts`, `tests/spending-meter.test.ts`). Status: **PENDING**.
+  23. `feature-catalogue-mismatch-explainer`: Deliberate catalogue mismatch explanation service to evaluate why an opportunity outside a user's match set does not match their saved profile (`src/domain/mismatch-explainer.ts`, `tests/mismatch-explainer.test.ts`). Status: **PENDING**.
+  24. `feature-cron-scheduler-runner`: Hosted background cron runner adapter to coordinate and execute scheduled recurring tasks (digests, deadline reminders, retention sweep) with authorized job keys and execution audit logs (`src/jobs/cron-runner.ts`, `tests/cron-runner.test.ts`). Status: **PENDING**.
+- Structured authority reconciled in `state.json` (Gen 103) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.
