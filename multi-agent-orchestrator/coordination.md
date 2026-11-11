@@ -109,7 +109,10 @@ Structured authority reconciled in `state.json` (generation 33) and `plan.json`.
 ## Milestone 8 Formulation & Decomposition — 2026-11-11T08:35:00Z
 - Human operator authorized Milestone 8 ("Spending Controls, Mismatch Explanations and Hosted Cron Runner").
 - Decomposed into 3 concurrent bounded tasks with strictly disjoint file scopes:
-  22. `feature-operations-spending-meter`: Monthly operational spending meter, token usage accounting, and spend threshold alerts (70% warning, 90% throttle, 100% hard ceiling against US$30/mo budget) (`src/admin/spending-meter.ts`, `tests/spending-meter.test.ts`). Status: **PENDING**.
-  23. `feature-catalogue-mismatch-explainer`: Deliberate catalogue mismatch explanation service to evaluate why an opportunity outside a user's match set does not match their saved profile (`src/domain/mismatch-explainer.ts`, `tests/mismatch-explainer.test.ts`). Status: **PENDING**.
-  24. `feature-cron-scheduler-runner`: Hosted background cron runner adapter to coordinate and execute scheduled recurring tasks (digests, deadline reminders, retention sweep) with authorized job keys and execution audit logs (`src/jobs/cron-runner.ts`, `tests/cron-runner.test.ts`). Status: **PENDING**.
+  22. `feature-operations-spending-meter`: Monthly operational spending meter, token usage accounting, and spend threshold alerts (70% warning, 90% throttle, 100% hard ceiling against US$30/mo budget) (`src/admin/spending-meter.ts`, `tests/spending-meter.test.ts`). Status: **HANDOFF**.
+  23. `feature-catalogue-mismatch-explainer`: Deliberate catalogue mismatch explanation service to evaluate why an opportunity outside a user's match set does not match their saved profile (`src/domain/mismatch-explainer.ts`, `tests/mismatch-explainer.test.ts`). **MERGED** via PR #83 (`a313655137ee30bc2c1b0fa02f472abf1a2c14b2`).
+  24. `feature-cron-scheduler-runner`: Hosted background cron runner adapter to coordinate and execute scheduled recurring tasks (digests, deadline reminders, retention sweep) with authorized job keys and execution audit logs (`src/jobs/cron-runner.ts`, `tests/cron-runner.test.ts`). Status: **HANDOFF**.
 - Structured authority reconciled in `state.json` (Gen 103) and `plan.json`. Backlog open for worker acquisition via `orchestrator --acquire-next`.
+
+## Milestone 8 Publication Progress
+- **2026-11-11 08:55 UTC**: Planner merged PR #83 (`feat/catalogue-mismatch-explainer`) into `main` (merge commit `a313655137ee30bc2c1b0fa02f472abf1a2c14b2`) following verified GitHub Actions CI run (`local-spike` green, all unit tests, typecheck and format check pass). Worktree deleted, Task 23 marked Complete. Primary checkout on `main` synchronized.

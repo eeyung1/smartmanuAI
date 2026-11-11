@@ -484,3 +484,31 @@ Append-only completed-work evidence.
   - Task 20: `feature-multi-opportunity-extractor` (PR #81, merge commit `5a2fc787e397f01845a8193f41a917fe9119b0fc`)
   - Task 21: `feature-data-retention-sweeper` (PR #82, merge commit `2c4a2bb21299389d924eaab69a7d615d4754c0b6`)
 - Milestone 7 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 19, 20, 21) merged, CI green, and validated in `main`.
+
+## feature-catalogue-mismatch-explainer — claim-ae61ebfc72571382db24b59ff56536b4
+- Session: opencode-gpt56sol-20261111-n5c7d1-20261111-b03acb8d
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/mismatch-explainer.test.ts && npm run typecheck
+- Evidence: ✔ a matching profile produces no mismatch and full affinity (7.460294ms); ✔ each mismatch dimension is detected with bilingual explanations (2.397496ms); ✔ missing profile facts become guidance rather than fabricated mismatches (0.570065ms); ✔ age limits use recorded age and birth-year ranges conservatively (1.214397ms); ✔ expired, mismatched and unknown language evidence stay conservative (1.115055ms); ✔ malformed input fails safely and deterministically (0.634263ms); ℹ tests 6; ℹ suites 0; ℹ pass 6; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 637.593999; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T08:45:55Z
+
+## feature-operations-spending-meter — claim-c14303b127fbca69e06c1eade065eca1
+- Session: opencode-gpt56sol-20261111-p6e2b7-20261111-681aafdb
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/spending-meter.test.ts && npm run typecheck
+- Evidence: ✔ monthly spending aggregates exact microdollars per category and token usage (4.897539ms); ✔ threshold statuses and throttle directives follow exact percentages (1.550123ms); ✔ default month is the current UTC month and invalid inputs are skipped safely (0.79391ms); ✔ alerts are bilingual and deterministic for every status (1.723822ms); ℹ tests 4; ℹ suites 0; ℹ pass 4; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 367.427197; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T08:49:26Z
+
+## feature-cron-scheduler-runner — claim-077cb13545d79d6ea5033fc0fec95e73
+- Session: opencode-gpt56sol-20261111-q8f3c5-20261111-7feae9e0
+- State: COMPLETE
+- Validation: /bin/bash -lc node --import tsx --test tests/cron-runner.test.ts && npm run typecheck
+- Evidence: ✔ authorized jobs run, report audited outcomes and count affected records (4.886199ms); ✔ unauthorized and unknown job triggers are rejected (1.820695ms); ✔ overlapping runs of the same job never execute concurrently (23.190915ms); ✔ dry runs report planned actions without invoking the handler (2.21862ms); ✔ failing jobs are isolated and reported as failures (7.092275ms); ✔ schedule criteria skip jobs that are not yet due (2.984419ms); ✔ the shared lock refuses a second holder until it is released (1.419262ms); ℹ tests 7; ℹ suites 0; ℹ pass 7; ℹ fail 0; ℹ cancelled 0; ℹ skipped 0; ℹ todo 0; ℹ duration_ms 343.666149; ; > smartmanuai@0.1.0 typecheck; > tsc --noEmit
+- Recorded UTC: 2026-11-11T08:55:06Z
+
+## feature-catalogue-mismatch-explainer — PR #83 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/83
+- Merge Commit: `a313655137ee30bc2c1b0fa02f472abf1a2c14b2`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T08:55:08Z

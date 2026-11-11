@@ -3,7 +3,7 @@
     "repository_id": "local-git:/home/recoding/Projects/smartmanuAI#/home/recoding/Projects/smartmanuAI/.git",
     "protocol": "orchestrator/v1",
     "schema": 4,
-    "generation": 108,
+    "generation": 117,
     "enrollment": "NATIVE",
     "provenance": "Human operator initialized project coordination",
     "enrolled_utc": "2026-11-04T09:54:21Z"
@@ -141,6 +141,18 @@
       "state": "ACTIVE",
       "generation": 107
     },
+    "opencode-gpt56sol-20261111-p6e2b7-20261111-681aafdb": {
+      "id": "opencode-gpt56sol-20261111-p6e2b7-20261111-681aafdb",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 111
+    },
+    "opencode-gpt56sol-20261111-q8f3c5-20261111-7feae9e0": {
+      "id": "opencode-gpt56sol-20261111-q8f3c5-20261111-7feae9e0",
+      "role": "worker",
+      "state": "ACTIVE",
+      "generation": 115
+    },
     "planner-antigravity-20261104-b9e2894a": {
       "id": "planner-antigravity-20261104-b9e2894a",
       "role": "planner",
@@ -188,7 +200,7 @@
     "milestone-8-spending-mismatch-cron": {
       "id": "milestone-8-spending-mismatch-cron",
       "description": "Milestone 8: Spending Controls, Mismatch Explanations and Hosted Cron Runner",
-      "status": "OPEN"
+      "status": "AWAITING_REVIEW"
     }
   },
   "tasks": {
@@ -763,11 +775,11 @@
       "feature": "feature-catalogue-mismatch-explainer",
       "scope": "src/domain/mismatch-explainer.ts,tests/mismatch-explainer.test.ts",
       "priority": 9,
-      "status": "ASSIGNED",
+      "status": "COMPLETE",
       "attempt": 1,
       "assignment_generation": 106,
-      "token": "claim-ae61ebfc72571382db24b59ff56536b4",
       "session_id": "opencode-gpt56sol-20261111-n5c7d1-20261111-b03acb8d",
+      "result_id": "milestone-8-spending-mismatch-cron::feature-catalogue-mismatch-explainer::106",
       "description": "Implement deliberate catalogue mismatch explanation service to evaluate why an opportunity outside a user's match set does not match their saved profile.",
       "acceptance_criteria": [
         "explainOpportunityMismatch(opportunity, profile, options) compares an opportunity's eligibility rules against a user profile and returns a structured evaluation (isMatch: boolean, mismatches: MismatchReason[])",
@@ -791,9 +803,11 @@
       "feature": "feature-cron-scheduler-runner",
       "scope": "src/jobs/cron-runner.ts,tests/cron-runner.test.ts",
       "priority": 8,
-      "status": "PENDING",
-      "attempt": 0,
-      "assignment_generation": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 114,
+      "session_id": "opencode-gpt56sol-20261111-q8f3c5-20261111-7feae9e0",
+      "result_id": "milestone-8-spending-mismatch-cron::feature-cron-scheduler-runner::114",
       "description": "Implement hosted background cron runner adapter to coordinate and execute scheduled recurring tasks (digests, deadline reminders, retention sweep) with authorized job keys and execution audit logs.",
       "acceptance_criteria": [
         "executeScheduledJobRunner(jobName, context, options) dispatches registered recurring jobs (digest_dispatch, reminder_recheck, retention_sweep) based on schedule criteria and authorized execution keys",
@@ -806,7 +820,10 @@
       "validation": [
         "node --import tsx --test tests/cron-runner.test.ts \u0026\u0026 npm run typecheck"
       ],
-      "capability": "coding"
+      "capability": "coding",
+      "branch": "agent/feature-cron-scheduler-runner-fec95e73",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-cron-scheduler-runner-fec95e73",
+      "base_sha": "main"
     },
     "milestone-8-spending-mismatch-cron::feature-operations-spending-meter": {
       "id": "feature-operations-spending-meter",
@@ -814,21 +831,27 @@
       "feature": "feature-operations-spending-meter",
       "scope": "src/admin/spending-meter.ts,tests/spending-meter.test.ts",
       "priority": 10,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
+      "assignment_generation": 110,
+      "session_id": "opencode-gpt56sol-20261111-p6e2b7-20261111-681aafdb",
+      "result_id": "milestone-8-spending-mismatch-cron::feature-operations-spending-meter::110",
       "description": "Implement monthly operational spending meter, token usage accounting, and spend threshold alerts (70% warning, 90% throttle, 100% hard ceiling against US$30/mo budget).",
       "acceptance_criteria": [
         "calculateMonthlySpending(usageRecords, options) aggregates provider token consumption and research/outbound operational costs into USD microdollars for a given billing month (defaulting to current UTC month)",
         "Evaluates spending against configurable monthly budget ceilings (defaulting to PRD D05 US$30.00 / 30,000,000 microdollars)",
-        "Computes operational spend threshold alerts: status NORMAL (<70%), WARNING (>=70%), THROTTLE (>=90%), and HARD_STOP (>=100%)",
+        "Computes operational spend threshold alerts: status NORMAL (\u003c70%), WARNING (\u003e=70%), THROTTLE (\u003e=90%), and HARD_STOP (\u003e=100%)",
         "Provides structured throttle directives indicating whether expensive AI extractions or collection jobs should be deferred or blocked",
         "Formats bilingual alert messages (EN/ZH) suitable for administrator notification digests and operations dashboard display",
         "Validates input usage records, handles empty or malformed cost inputs safely without throwing, and ensures deterministic monetary math (integer microdollars)"
       ],
       "validation": [
-        "node --import tsx --test tests/spending-meter.test.ts && npm run typecheck"
+        "node --import tsx --test tests/spending-meter.test.ts \u0026\u0026 npm run typecheck"
       ],
-      "capability": "coding"
+      "capability": "coding",
+      "branch": "agent/feature-operations-spending-meter-e065eca1",
+      "worktree": "/home/recoding/Projects/smartmanuAI/.agent-worktrees/feature-operations-spending-meter-e065eca1",
+      "base_sha": "main"
     }
   },
   "results": {
@@ -1095,6 +1118,57 @@
       ],
       "recorded_utc": "2026-11-10T20:04:42Z"
     },
+    "milestone-8-spending-mismatch-cron::feature-catalogue-mismatch-explainer::106": {
+      "id": "milestone-8-spending-mismatch-cron::feature-catalogue-mismatch-explainer::106",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "task_id": "feature-catalogue-mismatch-explainer",
+      "session_id": "opencode-gpt56sol-20261111-n5c7d1-20261111-b03acb8d",
+      "assignment_generation": 106,
+      "branch": "agent/feature-catalogue-mismatch-explainer-f56536b4",
+      "head_sha": "b26baa0cba332c62cefdd8a5629c0df579da6f8d",
+      "validation": "mismatch explainer tests pass (6/6); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "b26baa0"
+      ],
+      "limitations": [
+        "Explainer is a pure domain service and is not yet surfaced in the private matches UI, which was outside the approved scope"
+      ],
+      "recorded_utc": "2026-11-11T08:46:03Z"
+    },
+    "milestone-8-spending-mismatch-cron::feature-cron-scheduler-runner::114": {
+      "id": "milestone-8-spending-mismatch-cron::feature-cron-scheduler-runner::114",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "task_id": "feature-cron-scheduler-runner",
+      "session_id": "opencode-gpt56sol-20261111-q8f3c5-20261111-7feae9e0",
+      "assignment_generation": 114,
+      "branch": "agent/feature-cron-scheduler-runner-fec95e73",
+      "head_sha": "591dc327b1fa8a1368daf714e67340abd5957b4e",
+      "validation": "cron runner tests pass (7/7); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "591dc32"
+      ],
+      "limitations": [
+        "Job handlers are injected by the host; the runner does not itself invoke digests, reminders or the retention sweep, which stayed outside the approved scope"
+      ],
+      "recorded_utc": "2026-11-11T08:55:20Z"
+    },
+    "milestone-8-spending-mismatch-cron::feature-operations-spending-meter::110": {
+      "id": "milestone-8-spending-mismatch-cron::feature-operations-spending-meter::110",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "task_id": "feature-operations-spending-meter",
+      "session_id": "opencode-gpt56sol-20261111-p6e2b7-20261111-681aafdb",
+      "assignment_generation": 110,
+      "branch": "agent/feature-operations-spending-meter-e065eca1",
+      "head_sha": "959fa6d7c330bffe8788319e1edc793547784715",
+      "validation": "spending meter tests pass (4/4); typecheck and repository format check pass; staged diff check passes",
+      "artifacts": [
+        "959fa6d"
+      ],
+      "limitations": [
+        "Meter is a pure service over supplied usage records and does not read the database budget or research ledger, which was outside the approved scope"
+      ],
+      "recorded_utc": "2026-11-11T08:49:36Z"
+    },
     "result-pr-27": {
       "id": "result-pr-27",
       "objective_id": "milestone-1-application-flow",
@@ -1334,8 +1408,19 @@
       "assignment_generation": 98,
       "branch": "agent/feature-data-retention-sweeper-402c9c7a",
       "head_sha": "1c6b0a8948795b119a078d969ab964e499aa03b2",
-      "validation": "node --import tsx --test tests/retention-sweeper.test.ts tests/error-translations.test.ts \u0026\u0026 npm run typecheck \u0026\u0026 npm run format:check (pass; CI local-spike green)",
+      "validation": "node --import tsx --test tests/retention-sweeper.test.ts tests/error-translations.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
       "recorded_utc": "2026-11-10T20:36:18Z"
+    },
+    "result-pr-83": {
+      "id": "result-pr-83",
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "task_id": "feature-catalogue-mismatch-explainer",
+      "session_id": "opencode-gpt56sol-20261111-n5c7d1-20261111-b03acb8d",
+      "assignment_generation": 106,
+      "branch": "agent/feature-catalogue-mismatch-explainer-f56536b4",
+      "head_sha": "b26baa0cba332c62cefdd8a5629c0df579da6f8d",
+      "validation": "node --import tsx --test tests/mismatch-explainer.test.ts && npm run typecheck && npm run format:check (pass; CI local-spike green)",
+      "recorded_utc": "2026-11-11T08:55:08Z"
     }
   },
   "reviews": {
@@ -1416,6 +1501,15 @@
       "decision": "APPROVED",
       "decided_by": "planner-antigravity-20261104-b9e2894a",
       "decided_utc": "2026-11-10T20:36:36Z"
+    },
+    "milestone-8-spending-mismatch-cron": {
+      "objective_id": "milestone-8-spending-mismatch-cron",
+      "status": "AWAITING_REVIEW",
+      "result_ids": [
+        "milestone-8-spending-mismatch-cron::feature-catalogue-mismatch-explainer::106",
+        "milestone-8-spending-mismatch-cron::feature-cron-scheduler-runner::114",
+        "milestone-8-spending-mismatch-cron::feature-operations-spending-meter::110"
+      ]
     }
   },
   "events": [
@@ -2167,6 +2261,69 @@
       "operation": "bind-assignment",
       "generation": 108,
       "utc": "2026-11-11T08:40:24Z"
+    },
+    {
+      "id": "109-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 109,
+      "utc": "2026-11-11T08:46:03Z"
+    },
+    {
+      "id": "110-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 110,
+      "utc": "2026-11-11T08:46:11Z"
+    },
+    {
+      "id": "111-register-session",
+      "actor": "opencode-gpt56sol-20261111-p6e2b7-20261111-681aafdb",
+      "operation": "register-session",
+      "generation": 111,
+      "utc": "2026-11-11T08:46:11Z"
+    },
+    {
+      "id": "112-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 112,
+      "utc": "2026-11-11T08:46:11Z"
+    },
+    {
+      "id": "113-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 113,
+      "utc": "2026-11-11T08:49:36Z"
+    },
+    {
+      "id": "114-acquire-next",
+      "actor": "ORCHESTRATOR",
+      "operation": "acquire-next",
+      "generation": 114,
+      "utc": "2026-11-11T08:49:44Z"
+    },
+    {
+      "id": "115-register-session",
+      "actor": "opencode-gpt56sol-20261111-q8f3c5-20261111-7feae9e0",
+      "operation": "register-session",
+      "generation": 115,
+      "utc": "2026-11-11T08:49:44Z"
+    },
+    {
+      "id": "116-bind-assignment",
+      "actor": "ORCHESTRATOR",
+      "operation": "bind-assignment",
+      "generation": 116,
+      "utc": "2026-11-11T08:49:45Z"
+    },
+    {
+      "id": "117-collect-result",
+      "actor": "ORCHESTRATOR",
+      "operation": "collect-result",
+      "generation": 117,
+      "utc": "2026-11-11T08:55:20Z"
     }
   ]
 }
