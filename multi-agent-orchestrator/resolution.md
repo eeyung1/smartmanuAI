@@ -512,3 +512,27 @@ Append-only completed-work evidence.
 - State: MERGED
 - CI: `local-spike` (conclusion=success)
 - Recorded UTC: 2026-11-11T08:55:08Z
+
+## feature-operations-spending-meter — PR #84 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/84
+- Merge Commit: `2189c0a5ed812b9ef0eae773103bc3f41fd8e777`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T09:41:33Z
+
+## feature-cron-scheduler-runner — PR #85 Merge
+- PR: https://github.com/eeyung1/smartmanuAI/pull/85
+- Merge Commit: `cafcb971aa20ca98a8003fd9bf0325dc560aa936`
+- State: MERGED
+- CI: `local-spike` (conclusion=success)
+- Recorded UTC: 2026-11-11T10:23:54Z
+
+## milestone-8-spending-mismatch-cron — Review Decision: APPROVED
+- Review Decision: APPROVED
+- Decided by: `planner-antigravity-20261104-b9e2894a`
+- Decided UTC: 2026-11-11T10:26:02Z
+- Evaluated Tasks:
+  - Task 22: `feature-operations-spending-meter` (PR #84, merge commit `2189c0a5ed812b9ef0eae773103bc3f41fd8e777`)
+  - Task 23: `feature-catalogue-mismatch-explainer` (PR #83, merge commit `a313655137ee30bc2c1b0fa02f472abf1a2c14b2`)
+  - Task 24: `feature-cron-scheduler-runner` (PR #85, merge commit `cafcb971aa20ca98a8003fd9bf0325dc560aa936`)
+- Milestone 8 Status: **100% COMPLETE & APPROVED**. All 3 tasks (Tasks 22, 23, 24) merged, CI green, and validated in `main`.

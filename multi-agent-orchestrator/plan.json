@@ -8,8 +8,8 @@
       "feature": "feature-operations-spending-meter",
       "scope": "src/admin/spending-meter.ts,tests/spending-meter.test.ts",
       "priority": 10,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement monthly operational spending meter, token usage accounting, and spend threshold alerts (70% warning, 90% throttle, 100% hard ceiling against US$30/mo budget).",
       "acceptance_criteria": [
         "calculateMonthlySpending(usageRecords, options) aggregates provider token consumption and research/outbound operational costs into USD microdollars for a given billing month (defaulting to current UTC month)",
@@ -30,8 +30,8 @@
       "feature": "feature-catalogue-mismatch-explainer",
       "scope": "src/domain/mismatch-explainer.ts,tests/mismatch-explainer.test.ts",
       "priority": 9,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement deliberate catalogue mismatch explanation service to evaluate why an opportunity outside a user's match set does not match their saved profile.",
       "acceptance_criteria": [
         "explainOpportunityMismatch(opportunity, profile, options) compares an opportunity's eligibility rules against a user profile and returns a structured evaluation (isMatch: boolean, mismatches: MismatchReason[])",
@@ -52,8 +52,8 @@
       "feature": "feature-cron-scheduler-runner",
       "scope": "src/jobs/cron-runner.ts,tests/cron-runner.test.ts",
       "priority": 8,
-      "status": "PENDING",
-      "attempt": 0,
+      "status": "COMPLETE",
+      "attempt": 1,
       "description": "Implement hosted background cron runner adapter to coordinate and execute scheduled recurring tasks (digests, deadline reminders, retention sweep) with authorized job keys and execution audit logs.",
       "acceptance_criteria": [
         "executeScheduledJobRunner(jobName, context, options) dispatches registered recurring jobs (digest_dispatch, reminder_recheck, retention_sweep) based on schedule criteria and authorized execution keys",
