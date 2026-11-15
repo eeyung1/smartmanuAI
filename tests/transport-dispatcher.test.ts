@@ -219,3 +219,66 @@ test("payloads resolve through the stored reference", async () => {
   assert.equal(receipt.status, "accepted");
   assert.equal(receipt.externalReference, "resolved-1");
 });
+
+test("Brevo dispatch uses messageId and keeps unsubscribe headers in the email", async () => {
+  const receipt = await dispatchDeliveryIntent(
+    intent(),
+    async (request) => {
+      assert.equal(request.url, "https://api.brevo.com/v3/smtp/email");
+      const body = JSON.parse(request.body);
+      assert.equal(body.to[0].email, "member@example.test");
+      assert.equal(
+        body.headers["List-Unsubscribe"],
+        `<${payload.unsubscribeUrl}>`,
+      );
+      return { status: 201, headers: {}, body: { messageId: "brevo-receipt" } };
+    },
+    {
+      payload,
+      brevo: {
+        apiKey: "fixture-only",
+        sender: { name: "smartmanuAI", email: "sender@example.test" },
+      },
+    },
+  );
+  assert.equal(receipt.status, "accepted");
+  assert.equal(receipt.externalReference, "brevo-receipt");
+});
+
+test("Brevo ambiguous sends require reconciliation instead of automatic retry", async () => {
+  const options = {
+    payload,
+    brevo: {
+      apiKey: "fixture-only",
+      sender: { name: "smartmanuAI", email: "sender@example.test" },
+    },
+  };
+  for (const transport of [
+    transportReturning(503),
+    transportReturning(201, {}),
+    async () => {
+      throw Error("secret response must not leak");
+    },
+  ]) {
+    const receipt = await dispatchDeliveryIntent(intent(), transport, options);
+    assert.equal(receipt.status, "uncertain");
+    assert.equal(receipt.retryAfterSeconds, null);
+    assert.doesNotMatch(
+      JSON.stringify(receipt),
+      /secret response|fixture-only/,
+    );
+  }
+  const limited = await dispatchDeliveryIntent(
+    intent(),
+    transportReturning(429, {}, { "retry-after": "120" }),
+    options,
+  );
+  assert.equal(limited.status, "retry");
+  assert.equal(limited.retryAfterSeconds, 120);
+  const rejected = await dispatchDeliveryIntent(
+    intent(),
+    transportReturning(401),
+    options,
+  );
+  assert.equal(rejected.status, "failed");
+});

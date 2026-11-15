@@ -8,6 +8,18 @@ The product uses one shared research pipeline and reviewed catalogue for all use
 
 Feature audit: **9 November 2026**, through [implementation PR #70](https://github.com/eeyung1/smartmanuAI/pull/70). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
 
+## Brevo live-integration checkpoint
+
+- [x] Select Brevo for the initial email pilot; owner reports saving its API key and sender in Vercel Production.
+- [x] Implement and fixture-test Brevo request formatting, HTTP transport and delivery-intent receipt handling.
+- [x] Preserve unsubscribe headers and prevent automatic retries of ambiguous Brevo sends.
+- [ ] Enable the production database writer and real-address sign-in email path.
+- [ ] Connect the persisted consent/suppression/quota worker and Brevo delivery callbacks.
+- [ ] Verify the sender and a real sign-in/alert flow in the hosted environment.
+
+See [Brevo integration](docs/brevo-email.md). Credentials alone do not activate
+sending; the protected read-only staging behavior remains in place.
+
 ## How to read this checklist
 
 - **[x] Implemented:** code or the named planning deliverable exists, with the local/fixture validation described here. A checked adapter or protocol does not mean its external service is connected.
