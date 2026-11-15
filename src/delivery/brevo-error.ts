@@ -6,7 +6,9 @@ export type BrevoFailureReason =
   | "rate_limited"
   | "provider_unavailable"
   | "invalid_success_response"
-  | "request_rejected";
+  | "request_rejected"
+  | "account_activation_required"
+  | "request_format_rejected";
 
 /** Inspect untrusted provider text, but expose only fixed diagnostic categories. */
 export class BrevoDeliveryError extends Error {
@@ -34,11 +36,22 @@ export class BrevoDeliveryError extends Error {
       reason = "ip_authorization_required";
     else if (safeStatus === 401 || safeStatus === 403)
       reason = "api_authentication_rejected";
+    else if (
+      /account.{0,80}(?:not activat|not validat|suspend)|(?:activat|validat).{0,80}account/.test(
+        message,
+      )
+    )
+      reason = "account_activation_required";
     else if (/sender|sending domain|from address/.test(message))
       reason = "sender_configuration_rejected";
     else if (code === "not_enough_credits") reason = "quota_exhausted";
     else if (safeStatus === 429) reason = "rate_limited";
     else if (safeStatus >= 500) reason = "provider_unavailable";
+    else if (
+      safeStatus === 400 &&
+      /htmlcontent|textcontent|templateid|headers|json/.test(message)
+    )
+      reason = "request_format_rejected";
     super(`Brevo sign-in email failed: HTTP ${safeStatus}; ${reason}.`);
     this.name = "BrevoDeliveryError";
     this.status = safeStatus;
