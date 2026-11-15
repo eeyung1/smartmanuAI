@@ -25,6 +25,34 @@ export function brevoConfig(
   };
 }
 
+function emailHtml(text: string) {
+  const escape = (value: string) =>
+    value.replace(
+      /[&<>"']/g,
+      (char) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char]!,
+    );
+  return (
+    "<!doctype html><html><body>" +
+    text
+      .split("\n")
+      .map((line) => {
+        const safe = escape(line);
+        return /^https:\/\/[^\s]+$/.test(line)
+          ? `<p><a href="${safe}">${safe}</a></p>`
+          : `<p>${safe || "<br>"}</p>`;
+      })
+      .join("") +
+    "</body></html>"
+  );
+}
+
 export function buildBrevoRequest(
   config: BrevoConfig,
   message: {
@@ -54,8 +82,8 @@ export function buildBrevoRequest(
       sender: config.sender,
       to: [{ email: message.to }],
       subject: message.subject,
-      textContent: message.text,
-      headers,
+      htmlContent: emailHtml(message.text),
+      ...(Object.keys(headers).length ? { headers } : {}),
     }),
   };
 }

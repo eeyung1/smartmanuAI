@@ -28,7 +28,8 @@ test("Brevo formats the verified sender, recipient and provider headers", async 
     const body = JSON.parse(String(options?.body));
     assert.deepEqual(body.sender, config.sender);
     assert.deepEqual(body.to, [{ email: "member@example.test" }]);
-    assert.equal(body.textContent, "A private sign-in link");
+    assert.match(body.htmlContent, /A private sign-in link/);
+    assert.equal(body.textContent, undefined);
     assert.equal(body.headers["Authorization"], undefined);
     assert.ok(body.headers["List-Unsubscribe"]);
     return Response.json(
@@ -71,5 +72,23 @@ test("Brevo transport rejects arbitrary endpoints without a network call", async
       new AbortController().signal,
     ),
     /endpoint/,
+  );
+});
+
+test("Brevo sign-in payload omits empty headers and renders escaped clickable links", () => {
+  const body = JSON.parse(
+    buildBrevoRequest(config, {
+      to: "member@example.test",
+      subject: "Sign in",
+      text: 'Hello <script>alert("x")</script>\n\nhttps://example.test/api/auth/magic-link/verify?token=fixture&callbackURL=%2Fmatches',
+    }).body,
+  );
+  assert.equal(Object.hasOwn(body, "headers"), false);
+  assert.equal(Object.hasOwn(body, "textContent"), false);
+  assert.match(body.htmlContent, /&lt;script&gt;/);
+  assert.ok(!body.htmlContent.includes("<script>"));
+  assert.match(
+    body.htmlContent,
+    /<a href="https:\/\/example.test\/api\/auth\/magic-link\/verify\?token=fixture&amp;callbackURL=%2Fmatches">/,
   );
 });

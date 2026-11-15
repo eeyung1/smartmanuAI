@@ -20,6 +20,13 @@ test("Brevo failure categories distinguish actionable causes without exposing pr
       { message: "Sender is not verified" },
       "sender_configuration_rejected",
     ],
+    [
+      400,
+      { message: "Your transactional account is not activated" },
+      "account_activation_required",
+    ],
+    [400, { message: "htmlContent is required" }, "request_format_rejected"],
+    [400, { message: "headers is empty" }, "request_format_rejected"],
     [402, { code: "not_enough_credits" }, "quota_exhausted"],
     [429, {}, "rate_limited"],
     [503, {}, "provider_unavailable"],

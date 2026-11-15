@@ -16,6 +16,7 @@ Feature audit: **9 November 2026**, through [implementation PR #70](https://gith
 - [x] Implement a scoped production application-role setup and allowlisted Brevo sign-in path with persistent daily send limits.
 - [x] Verify hosted database-role activation and production database connectivity using the owner-confirmed pooler hostname.
 - [x] Classify Brevo sign-in failures using fixed categories and HTTP status without logging provider bodies, keys or links.
+- [x] Use a minimal Brevo HTML payload, omit empty optional headers and escape sign-in links.
 - [ ] Verify real-mailbox sign-in acceptance.
 - [ ] Connect the persisted consent/suppression/quota worker and Brevo delivery callbacks.
 - [ ] Verify the sender and a real sign-in/alert flow in the hosted environment.

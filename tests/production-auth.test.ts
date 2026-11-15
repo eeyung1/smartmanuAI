@@ -132,7 +132,11 @@ for (const kind of ["pglite", "postgres"] as const)
         const auth = await createLocalAuth(runtime, dir, {
           config: pilotConfig,
           mailTransport: async (request) => {
-            messages.push(JSON.parse(request.body).textContent);
+            const body = JSON.parse(request.body);
+            const link = body.htmlContent
+              .match(/href="([^"]+)"/)[1]
+              .replace(/&amp;/g, "&");
+            messages.push(link);
             return {
               status: 201,
               headers: {},
