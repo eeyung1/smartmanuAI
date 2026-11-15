@@ -4,9 +4,9 @@ A multi-user platform for finding smart manufacturing scholarships to study in C
 
 The product uses one shared research pipeline and reviewed catalogue for all users. Private profiles drive deterministic matching; source collection and AI extraction are shared so research costs do not grow as one agent per subscriber.
 
-**Current stage: local implementation plus verified protected read-only Vercel staging. Public release is not complete.** Local sign-in accepts synthetic `.test` addresses and notifications use local sinks or injected simulations. The explicit staging mode supports a private Supabase catalogue reader, disables account sign-in and notifications, and never runs migrations at request time. See [Vercel/Supabase staging](docs/vercel-supabase-staging.md) for provisioning and verification status.
+**Current stage: limited production sign-in pilot; public release is not complete.** The hosted database and invited-address sign-in form are connected. Real-mailbox acceptance is still pending. Local mode retains synthetic `.test` mail, and staging remains available as a read-only rollback. Discovery and scholarship alerts are not live. See the [production sign-in pilot](docs/production-sign-in.md) and [staging setup](docs/vercel-supabase-staging.md).
 
-Feature audit: **9 November 2026**, through [implementation PR #70](https://github.com/eeyung1/smartmanuAI/pull/70). Staging serves an empty reviewed catalogue; production accounts, scheduled discovery and real notifications remain release work.
+Feature audit: **9 November 2026**, through [implementation PR #70](https://github.com/eeyung1/smartmanuAI/pull/70). The reviewed catalogue is empty. Production sign-in was added in PR #102; scheduled discovery, real-mailbox acceptance and live notifications remain release work.
 
 ## Brevo live-integration checkpoint
 
@@ -14,7 +14,9 @@ Feature audit: **9 November 2026**, through [implementation PR #70](https://gith
 - [x] Implement and fixture-test Brevo request formatting, HTTP transport and delivery-intent receipt handling.
 - [x] Preserve unsubscribe headers and prevent automatic retries of ambiguous Brevo sends.
 - [x] Implement a scoped production application-role setup and allowlisted Brevo sign-in path with persistent daily send limits.
-- [ ] Verify hosted database-role activation and real-mailbox sign-in acceptance.
+- [x] Verify hosted database-role activation and production database connectivity using the owner-confirmed pooler hostname.
+- [x] Classify Brevo sign-in failures using fixed categories and HTTP status without logging provider bodies, keys or links.
+- [ ] Verify real-mailbox sign-in acceptance.
 - [ ] Connect the persisted consent/suppression/quota worker and Brevo delivery callbacks.
 - [ ] Verify the sender and a real sign-in/alert flow in the hosted environment.
 
