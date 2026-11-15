@@ -217,6 +217,14 @@ CREATE INDEX opportunity_source_aliases_browse
   ON opportunity_source_aliases(opportunity_id,recorded_at,source_id);
 
 INSERT INTO schema_migrations(name) VALUES('027_public_source_provenance.sql');
+CREATE TABLE auth_mail_quota (
+  bucket text NOT NULL,
+  day date NOT NULL,
+  attempts integer NOT NULL CHECK (attempts BETWEEN 1 AND 20),
+  PRIMARY KEY (bucket, day)
+);
+
+INSERT INTO schema_migrations(name) VALUES('028_auth_mail_quota.sql');
 DO $guard$ DECLARE item record; BEGIN FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='smartmanuai' LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY','smartmanuai',item.tablename); END LOOP; FOR item IN SELECT p.oid::regprocedure AS signature FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='smartmanuai' LOOP EXECUTE format('ALTER FUNCTION %s SET search_path=smartmanuai,pg_catalog',item.signature); END LOOP; END $guard$;
 REVOKE ALL ON SCHEMA "smartmanuai" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "smartmanuai" FROM PUBLIC;

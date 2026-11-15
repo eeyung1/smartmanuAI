@@ -5,7 +5,7 @@ import { Pool } from "pg";
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { localConfig } from "../config";
-import * as schema from "./schema";
+import { authSchema } from "./schema";
 export interface SQL {
   query<T extends Record<string, unknown> = Record<string, unknown>>(
     sql: string,
@@ -47,6 +47,7 @@ export async function openDatabase(
 ) {
   if (options.schema && !/^[a-z][a-z0-9_]{0,62}$/.test(options.schema))
     throw new Error("Invalid database schema.");
+  const schema = authSchema(options.schema);
   if (!databaseURL) {
     await mkdir(dataDir, { recursive: true, mode: 0o700 });
     const engine = new PGlite(resolve(dataDir, "postgres"));
@@ -55,6 +56,7 @@ export async function openDatabase(
     return {
       sql,
       orm: pgliteDrizzle(engine, { schema }),
+      authSchema: schema,
       close: () => engine.close(),
       kind: "pglite" as const,
     };
@@ -122,6 +124,7 @@ export async function openDatabase(
   return {
     sql,
     orm: postgresDrizzle(pool, { schema }),
+    authSchema: schema,
     close: () => pool.end(),
     kind: "postgres" as const,
   };
@@ -138,7 +141,7 @@ export function getDatabase() {
     {
       schema: config.databaseSchema,
       migrate: config.mode === "local",
-      ssl: config.mode === "staging",
+      ssl: config.mode !== "local",
       ca: config.databaseCA,
     },
   ));

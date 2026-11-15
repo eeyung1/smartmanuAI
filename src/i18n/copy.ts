@@ -18,6 +18,12 @@ const en = {
   welcome: "Welcome back.",
   signInIntro:
     "Use a synthetic address ending in .test. A sign-in link will be written to the local mail sink.",
+  pilotSignInIntro:
+    "Use your invited pilot email address. We will email a sign-in link valid for 10 minutes.",
+  pilotLinkReady: "Check your inbox and spam folder for your sign-in link.",
+  pilotEmail: "Email",
+  pilotNotice:
+    "Limited pilot: email sign-in is enabled for invited accounts. Discovery and alerts are not live yet.",
   email: "Test email",
   preparing: "Preparing link…",
   getLink: "Get sign-in link",
@@ -43,6 +49,11 @@ const zh: Record<keyof typeof en, string> = {
   welcome: "欢迎回来。",
   signInIntro:
     "请使用以 .test 结尾的模拟邮箱地址。登录链接将写入本地邮件收件箱。",
+  pilotSignInIntro:
+    "请使用受邀的试用邮箱地址。我们将发送有效期为10分钟的登录链接。",
+  pilotLinkReady: "请在收件箱和垃圾邮件文件夹中查看登录链接。",
+  pilotEmail: "邮箱",
+  pilotNotice: "有限试用：受邀账户可通过邮件登录。信息发现和提醒尚未上线。",
   email: "测试邮箱",
   preparing: "正在准备链接…",
   getLink: "获取登录链接",

@@ -6,9 +6,11 @@ import { useState } from "react";
 export default function SignIn({
   locale,
   returnTo,
+  live = false,
 }: {
   locale: Locale;
   returnTo: string;
+  live?: boolean;
 }) {
   const copy = interfaceCopy(locale);
   const callbackURL = safeAuthDestination(returnTo);
@@ -19,7 +21,7 @@ export default function SignIn({
     <section className="form" lang={locale}>
       <p className="eyebrow">{copy.eyebrow}</p>
       <h1>{copy.welcome}</h1>
-      <p>{copy.signInIntro}</p>
+      <p>{live ? copy.pilotSignInIntro : copy.signInIntro}</p>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -31,7 +33,13 @@ export default function SignIn({
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ email, callbackURL }),
             });
-            setMessage(r.ok ? copy.linkReady : copy.linkError);
+            setMessage(
+              r.ok
+                ? live
+                  ? copy.pilotLinkReady
+                  : copy.linkReady
+                : copy.linkError,
+            );
           } catch {
             setMessage(copy.connectionError);
           } finally {
@@ -39,14 +47,14 @@ export default function SignIn({
           }
         }}
       >
-        <label htmlFor="email">{copy.email}</label>
+        <label htmlFor="email">{live ? copy.pilotEmail : copy.email}</label>
         <input
           id="email"
           name="email"
           type="email"
           required
           autoComplete="email"
-          placeholder="samuel@example.test"
+          placeholder={live ? "you@example.com" : "samuel@example.test"}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
