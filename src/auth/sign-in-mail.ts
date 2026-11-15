@@ -6,6 +6,7 @@ import {
   brevoTransport,
 } from "../delivery/brevo";
 import type { Transport } from "../delivery/adapters";
+import { BrevoDeliveryError } from "../delivery/brevo-error";
 
 /** Reserve before attempting delivery; all outcomes count against the daily limit. */
 export async function reserveSignInMail(sql: SQL, email: string) {
@@ -82,9 +83,8 @@ export async function sendPilotSignInMail(input: {
     response.status < 200 ||
     response.status >= 300 ||
     typeof (response.body as { messageId?: unknown } | null)?.messageId !==
-      "string"
+      "string" ||
+    !(response.body as { messageId: string }).messageId.trim()
   )
-    throw Error(
-      "Unable to confirm sign-in email acceptance. Check your inbox before requesting another link.",
-    );
+    throw new BrevoDeliveryError(response.status, response.body);
 }
