@@ -1,8 +1,9 @@
 import type { ProviderRequest, Transport } from "./adapters";
 import type { DeliveryIntent } from "./intent-queue";
+import { buildBrevoRequest, type BrevoConfig } from "./brevo";
 
 export type DispatchReceiptStatus =
-  "accepted" | "retry" | "failed" | "suppressed";
+  "accepted" | "retry" | "failed" | "suppressed" | "uncertain";
 
 export type DispatchReceipt = {
   status: DispatchReceiptStatus;
@@ -25,6 +26,8 @@ export type DispatchPayload = {
 
 export type DispatchOptions = {
   timeoutMs?: number;
+  /** Explicit provider configuration; absent keeps fixture-only behavior. */
+  brevo?: BrevoConfig;
   payload?: DispatchPayload | null;
   /** Resolves the stored payload for an intent payload reference. */
   resolvePayload?: (
@@ -77,6 +80,7 @@ function externalReference(body: unknown) {
 function emailRequest(
   intent: DeliveryIntent,
   payload: DispatchPayload,
+  options: DispatchOptions,
 ): ProviderRequest {
   const headers: Record<string, string> = {
     "Content-Type": "text/plain; charset=utf-8",
@@ -91,6 +95,13 @@ function emailRequest(
     if (/^https:\/\/[^\s]+$/i.test(post))
       headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
   }
+  if (options.brevo)
+    return buildBrevoRequest(options.brevo, {
+      to: intent.recipient,
+      subject,
+      text: [payload.title, payload.body].filter(Boolean).join("\n\n"),
+      headers,
+    });
   return {
     url: "https://mail.smartmanu.example/deliver",
     headers,
@@ -160,10 +171,16 @@ export async function dispatchDeliveryIntent(
   )
     return { ...base, status: "failed", code: "payload_unavailable" };
 
-  const request =
-    intent.channel === "email"
-      ? emailRequest(intent, payload)
-      : telegramRequest(intent, payload, options);
+  const isBrevo = intent.channel === "email" && !!options.brevo;
+  let request: ProviderRequest | null;
+  try {
+    request =
+      intent.channel === "email"
+        ? emailRequest(intent, payload, options)
+        : telegramRequest(intent, payload, options);
+  } catch {
+    return { ...base, status: "failed", code: "invalid_email_configuration" };
+  }
   if (!request) return { ...base, status: "failed", code: "missing_bot_token" };
 
   const timeoutMs = options.timeoutMs ?? 15_000;
@@ -182,6 +199,15 @@ export async function dispatchDeliveryIntent(
           options.defaultRetryAfterSeconds ?? 60,
         ),
       };
+    if (isBrevo && status >= 500)
+      return { ...base, status: "uncertain", code: "provider_error" };
+    if (
+      isBrevo &&
+      status >= 200 &&
+      status < 300 &&
+      !externalReference(response.body)
+    )
+      return { ...base, status: "uncertain", code: "missing_provider_receipt" };
     if (status >= 500)
       return {
         ...base,
@@ -202,6 +228,12 @@ export async function dispatchDeliveryIntent(
       };
     return { ...base, status: "failed", code: "unexpected_status" };
   } catch (error) {
+    if (isBrevo)
+      return {
+        ...base,
+        status: "uncertain",
+        code: controller.signal.aborted ? "timeout" : "network_error",
+      };
     if (controller.signal.aborted)
       return {
         ...base,
