@@ -41,6 +41,9 @@ export default async function Layout({
             )}
           </p>
         ) : null}
+        {localConfig().mode === "production" ? (
+          <p className="locale-notice">{copy.pilotNotice}</p>
+        ) : null}
         {locale === "zh-Hans" ? (
           <p className="locale-notice">{copy.partial}</p>
         ) : null}
@@ -53,7 +56,9 @@ export default async function Layout({
                 locale,
                 "Staging preview: read-only catalogue. Sign-in and notifications are not enabled.",
               )
-            : copy.footer}
+            : localConfig().mode === "production"
+              ? copy.pilotNotice
+              : copy.footer}
         </footer>
       </body>
     </html>

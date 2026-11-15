@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { APIError } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink } from "better-auth/plugins/magic-link";
 import { nextCookies } from "better-auth/next-js";
@@ -7,14 +8,22 @@ import { createHash } from "node:crypto";
 
 import { getDatabase } from "../db";
 import { localConfig } from "../config";
-import * as schema from "../db/schema";
+import { sendPilotSignInMail } from "./sign-in-mail";
+import type { Transport } from "../delivery/adapters";
 export async function createLocalAuth(
   database: Awaited<ReturnType<typeof getDatabase>>,
   dataDir: string,
+  options: {
+    config?: ReturnType<typeof localConfig>;
+    mailTransport?: Transport;
+  } = {},
 ) {
-  const config = localConfig();
+  const config = options.config ?? localConfig();
   return betterAuth({
-    database: drizzleAdapter(database.orm, { provider: "pg", schema }),
+    database: drizzleAdapter(database.orm, {
+      provider: "pg",
+      schema: database.authSchema,
+    }),
     baseURL: config.baseURL,
     secret: config.secret,
     trustedOrigins: [config.baseURL],
@@ -52,6 +61,12 @@ export async function createLocalAuth(
               return;
             }
             if (
+              config.mode === "production" &&
+              (typeof email !== "string" ||
+                !config.pilotEmails.includes(email.toLowerCase()))
+            )
+              return false;
+            if (
               typeof email === "string" &&
               (
                 await database.sql.query(
@@ -71,6 +86,21 @@ export async function createLocalAuth(
         expiresIn: 600,
         storeToken: "hashed",
         sendMagicLink: async ({ email, url }) => {
+          if (config.mode === "production") {
+            if (!config.pilotEmails.includes(email.toLowerCase()))
+              throw new APIError("FORBIDDEN", {
+                message: "Sign-in is limited to invited pilot accounts.",
+              });
+            await sendPilotSignInMail({
+              sql: database.sql,
+              email,
+              url,
+              baseURL: config.baseURL,
+              pilotEmails: config.pilotEmails,
+              transport: options.mailTransport,
+            });
+            return;
+          }
           if (!email.endsWith(".test"))
             throw new Error("Use a synthetic .test email in this local spike.");
           await appendLocalMail(dataDir, { to: email, url }, async () => {

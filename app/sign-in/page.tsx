@@ -31,5 +31,12 @@ export default async function SignInPage({
   const returnTo = safeAuthDestination(
     typeof rawReturnTo === "string" ? rawReturnTo : undefined,
   );
-  return <SignIn key={locale} locale={locale} returnTo={returnTo} />;
+  return (
+    <SignIn
+      key={locale}
+      locale={locale}
+      returnTo={returnTo}
+      live={localConfig().mode === "production"}
+    />
+  );
 }

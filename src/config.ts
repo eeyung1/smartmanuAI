@@ -1,12 +1,12 @@
+import { brevoConfig } from "./delivery/brevo";
+import { z } from "zod";
 import { X509Certificate } from "node:crypto";
 export function localConfig(
   env: Record<string, string | undefined> = process.env,
 ) {
   const mode = env.SMARTMANU_MODE;
-  if (mode !== "local" && mode !== "staging")
-    throw new Error(
-      "This spike requires SMARTMANU_MODE=local; hosted previews require explicit staging configuration.",
-    );
+  if (mode !== "local" && mode !== "staging" && mode !== "production")
+    throw new Error("Set SMARTMANU_MODE to local, staging or production.");
   const baseURL = env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",
     url = new URL(baseURL);
   const secret = env.BETTER_AUTH_SECRET;
@@ -14,14 +14,15 @@ export function localConfig(
     throw new Error(
       "Set a random BETTER_AUTH_SECRET of at least 32 characters.",
     );
-  const databaseURL = env.DATABASE_URL;
+  const databaseURL =
+    mode === "production" ? env.SMARTMANU_APP_DATABASE_URL : env.DATABASE_URL;
   const databaseCA =
-    mode === "staging" ? env.SMARTMANU_DATABASE_CA_CERT : undefined;
+    mode !== "local" ? env.SMARTMANU_DATABASE_CA_CERT : undefined;
   if (databaseCA && !new X509Certificate(databaseCA).ca)
     throw new Error(
       "Database TLS certificate must be a certificate authority.",
     );
-  if (mode === "staging") {
+  if (mode !== "local") {
     if (
       url.protocol !== "https:" ||
       url.username ||
@@ -32,26 +33,28 @@ export function localConfig(
       !url.hostname.endsWith(".vercel.app")
     )
       throw new Error(
-        "Staging requires an explicit HTTPS Vercel application origin.",
+        "Hosted mode requires an explicit HTTPS Vercel application origin.",
       );
     const ref = env.SMARTMANU_SUPABASE_PROJECT_REF;
     if (!ref || !/^[a-z]{20}$/.test(ref) || !databaseURL)
       throw new Error(
-        "Staging requires the selected Supabase project and a database connection.",
+        "Hosted mode requires the selected Supabase project and a database connection.",
       );
     const db = new URL(databaseURL);
     if (
       !["postgres:", "postgresql:"].includes(db.protocol) ||
       !db.hostname.endsWith(".pooler.supabase.com") ||
       !["5432", "6543"].includes(db.port) ||
-      decodeURIComponent(db.username) !== "smartmanuai_reader." + ref ||
+      decodeURIComponent(db.username) !==
+        (mode === "staging" ? "smartmanuai_reader." : "smartmanuai_app.") +
+          ref ||
       !db.password ||
       db.pathname !== "/postgres" ||
       db.search ||
       db.hash
     )
       throw new Error(
-        "Staging requires the dedicated Supabase reader pooler connection.",
+        "Hosted mode requires its dedicated Supabase pooler connection.",
       );
     if (
       [
@@ -65,7 +68,7 @@ export function localConfig(
       ].some(Boolean)
     )
       throw new Error(
-        "Research, channel tests and paid execution must remain disabled in staging.",
+        "Research, channel tests and paid execution must remain disabled in hosted mode.",
       );
   } else {
     if (
@@ -84,13 +87,29 @@ export function localConfig(
         throw new Error("Only local PostgreSQL is allowed in this spike.");
     }
   }
+  const pilotEmails = (env.SMARTMANU_PILOT_EMAILS ?? "")
+    .split(",")
+    .map((v) => v.trim().toLowerCase())
+    .filter(Boolean);
+  if (mode === "production") {
+    if (!databaseCA)
+      throw Error("Production requires the database CA certificate.");
+    if (
+      !pilotEmails.length ||
+      pilotEmails.length > 20 ||
+      pilotEmails.some((email) => !z.email().safeParse(email).success)
+    )
+      throw Error("Production requires 1–20 valid pilot email addresses.");
+    brevoConfig(env);
+  }
   return {
     mode,
+    pilotEmails,
     baseURL: url.origin,
     secret,
     databaseURL,
     databaseCA,
     dataDir: env.SMARTMANU_DATA_DIR ?? ".local",
-    databaseSchema: mode === "staging" ? "smartmanuai" : undefined,
+    databaseSchema: mode !== "local" ? "smartmanuai" : undefined,
   };
 }
