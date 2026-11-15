@@ -60,3 +60,23 @@ describe their fixture-only notification behavior; the pilot banner states this.
 For rollback, set `SMARTMANU_MODE=staging` and redeploy. The original reader
 `DATABASE_URL` remains unchanged; production selects the separate app URL. Do not drop account data or disable
 RLS. An older build also tolerates additive migration 028.
+
+## Verified pilot checkpoint — 15 November 2026
+
+The owner confirmed receipt of the Brevo sign-in email, followed the link and
+signed in. A read-only database check confirmed one verified pilot account and
+one unexpired session. The owner also confirmed access to My space. A follow-up
+check found no saved profile row yet, so profile persistence remains unverified.
+No session tokens, sign-in URLs or credentials were retrieved for these checks.
+
+The deployed database health check returns production mode with database
+connected. The owner-confirmed session pooler is
+`aws-0-eu-west-1.pooler.supabase.com`; the application uses its dedicated backend
+role and private schema. Brevo IP authorization was required during testing.
+One recipient retry was restored after unsuccessful setup attempts; the shared
+daily cap remained unchanged. This exception did not disable quota enforcement.
+
+This verifies the sign-in pilot only. Automated scholarship emails, Telegram
+binding, production delivery callbacks, discovery and scheduled execution remain
+open. Next, the owner can create the Telegram bot through official BotFather;
+the bot token must be stored as a server-side secret, never in this document.
