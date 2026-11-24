@@ -20,6 +20,11 @@ export async function GET(request: Request) {
   });
 }
 export async function PATCH(request: Request) {
+  if (localConfig().mode === "production")
+    return Response.json(
+      { error: "Use the live email settings on Alerts." },
+      { status: 409 },
+    );
   if (request.headers.get("origin") !== localConfig().baseURL)
     return Response.json({ error: "invalid_origin" }, { status: 403 });
   const session = await (

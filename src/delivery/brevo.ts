@@ -71,6 +71,9 @@ export function buildBrevoRequest(
     const value = message.headers?.[name];
     if (value && !/[\r\n]/.test(value)) headers[name] = value;
   }
+  const correlation = message.headers?.["X-Mailin-custom"];
+  if (correlation && /^smartmanuai-alert:[a-f0-9-]{36}$/.test(correlation))
+    headers["X-Mailin-custom"] = correlation;
   return {
     url: ENDPOINT,
     headers: {

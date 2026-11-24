@@ -1,3 +1,7 @@
+import { localConfig } from "@/src/config";
+import { liveEmailConfig } from "@/src/email/config";
+import { liveEmailSettings } from "@/src/email/settings";
+import LiveEmail from "./live-email";
 import { interfaceLocale } from "@/src/i18n/server";
 import { screenText } from "@/src/i18n/screens";
 import { headers } from "next/headers";
@@ -19,6 +23,29 @@ export default async function Notifications() {
   ).api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
   const { sql } = await getDatabase();
+  if (localConfig().mode === "production") {
+    let config;
+    try {
+      config = liveEmailConfig();
+    } catch {
+      return (
+        <p>
+          {locale === "zh-Hans"
+            ? "邮件提醒正在配置中。"
+            : "Email alerts are being configured."}
+        </p>
+      );
+    }
+    return (
+      <LiveEmail
+        initial={JSON.parse(
+          JSON.stringify(await liveEmailSettings(sql, session.user.id, config)),
+        )}
+        operator={session.user.email.toLowerCase() === config.operator}
+        locale={locale}
+      />
+    );
+  }
   const [settings, history] = await Promise.all([
     readNotificationSettings(sql, session.user.id),
     digestHistory(sql, session.user.id),
