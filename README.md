@@ -30,6 +30,8 @@ sending; staging remains available for rollback. See the [production sign-in pil
 
 ## Email-only alert pilot
 
+- [x] Update the pinned Next.js dependency to 16.4.6 after the build detected published advisories affecting 16.4.3; retain the committed lockfile.
+
 - [x] Separate real Brevo consent from previous local simulation consent.
 - [x] Provide English/Simplified Chinese email controls, daily/weekly timezone settings and private delivery history.
 - [x] Add an operator-only callback-connection action using the existing server-side Brevo key.
