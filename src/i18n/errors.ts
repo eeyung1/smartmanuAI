@@ -1,4 +1,16 @@
 export const errorChinese: Record<string, string> = {
+  "Live email is unavailable.": "真实邮件服务当前不可用。",
+  "Brevo callback setup failed. Check provider permissions and IP authorization.":
+    "Brevo 回调设置失败。请检查服务商权限及 IP 授权。",
+  "Consent to live email is required.": "启用真实邮件需要明确同意。",
+  "Connect Brevo callbacks first.": "请先连接 Brevo 回调。",
+  "Enable live email with fresh consent first.": "请先重新同意并启用真实邮件。",
+  "Daily live email limit reached.": "已达到每日真实邮件发送上限。",
+  "Email outcome needs operator review. Do not retry automatically.":
+    "邮件结果需要管理员核查。请勿自动重试。",
+  "Operator access required.": "需要管理员权限。",
+  "Use the live email settings on Alerts.": "请使用提醒页面中的真实邮件设置。",
+
   "A reviewed intake or event edition cannot be replaced or cleared. Create a separate opportunity for a different edition.":
     "已审核的入学批次或活动届次不能替换或清除。不同届次请创建独立机会记录。",
   "Different intake or event editions cannot be merged. Review both identities first.":

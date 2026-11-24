@@ -10,8 +10,18 @@ import { CatalogueError } from "../catalogue/service";
 export function emailControlsConfig(
   env: Record<string, string | undefined> = process.env,
 ) {
-  const key = env.NOTIFICATION_UNSUBSCRIBE_KEY,
-    secret = env.EMAIL_WEBHOOK_SIGNING_SECRET;
+  const key = env.NOTIFICATION_UNSUBSCRIBE_KEY;
+  if (
+    env.SMARTMANU_MODE === "production" &&
+    /^[a-f0-9]{64}$/i.test(key ?? "") &&
+    /^[a-f0-9]{64}$/i.test(env.BREVO_WEBHOOK_SECRET ?? "")
+  )
+    return {
+      key: Buffer.from(key!, "hex"),
+      webhookKey: Buffer.alloc(0),
+      mode: "production" as "production" | "local",
+    };
+  const secret = env.EMAIL_WEBHOOK_SIGNING_SECRET;
   if (
     env.SMARTMANU_EMAIL_MODE !== "local" ||
     !key?.match(/^[a-f0-9]{64}$/i) ||
@@ -66,6 +76,10 @@ export async function mintUnsubscribeToken(
 }
 async function pauseEmail(sql: SQL, userId: string) {
   await sql.query(
+    "UPDATE live_email_deliveries SET state='suppressed',error_code='paused' WHERE user_id=$1 AND state='pending'",
+    [userId],
+  );
+  await sql.query(
     "UPDATE notification_preferences SET enabled=false,consent_version=NULL,next_due_at=NULL,version=version+1 WHERE user_id=$1 AND channel='email'",
     [userId],
   );
@@ -96,6 +110,15 @@ export async function unsubscribeEmail(
     await tx.query("SELECT id FROM auth_user WHERE id=$1 FOR NO KEY UPDATE", [
       owner.user_id,
     ]);
+    if (
+      (
+        await tx.query(
+          "SELECT 1 FROM account_deletion_requests WHERE user_id=$1 AND state='queued'",
+          [owner.user_id],
+        )
+      ).rows.length
+    )
+      return { unsubscribed: true };
     const pref = (
       await tx.query(
         "SELECT * FROM notification_preferences WHERE user_id=$1 FOR UPDATE",
@@ -146,6 +169,8 @@ export function verifyEmailWebhook(
   config: EmailControls,
   now = new Date(),
 ) {
+  if (config.mode === "production")
+    throw new CatalogueError(401, "Invalid email webhook authentication.");
   const id = headers.get("svix-id") ?? "",
     timestamp = headers.get("svix-timestamp") ?? "",
     signatures = headers.get("svix-signature") ?? "";

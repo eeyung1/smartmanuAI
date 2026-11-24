@@ -72,6 +72,12 @@ export async function accountExport(sql: SQL, userId: string) {
           [userId],
         )
       ).rows,
+      liveEmailDeliveries: (
+        await tx.query(
+          "SELECT id,kind,state,provider_state,error_code,created_at FROM live_email_deliveries WHERE user_id=$1 ORDER BY created_at,id",
+          [userId],
+        )
+      ).rows,
       sessions: (
         await tx.query(
           "SELECT created_at,expires_at FROM auth_session WHERE user_id=$1 ORDER BY created_at",
@@ -118,6 +124,10 @@ export async function requestAccountDeletion(
       ).rows.length
     )
       throw new CatalogueError(409, "Deletion was already requested.");
+    await tx.query(
+      "UPDATE live_email_deliveries SET state=CASE WHEN state='dispatching' THEN 'uncertain' ELSE 'suppressed' END,error_code='deletion_requested' WHERE user_id=$1 AND state IN ('pending','dispatching')",
+      [userId],
+    );
     await tx.query(
       "UPDATE outbox SET state='suppressed' WHERE user_id=$1 AND state='queued'",
       [userId],

@@ -17,6 +17,10 @@ export default async function Layout({
 }) {
   const locale = await interfaceLocale();
   const copy = interfaceCopy(locale);
+  const pilotNotice =
+    process.env.SMARTMANU_EMAIL_ALERTS_ENABLED === "1"
+      ? copy.emailPilotNotice
+      : copy.pilotNotice;
   return (
     <html lang={locale}>
       <body>
@@ -42,7 +46,7 @@ export default async function Layout({
           </p>
         ) : null}
         {localConfig().mode === "production" ? (
-          <p className="locale-notice">{copy.pilotNotice}</p>
+          <p className="locale-notice">{pilotNotice}</p>
         ) : null}
         {locale === "zh-Hans" ? (
           <p className="locale-notice">{copy.partial}</p>
@@ -57,7 +61,7 @@ export default async function Layout({
                 "Staging preview: read-only catalogue. Sign-in and notifications are not enabled.",
               )
             : localConfig().mode === "production"
-              ? copy.pilotNotice
+              ? pilotNotice
               : copy.footer}
         </footer>
       </body>

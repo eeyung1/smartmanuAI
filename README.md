@@ -4,9 +4,9 @@ A multi-user platform for finding smart manufacturing scholarships to study in C
 
 The product uses one shared research pipeline and reviewed catalogue for all users. Private profiles drive deterministic matching; source collection and AI extraction are shared so research costs do not grow as one agent per subscriber.
 
-**Current stage: limited production sign-in pilot; public release is not complete.** The hosted database and invited-address sign-in form are connected. Real-mailbox sign-in and an active hosted session are verified for the pilot account. Local mode retains synthetic `.test` mail, and staging remains available as a read-only rollback. Discovery and scholarship alerts are not live. See the [production sign-in pilot](docs/production-sign-in.md) and [staging setup](docs/vercel-supabase-staging.md).
+**Current stage: limited production email pilot; public release is not complete.** The hosted database and invited-address sign-in form are connected. Real-mailbox sign-in and an active hosted session are verified for the pilot account. Local mode retains synthetic `.test` mail, and staging remains available as a read-only rollback. Discovery and real scholarship-alert acceptance remain unverified. The email-only alert path is implemented and requires callback connection and fresh consent. See the [production sign-in pilot](docs/production-sign-in.md) and [staging setup](docs/vercel-supabase-staging.md).
 
-Feature audit: **9 November 2026**, through [implementation PR #70](https://github.com/eeyung1/smartmanuAI/pull/70). The reviewed catalogue is empty. Production sign-in was added in PR #102; scheduled discovery and live notifications remain release work.
+Feature audit: **9 November 2026**, through [implementation PR #70](https://github.com/eeyung1/smartmanuAI/pull/70). The reviewed catalogue is empty. Production sign-in was added in PR #102; scheduled discovery and real notification acceptance remain release work.
 
 ## Brevo live-integration checkpoint
 
@@ -20,12 +20,34 @@ Feature audit: **9 November 2026**, through [implementation PR #70](https://gith
 - [x] Verify real-mailbox magic-link sign-in and an active hosted session for the invited pilot account.
 - [x] Confirm access to My space with the project owner.
 - [ ] Verify a saved hosted profile row after completing the preferences form.
-- [ ] Connect the persisted consent/suppression/quota worker and Brevo delivery callbacks.
+- [x] Implement the persisted live-email queue, explicit consent, quotas, callback correlation and suppression with mocked-provider integration tests.
+- [ ] Verify callback registration and an owner-requested real delivery test on the deployed Alerts screen.
 - [x] Verify the configured sender can deliver a real sign-in email to the invited pilot mailbox.
 - [ ] Verify a real scholarship-alert flow, including opt-out, in the hosted environment.
 
 See [Brevo integration](docs/brevo-email.md). Credentials alone do not activate
 sending; staging remains available for rollback. See the [production sign-in pilot](docs/production-sign-in.md) for activation and remaining release gates.
+
+## Email-only alert pilot
+
+- [x] Update the pinned Next.js dependency to 16.4.6 after the build detected published advisories affecting 16.4.3; retain the committed lockfile.
+
+- [x] Separate real Brevo consent from previous local simulation consent.
+- [x] Provide English/Simplified Chinese email controls, daily/weekly timezone settings and private delivery history.
+- [x] Add an operator-only callback-connection action using the existing server-side Brevo key.
+- [x] Add explicitly requested test email to the verified signed-in account.
+- [x] Plan reviewed non-synthetic opportunity digests, recheck 24-hour freshness and deduplicate material facts.
+- [x] Fence duplicate sends persistently and retain uncertain outcomes without automatic retries.
+- [x] Enforce recipient/global daily quotas and a bounded daily Vercel job.
+- [x] Authenticate/deduplicate callbacks and apply sticky bounce/complaint suppression.
+- [x] Include signed unsubscribe links; preserve callback/opt-out controls when sending is switched off.
+- [x] Include delivery metadata in account export and cancel/purge deliveries with account deletion.
+- [ ] Verify hosted callback setup, a real test email and delivered receipt.
+- [ ] Verify a saved hosted matching profile and real reviewed opportunity digest.
+- [ ] Verify live unsubscribe, bounce suppression and scheduled execution end to end.
+- [ ] Enable live source discovery and finish public-release gates.
+
+Telegram is deferred for the current pilot. See [live email setup and operational limits](docs/live-email-alerts.md). Code/fixture checks above do not imply live acceptance; the hosted catalogue remains empty at this checkpoint.
 
 ## How to read this checklist
 
